@@ -1,0 +1,232 @@
+/* ============================================================================
+   工具学校 · 设计令牌
+   风格取自 Agents Anywhere 设计系统拆解：纯黑画布、发丝线、极低彩度、
+   排版驱动；颜色只存在于内容里，界面本身只有黑白灰。
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* 画布与表面（官网 #000 / 产品 #0a0a0a / 卡片 #101010 #171717） */
+  --bg: #000000;
+  --bg-app: #0a0a0a;
+  --surface: #101010;
+  --surface-2: #171717;
+  --surface-3: #191919;
+  --surface-hover: #252525;
+
+  /* 文字 */
+  --text: #ffffff;
+  --text-strong: #fafafa;
+  --text-body: #e4e4e4;
+  --text-2: #b5b5b5;
+  --muted: #929292;
+  --dim: #6b6b6b;
+  --faint: #4a4a4a;
+
+  /* 线与边界：全站统一 1px 发丝线 */
+  --border: #303030;
+  --border-soft: #1f1f1f;
+  --hairline: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #737373;
+
+  /* 语义（唯一允许的彩色，只用于真正的错误提示文字） */
+  --danger: #ff6568;
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  /* 字体 */
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-body: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "SFMono-Regular", ui-monospace, "Cascadia Code", "JetBrains Mono",
+    Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 间距（4 的倍数） */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-section: 120px;
+
+  /* 版心 */
+  --page-w: 1200px;
+  --page-gutter: clamp(20px, 5vw, 72px);
+  --content-w: 780px;
+  --sidebar-w: 268px;
+  --topbar-h: 64px;
+
+  /* 动效 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.5, 0, 1, 1);
+  --dur-fast: 0.16s;
+  --dur-normal: 0.28s;
+  --dur-enter: 0.8s;
+}
+
+/* ---------------------------------------------------------------- 基础重置 */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, h5 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; }
+li { list-style: none; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input, textarea { font: inherit; color: inherit; }
+img { max-width: 100%; display: block; }
+code, pre, kbd { font-family: var(--font-mono); }
+::selection { background: #ffffff; color: #000000; }
+:focus-visible { outline: 3px solid #ffffff; outline-offset: 2px; border-radius: 4px; }
+
+/* 滚动条：细、暗、不抢戏 */
+* { scrollbar-width: thin; scrollbar-color: #333 transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2c2c2c; border-radius: 99px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: #3d3d3d; }
+
+/* ---------------------------------------------------------------- 排版刻度 */
+.display {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7vw, 5.75rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+}
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.6vw, 3rem);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.045em;
+}
+.h3 { font-size: 1.375rem; letter-spacing: -0.02em; }
+.h4 { font-size: 1.0625rem; letter-spacing: -0.01em; }
+.lede {
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--text-2);
+  letter-spacing: -0.01em;
+}
+.meta {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+.dim { color: var(--dim); }
+.silver {
+  background: linear-gradient(110deg, #686872 8%, #c5c5ce 32%, #777783 56%, #686872 80%);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: silver-flow 4.5s var(--ease-in-out, cubic-bezier(0.65, 0, 0.35, 1)) infinite alternate;
+}
+@keyframes silver-flow {
+  from { background-position: 0% 0; }
+  to { background-position: 100% 0; }
+}
+
+/* ---------------------------------------------------------------- 布局工具 */
+.container {
+  width: 100%;
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: 0 var(--page-gutter);
+}
+.section {
+  padding: var(--space-section) 0;
+  border-top: 1px solid var(--border);
+}
+.section--flush { border-top: 0; }
+.section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+  flex-wrap: wrap;
+}
+.section__head .meta { display: block; margin-bottom: 14px; }
+.section__head p { color: var(--muted); max-width: 52ch; margin-top: 12px; font-size: 15px; }
+.section__link {
+  font-size: 13px;
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+.section__link:hover { color: #fff; border-color: #fff; }
+.stack > * + * { margin-top: var(--space-4); }
+
+/* 入场动画 */
+@keyframes enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.enter { animation: enter var(--dur-enter) var(--ease-out) both; }
+.enter-1 { animation-delay: 0.06s; }
+.enter-2 { animation-delay: 0.12s; }
+.enter-3 { animation-delay: 0.18s; }
+
+.skip-link {
+  position: fixed;
+  top: -80px;
+  left: 16px;
+  z-index: 200;
+  background: #fff;
+  color: #000;
+  padding: 10px 18px;
+  border-radius: 0 0 12px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: top var(--dur-fast);
+}
+.skip-link:focus { top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}

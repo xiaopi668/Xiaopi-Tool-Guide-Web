@@ -1,0 +1,1301 @@
+window.PS = window.PS || {};
+window.PS.lessons = window.PS.lessons || [];
+window.PS.lessons.push(
+  {
+    id: 'git-mental-model',
+    order: 7,
+    track: 'git',
+    title: 'Git 到底在管什么',
+    subtitle: '提交是快照不是差异，三个区域决定改动去了哪里',
+    minutes: 12,
+    level: '入门',
+    goal: [
+      '说清工作区、暂存区、本地仓库的差别',
+      '理解提交是完整快照而不是差异',
+      '知道 HEAD 和分支指针各自在指什么',
+      '能用一条命令看清项目当前状态'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '先看一个所有人都干过的事',
+        html: '<p>交稿前一天，你的桌面大概是这样的：<code>论文.docx</code>、<code>论文-最终版.docx</code>、<code>论文-最终版2.docx</code>、<code>论文-最终版-真的最后一版.docx</code>。</p><p>这不是懒。你只是需要回答三个问题：<strong>上周三那版和现在差在哪、哪一版是老师看过的、不满意能不能退回去</strong>。文件名回答不了。它只记录一个时间点，顺序全得靠你脑子里记着。</p><p>版本控制（version control）就是把这三个问题变成一条可查询的历史。Git 是目前最常用的实现。</p>'
+      },
+      {
+        type: 'compare',
+        title: '复制文件夹 vs 版本控制',
+        left: {
+          label: '复制文件夹的做法',
+          items: [
+            '论文-最终版.docx、论文-最终版2.docx 越堆越多',
+            '靠文件名和修改时间猜哪份最新',
+            '想知道改了什么，只能把两份并排肉眼比对',
+            '两个人同时改，只能微信传来传去',
+            '手滑删掉文件夹，历史当场清零'
+          ]
+        },
+        right: {
+          label: '用 Git 的做法',
+          items: [
+            '只有一个 论文.docx，改完存盘',
+            '每次改动是一条提交，带作者、时间、说明',
+            'git diff 随时算出两份快照的差别',
+            '两个人各改一个分支，最后合并',
+            '远程仓库还留着一份完整历史'
+          ]
+        },
+        note: '文件名记录的是时间点，提交记录的是因果关系：谁在什么基础上改了什么、为什么改。'
+      },
+      {
+        type: 'text',
+        title: '提交是快照，不是差异',
+        html: '<p>很多人以为 Git 存的是每次改动的补丁。不是。每条提交（commit）记录的是<strong>整个项目在那一刻的完整样子</strong>：有哪些文件、每个文件什么内容、目录怎么排。</p><p>你看到的 diff 是现算的：Git 拿出两个快照一比，把不一样的行标出来。所以你能直达任何一个提交，因为那个提交本身是完整的，不需要从头重放补丁。</p><p>快照也不等于把磁盘复制一遍。Git 按内容算哈希（hash），内容相同的文件只存一份。一个 200MB 的仓库塞一万条提交，通常也不会变成 200GB。</p>'
+      },
+      {
+        type: 'table',
+        title: '三个区域，三条命令',
+        head: ['区域', '里面放什么', '谁把东西放进去', 'git status 里的说法'],
+        rows: [
+          ['工作区（working directory）', '你在编辑器里打开、正在改的文件', '你自己按保存', 'Changes not staged for commit'],
+          ['暂存区（staging area）', '下一次提交要包含的那些改动', 'git add', 'Changes to be committed'],
+          ['本地仓库（repository）', '.git 目录里的提交历史', 'git commit', 'nothing to commit, working tree clean']
+        ]
+      },
+      {
+        type: 'terminal',
+        title: '一条命令看清三个区域',
+        command: 'git status',
+        output: 'On branch main\nChanges to be committed:\n  (use "git restore --staged <file>..." to unstage)\n\tmodified:   article.md\n\nChanges not staged for commit:\n  (use "git add <file>..." to update what will be committed)\n\tmodified:   config.json\n\nUntracked files:\n  (use "git add <file>..." to include in what will be committed)\n\tnotes.txt',
+        note: '三段分别对应暂存区、工作区、以及还没被 Git 管起来的新文件。输出里括号中的提示语，就是 Git 在告诉你下一步该敲哪条命令。'
+      },
+      {
+        type: 'text',
+        title: 'HEAD 和分支只是指针',
+        html: '<p>HEAD 是<strong>你现在站在哪</strong>的记号。正常状态下它指向一个分支名，分支名再指向某条提交。你在哪个分支上提交，HEAD 就带着那个分支一起往前挪一格。</p><p>分支（branch）本身轻得离谱：它就是一个存着提交哈希的文本文件，通常 41 个字节。<code>git switch -c feature/login</code> 不会复制你的代码，只是多写了一个指针。</p><p>提交则相反，它是内容寻址（content-addressable）的：哈希由内容算出来，改一个字符哈希就变。所以历史只能往后追加。所谓改历史，其实是造一批新提交，再让分支指过去。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '历史长什么样',
+        command: 'git log --oneline --decorate --graph --all',
+        output: '* 4d8e2f1 (HEAD -> main) docs: 补充第二节的例子\n* 2b7d9e4 feat: 增加草稿自动保存\n| * 9a1c3f7 (origin/feature/search) feat(search): 支持按标签过滤\n|/\n* 8c1d0a7 chore: 初始化项目',
+        note: 'HEAD -> main 说明你现在在 main 上。每行开头一个星号就是一条提交，竖线表示分支的分叉与合流，all 表示连远程分支和别的分支一起画出来。'
+      },
+      {
+        type: 'terminal',
+        title: '提交里到底存了什么',
+        command: 'git cat-file -p HEAD',
+        output: 'tree 8f3c1a0d9e2b4c5a6f7d8e9a0b1c2d3e4f5a6b7c\nparent 2b7d9e4a1c3f5d7e9b0a2c4e6f8d1b3a5c7e9f0d\nauthor Lin <lin@example.com> 1730451600 +0800\ncommitter Lin <lin@example.com> 1730451600 +0800\n\ndocs: 补充第二节的例子',
+        note: '一条提交里存的是指向整棵目录树的 tree 哈希、父提交的哈希、作者与时间、说明文字，没有一行 diff。这就是快照的实物样子。'
+      },
+      {
+        type: 'tip',
+        title: '不可变历史带来的两个好处',
+        html: '<p>第一，<strong>破坏会被发现</strong>：如果有人悄悄改了旧提交，哈希对不上，<code>git fsck</code> 会报错。第二，<strong>回退永远可靠</strong>：每个提交都完整，回到三个月前不需要重放任何东西。</p><p>代价是你没法真正改掉一条已推送的提交。<code>git commit --amend</code>、<code>git rebase</code> 都是造新提交，旧的那条还在 reflog 里躺着，第 13 课讲怎么靠它救命。</p>'
+      },
+      {
+        type: 'warn',
+        title: '别把 .git 当成可有可无的隐藏文件夹',
+        html: '<p>删掉 <code>.git</code>，你手里的文件还是最新的，但<strong>全部历史当场消失</strong>：分支、提交、作者、说明、reflog 一起没，回收站也救不回来。</p><p>另一个误解是把 Git 当网盘。本地仓库只在本机，硬盘坏了就全没了，备份来自远程仓库（remote），第 8 课配地址，第 11 课细讲推送。</p><p>还有个会毁掉别人工作的操作：对整个仓库跑 <code>git clean -xfd</code>，它会连 .gitignore 里忽略的本地配置文件一起删。</p>'
+      },
+      {
+        type: 'steps',
+        title: '一次改动要穿过三个区域',
+        items: [
+          {
+            title: '改文件',
+            html: '<p>在编辑器里改完保存。此时只有工作区变了，<code>git status</code> 里显示的是红字 modified，暂存区还是旧内容。</p>'
+          },
+          {
+            title: 'git add 挑出这次要提交的部分',
+            html: '<p>把文件从工作区放进暂存区。这一步真正的价值是<strong>让你先挑</strong>：改了两个功能，可以只提交其中一个。</p>'
+          },
+          {
+            title: 'git commit 写进历史',
+            html: '<p>暂存区的内容被打包成一条快照，HEAD 和当前分支一起往前挪一格，工作区不受影响。</p>'
+          },
+          {
+            title: 'git push 送到远程',
+            html: '<p>本地仓库有了，别人还看不到。推送之后远程仓库才有这条提交，同事才拉得到。</p>'
+          }
+        ]
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '建一个空仓库，制造一次「改了但没暂存」和一次「暂存了没提交」，用 status 分别看清它们停在哪一层。',
+      items: [
+        { text: '新建目录并初始化仓库', cmd: 'mkdir git-lab && cd git-lab && git init' },
+        { text: '写一个文件，看看 status 怎么描述未跟踪文件', cmd: 'echo hello > notes.txt && git status' },
+        { text: '暂存它，再跑一次 status，对比两段输出的标题差异', cmd: 'git add notes.txt && git status' },
+        { text: '提交，然后查看这条提交的 tree 与父提交', cmd: 'git commit -m "docs: 第一条提交" && git cat-file -p HEAD' }
+      ],
+      done: '你能指着 status 的三段输出，说出每段对应哪个区域，这一课就通了。'
+    },
+    quiz: [
+      {
+        q: 'git diff 显示的差异是怎么来的？',
+        options: [
+          'Git 保存了每次改动的一行行补丁，diff 就是把补丁读出来',
+          'Git 保存完整快照，diff 是拿两个快照现场比较算出来的',
+          'Git 向远程服务器请求两版文件再比对',
+          'Git 记录了文件的修改时间，按时间推算改了什么'
+        ],
+        answer: 1,
+        explain: '提交存的是整棵目录树的快照，diff 只是展示层的计算结果。所以任意两个提交都能比，不依赖中间有没有记录过补丁。'
+      },
+      {
+        q: '你改完一个文件，执行 git commit 后提示 nothing to commit。最可能的原因是什么？',
+        options: [
+          '文件被 .gitignore 忽略了，需要先 git add -f',
+          '改动没有 git add，还停在工作区，没进暂存区',
+          'Git 仓库损坏，需要重新 git init',
+          '当前分支是 main，main 上不允许提交'
+        ],
+        answer: 1,
+        explain: 'commit 只把暂存区里的内容打包成提交。工作区的改动没有 add 就不会被带走，status 里会以红字 modified 单独列出来，等你自己处理。'
+      },
+      {
+        q: 'git switch -c feature/login 这条命令在磁盘上做了什么？',
+        options: [
+          '把你的代码完整复制一份到新目录',
+          '新增一个指向当前提交的指针文件，并把 HEAD 切过去',
+          '在远程仓库创建同名分支并立即推送',
+          '为分支单独建一个 .git 目录，历史从零开始'
+        ],
+        answer: 1,
+        explain: '分支就是一个记录提交哈希的小文件，创建成本接近零。代码目录不动，变的只是 HEAD 指向哪个分支名。'
+      }
+    ]
+  },
+  {
+    id: 'git-setup',
+    order: 8,
+    track: 'git',
+    title: '安装与第一次配置',
+    subtitle: '四条命令把 Git 配成能干活的工具',
+    minutes: 12,
+    level: '入门',
+    goal: [
+      '确认本机装好了 Git 且版本够新',
+      '配好用户名邮箱，让提交有署名',
+      '能在新目录里 init 或 clone 仓库',
+      '把 SSH 公钥加到 GitHub 并验证'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '先确认你装的是哪个 Git',
+        html: '<p>macOS 自带一个 Git，但它可能来自 Command Line Tools，版本偏旧；Windows 需要自己装 Git for Windows，官网是 git-scm.com，安装时记得勾选 Git Bash。</p><p>版本决定你能用哪些命令：<code>git switch</code> 和 <code>git restore</code> 需要 2.23 以上，配置项 <code>init.defaultBranch</code> 需要 2.28 以上。低于 2.23 只能继续用 <code>git checkout</code>。</p><p>装完先开一个新终端窗口，旧窗口里的 PATH 不会自动更新。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '第一条命令',
+        command: 'git --version',
+        output: 'git version 2.43.0',
+        note: '看到版本号就说明装好了。如果提示 command not found（Windows 上是「不是内部或外部命令」），说明没装或没进 PATH，重装并在向导里选择把 Git 加入 PATH。'
+      },
+      {
+        type: 'text',
+        title: '两条配置决定提交算谁的',
+        html: '<p>Git 要在每条提交上写作者名字和邮箱。不配的话第一次 <code>git commit</code> 会直接拒绝，报 <code>Author identity unknown</code>，下面跟着一串提示让你去配 user.email 和 user.name。</p><p>邮箱尤其重要：GitHub 靠它把提交算到你账号头上。写错了照样能提交，只是网页上不显示你的头像，也不进贡献图。</p><p>加 <code>--global</code> 会写进用户目录的 <code>~/.gitconfig</code>，对这台机器所有仓库生效。公司项目要求用公司邮箱时，进那个仓库不带 --global 再跑一次，覆盖全局值。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '三条命令，一次配好',
+        command: 'git config --global user.name "Lin" && git config --global user.email "lin@example.com" && git config --global init.defaultBranch main',
+        note: '没有输出就是成功，Git 的配置命令默认很安静。第三条让以后 git init 出来的分支直接叫 main，不用再 git branch -m。名字和邮箱换成你自己的，别抄这一行。'
+      },
+      {
+        type: 'terminal',
+        title: '看清楚每个值是谁给的',
+        command: 'git config --list --show-origin',
+        output: 'file:/home/lin/.gitconfig\tuser.name=Lin\nfile:/home/lin/.gitconfig\tuser.email=lin@example.com\nfile:/home/lin/.gitconfig\tinit.defaultbranch=main\nfile:/home/lin/blog/.git/config\tcore.repositoryformatversion=0\nfile:/home/lin/blog/.git/config\tremote.origin.url=git@github.com:lin/blog.git',
+        note: '每行前面的 file: 告诉你这个值来自哪个文件。~/.gitconfig 是全局的，仓库里的 .git/config 只对这个项目生效，同名的写在后面的覆盖前面的。'
+      },
+      {
+        type: 'table',
+        title: '值得一次配好的六项',
+        head: ['配置项', '常用值', '作用'],
+        rows: [
+          ['user.name', 'Lin', '提交记录里显示的作者名'],
+          ['user.email', 'lin@example.com', 'GitHub 靠它把提交归到你账号'],
+          ['init.defaultBranch', 'main', 'git init 时的默认分支名'],
+          ['core.editor', 'code --wait', '写提交信息时打开哪个编辑器'],
+          ['core.autocrlf', 'Windows 填 true，macOS 填 input', '统一换行符，避免整文件显示成改动'],
+          ['pull.rebase', 'true', 'pull 时默认 rebase，少产生合并提交']
+        ]
+      },
+      {
+        type: 'warn',
+        title: '名字邮箱写错的两种后果',
+        html: '<p>一是用公司邮箱提交了个人项目，二是邮箱差一个字母，GitHub 上贡献图一片空白。已经写进历史的记录不会因为改配置而变。</p><p>只改最近一条提交，用 <code>git commit --amend --reset-author</code>；批量改历史要用 <code>git filter-repo</code>，那是重写哈希的操作，团队分支上必须先打招呼。</p><p>提交前别猜当前值：<code>git config user.email</code> 只输出这一项，<code>git config --show-origin user.email</code> 还会告诉你它来自哪个文件。</p>'
+      },
+      {
+        type: 'text',
+        title: 'init 与 clone：两个入口',
+        html: '<p><code>git init</code> 在<strong>已有目录</strong>里建一个 <code>.git</code> 文件夹，把现有文件变成可跟踪状态。它不改动任何文件内容，只多一个目录。</p><p><code>git clone</code> 从远程地址复制整个仓库到本地新目录：全部历史、默认分支、一个叫 origin 的远程地址，还会自动把本地 main 设成跟踪 origin/main。</p><p>顺序别搞反：先 clone 再改代码。先下载 zip 再 init 会得到一个没有历史的新仓库，以后 pull 会报 unrelated histories，很难收拾。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '克隆一个仓库',
+        command: 'git clone git@github.com:lin/blog.git',
+        output: "Cloning into 'blog'...\nremote: Enumerating objects: 128, done.\nremote: Counting objects: 100% (128/128), done.\nremote: Compressing objects: 100% (96/96), done.\nReceiving objects: 100% (128/128), 42.10 KiB | 1.20 MiB/s, done.\nResolving deltas: 100% (60/60), done.",
+        note: '没报错就是成功，当前目录下会多出 blog 文件夹。想换本地目录名，在地址后面加一个名字，例如 git clone 地址 my-blog。'
+      },
+      {
+        type: 'code',
+        title: '先把 .gitignore 写好，再开始提交',
+        lang: 'text',
+        text: `node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+.idea/
+.vscode/`,
+        note: 'node_modules 和 dist 随时能重新生成，提进去只会让仓库膨胀。.env 里是密钥，推上去等于公开。叹号开头的行是例外，用来放行 .env.example 这种模板文件。'
+      },
+      {
+        type: 'steps',
+        title: '把 SSH 公钥加到 GitHub',
+        items: [
+          {
+            title: '生成一对密钥',
+            html: '<p>跑 <code>ssh-keygen -t ed25519 -C "lin@example.com"</code>。它先问保存路径，直接回车用默认的 <code>~/.ssh/id_ed25519</code>；再问两遍密码短语（passphrase），可以留空直接回车，也可以设一个更安全的。</p><p>-t ed25519 指定算法，比老 RSA 更短更快；-C 后面的注释只是方便你以后认出这把钥匙属于哪台机器。</p>'
+          },
+          {
+            title: '复制公钥内容',
+            html: '<p>macOS 用 <code>cat ~/.ssh/id_ed25519.pub</code>，要的就是带 .pub 的那一行。Windows 在 PowerShell 里跑 <code>type $env:USERPROFILE\\.ssh\\id_ed25519.pub</code>，或者在 Git Bash 里用 cat。</p><p>带 .pub 的是公钥，可以随便给人；不带 .pub 的是私钥，一个字都别往外发。</p>'
+          },
+          {
+            title: '粘到 GitHub',
+            html: '<p>打开 GitHub，右上角头像 → Settings → 左侧 SSH and GPG keys → New SSH key。Title 写这台机器，比如 macbook-2024；Key 粘贴刚才那一整行，保存。</p>'
+          },
+          {
+            title: '验证连接',
+            html: '<p>跑 <code>ssh -T git@github.com</code>。第一次连接会问是否信任 github.com 的指纹，输 yes。看到 Hi 加你的用户名就通了。</p>'
+          }
+        ]
+      },
+      {
+        type: 'terminal',
+        title: '验证结果长这样',
+        command: 'ssh -T git@github.com',
+        output: 'Hi lin! You have successfully authenticated, but GitHub does not provide shell access.',
+        note: '后半句是说 GitHub 不提供 shell，属正常现象。如果看到 Permission denied (publickey)，先用 ssh -vT git@github.com 看客户端拿了哪把钥匙，再回 GitHub 确认公钥粘贴完整、没有漏掉结尾的注释。'
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '检查版本、配好身份、新建一个仓库并写 .gitignore，最后用一个本地测试连接验证 SSH 是否通。',
+      items: [
+        { text: '确认版本在 2.23 以上', cmd: 'git --version' },
+        { text: '设置名字与邮箱，再用 --show-origin 看清来源', cmd: 'git config --global user.name "你的名字" && git config --global user.email "you@example.com" && git config --show-origin user.email' },
+        { text: '新建仓库并把 .gitignore 一起提交', cmd: 'mkdir setup-lab && cd setup-lab && git init && printf "node_modules/\\n.env\\n" > .gitignore && git add . && git commit -m "chore: 初始化项目"' },
+        { text: '测试 GitHub 连接，看到 Hi 加用户名即成功', cmd: 'ssh -T git@github.com' }
+      ],
+      done: 'git config --show-origin 能指出邮箱来自哪个文件，且 ssh 测试返回 Hi 加你的名字。'
+    },
+    quiz: [
+      {
+        q: 'git config --global user.email 和 git config user.email 的区别是什么？',
+        options: [
+          '前者写入 ~/.gitconfig 对所有仓库生效，后者只写当前仓库的 .git/config',
+          '前者需要管理员权限，后者普通权限即可',
+          '前者只影响 push，后者只影响 commit',
+          '两者作用完全相同，只是写法长短不同'
+        ],
+        answer: 0,
+        explain: 'global 会写进用户目录的 .gitconfig，对这台机器上所有仓库生效；不带 global 则只写当前仓库的 .git/config，并且优先级更高，能覆盖全局值。'
+      },
+      {
+        q: '你只下载了项目 zip 解压后 git init，之后 pull 报 unrelated histories 的原因是什么？',
+        options: [
+          'Git 版本太旧，不支持远程仓库',
+          'zip 里没有 .git 历史，这个仓库与远程没有任何共同祖先',
+          '远程仓库设置了私有权限',
+          '缺少 .gitignore 导致 Git 无法识别项目类型'
+        ],
+        answer: 1,
+        explain: 'merge 需要共同祖先来判断改动。新初始化的仓库与远程是完全独立的两段历史，只能靠 clone 或允许无关历史合并。'
+      },
+      {
+        q: 'ssh-keygen -t ed25519 -C 里的 -C 是在做什么？',
+        options: [
+          '指定加密强度，数值越大越安全',
+          '给公钥末尾加一段注释，方便识别这把钥匙属于谁或哪台机器',
+          '指定私钥的保存路径',
+          '强制覆盖已经存在的密钥文件'
+        ],
+        answer: 1,
+        explain: '注释只是附在公钥末尾的可读文本，参与不了任何加密运算。真正决定算法和强度的是 -t 以及可选的 -b。'
+      }
+    ]
+  },
+  {
+    id: 'git-daily',
+    order: 9,
+    track: 'git',
+    title: '日常三件套：status / add / commit / log',
+    subtitle: '每天重复几十次的四条命令，把每一步看清',
+    minutes: 15,
+    level: '基础',
+    goal: [
+      '用 status 和 diff 判断改动停在哪一层',
+      '说清 git add 文件与 git add . 的边界',
+      '写出别人看得懂的提交信息',
+      '用 log 的图形模式读懂分支历史'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '开工第一条命令永远是 status',
+        html: '<p>不知道现在什么状态时，第一条命令永远是 <code>git status</code>。它不改任何东西，只回答三件事：你在哪个分支、哪些改动已经进了暂存区、哪些还留在工作区。</p><p>输出很长但结构固定：上面 Changes to be committed 是暂存区，下面 Changes not staged 是工作区，最后 Untracked files 是还没被 Git 管的新文件。看不懂英文也没关系，括号里 use git add... 那句就是它建议你敲的命令。</p><p>想看得紧凑，加 <code>-s</code>（short）和 <code>-b</code>（branch）。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '缩短版状态',
+        command: 'git status -sb',
+        output: '## main...origin/main [ahead 2]\n M article.md\nM  src/app.js\nA  postcss.config.js\n D old-notes.md\n?? notes.txt',
+        note: '第一行是分支与跟踪关系：本地 main 比 origin/main 多两条提交。两个字符位最关键，左列是暂存区，右列是工作区。同样是 M，在左列表示已暂存，在右列表示只改了没加。'
+      },
+      {
+        type: 'table',
+        title: '短标记怎么读',
+        head: ['标记', '出现在哪一列', '含义', '下一步'],
+        rows: [
+          ['M', '右列', '文件改过，还没进暂存区', 'git add 文件名'],
+          ['M', '左列', '改动已暂存，等提交', 'git commit'],
+          ['A', '左列', '新文件已加入暂存区', 'git commit'],
+          ['D', '任一列', '文件被删除，在左列表示删除已暂存', 'git add 或 git restore'],
+          ['??', '两列', '未跟踪的新文件', 'git add 文件名'],
+          ['!!', '两列', '被 .gitignore 忽略，一般不显示', '不用管']
+        ]
+      },
+      {
+        type: 'text',
+        title: 'add 到哪一步算够',
+        html: '<p><code>git add 文件名</code> 只处理你点名的那个文件；<code>git add .</code> 处理当前目录下的所有变化，包括新文件、修改和删除。</p><p>风险很具体：<code>git add .</code> 会把 <code>.env</code>、<code>node_modules</code>、编译产物、你顺手拷进来的导出文件一起推进去。加错了还能救，<code>git restore --staged 文件名</code> 把它撤下，文件内容一个字不丢。</p><p>不想整块提交时用 <code>git add -p</code>：它把改动切成小段逐段问 y/n，只把这一段放进暂存区，很适合「一次改了两个功能，只想提交其中一个」。</p>'
+      },
+      {
+        type: 'code',
+        title: 'add 的五种写法',
+        lang: 'bash',
+        text: `git add article.md                 # 只加一个文件
+git add src/                       # 加整个目录下的变化
+git add .                          # 当前目录下全部变化，含新文件、修改、删除
+git add -u                         # 只处理已跟踪文件的修改和删除，不含新文件
+git add -p src/app.js              # 分块挑选，逐段确认 y / n / s
+git restore --staged article.md    # 加错了撤下来，文件内容不变`,
+        note: 'add 只动暂存区，磁盘上的文件不会变。所以 add 本身不危险，危险的是 add 之后又 commit 又 push。'
+      },
+      {
+        type: 'text',
+        title: 'diff 的两个方向',
+        html: '<p><code>git diff</code> 比的是<strong>工作区 vs 暂存区</strong>，也就是你还没打算提交的改动。<code>git diff --staged</code> 比的是<strong>暂存区 vs 最后一次提交</strong>，也就是这次提交真正要带走的东西。</p><p>养成一个习惯：commit 之前先跑 <code>git diff --staged</code>。输出为空说明暂存区是空的，commit 会直接失败；看到不该出现的行，立刻用 restore --staged 撤下。</p><p>review 别人的分支用 <code>git diff main...feature</code>，三个点表示从两条分支的分叉点开始比。</p>'
+      },
+      {
+        type: 'terminal',
+        title: 'diff 输出怎么读',
+        command: 'git diff',
+        output: 'diff --git a/article.md b/article.md\nindex 3f9a1c2..8c1d0a7 100644\n--- a/article.md\n+++ b/article.md\n@@ -12,6 +12,8 @@\n \n ## 第二节\n \n-旧的一行\n+新的一行\n+再加一行',
+        note: '减号是被删掉的行，加号是新增的行，@@ 那行说明从第 12 行开始取 6 行上下文。这一份是工作区相对暂存区的差别，如果不 add，提交时带不走。'
+      },
+      {
+        type: 'text',
+        title: 'commit 信息写三件事',
+        html: '<p><code>git commit -m "说明"</code> 把暂存区打包成一条提交。第一行控制在 50 个字符以内，写<strong>做了什么</strong>，不要写「更新」「修改」「改一下」这类空话。</p><p>一次提交只做一件事。把「加登录页」和「修页脚错位」塞进同一条提交，以后想单独回滚其中一个就做不到了。</p><p>还有个细节：-m 后面的引号用英文引号。中文引号会被当成普通字符写进提交信息，在 git log 里很刺眼。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '提交成功的样子',
+        command: 'git commit -m "docs: 补充第二节的例子"',
+        output: '[main 4d8e2f1] docs: 补充第二节的例子\n 1 file changed, 2 insertions(+), 1 deletion(-)',
+        note: '方括号里是分支名和这条提交的短哈希，第二行统计改了几个文件、加了几行、删了几行。短哈希留着，回滚和查看都要用。'
+      },
+      {
+        type: 'warn',
+        title: '不带 -m 会掉进 Vim',
+        html: '<p>忘了 -m，Git 会打开默认编辑器。如果默认是 Vim，你会看到底部一行 <code>~</code>，按键全是响铃或乱跳——那是普通模式，不是卡死。</p><p>退出方法：按 <code>i</code> 进入编辑，写完说明按 <code>Esc</code>，输入 <code>:wq</code> 回车保存退出；不想提交就输入 <code>:q!</code> 回车放弃。直接关窗口会留下 .git/COMMIT_EDITMSG 和锁文件，下次 commit 报 index.lock 存在。</p><p>想换成熟悉的编辑器：<code>git config --global core.editor "code --wait"</code>（VS Code），或把值改成 <code>nano</code>。</p>'
+      },
+      {
+        type: 'compare',
+        title: '一次巨型提交 vs 小步提交',
+        left: {
+          label: '一次巨型提交',
+          items: [
+            '一条提交改了 14 个文件、900 多行',
+            '提交信息写的是 update',
+            '线上出问题，不知道是哪一行引起的',
+            '想回滚只能整条退，把别的功能一起退掉',
+            'review 的人看到一半就放弃，等于没 review'
+          ]
+        },
+        right: {
+          label: '小步提交',
+          items: [
+            '一条提交只做一件事，标题一句话讲得清',
+            'git blame 一眼定位是谁哪次改的',
+            'git revert 只退那一条，其他功能不受影响',
+            'review 十分钟看完，敢认真提意见',
+            'git bisect 几次就能找到引入问题的提交'
+          ]
+        },
+        note: '判断标准很土但好用：这条提交能不能用一句话说清。说不清，就说明它做了太多事。'
+      },
+      {
+        type: 'terminal',
+        title: '读历史的四个开关',
+        command: 'git log --oneline --graph --all',
+        output: '* 7b2e9d4 (HEAD -> main) fix: 修复移动端标题换行\n* 4d8e2f1 docs: 补充第二节的例子\n* 2b7d9e4 feat: 增加草稿自动保存\n* 8c1d0a7 chore: 初始化项目',
+        note: '--oneline 一行一条，--graph 画出分叉与合流，--all 连远程分支一起看。再加 --author=名字 只看某人，git show 短哈希 看某次提交具体改了什么。'
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '在一个练习仓库里改两个文件，只暂存其中一个并提交，再从 diff 和 log 里确认自己只提交了想要的那部分。',
+      items: [
+        { text: '新建仓库，写两个文件并提交一次作为起点', cmd: 'mkdir daily-lab && cd daily-lab && git init && echo A > a.txt && echo B > b.txt && git add . && git commit -m "chore: 初始化两个文件"' },
+        { text: '两个文件都改，然后只暂存 a.txt，用 -sb 看两列的区别', cmd: 'echo A2 >> a.txt && echo B2 >> b.txt && git add a.txt && git status -sb' },
+        { text: '对比工作区与暂存区，确认 b.txt 的改动没被带走', cmd: 'git diff && git diff --staged' },
+        { text: '提交并读一遍图形化历史', cmd: 'git commit -m "feat: 给 a.txt 追加一行" && git log --oneline --graph --all' }
+      ],
+      done: 'status -sb 里 a.txt 的 M 在左列、b.txt 的 M 在右列，且 diff --staged 只列出 a.txt，说明两份改动被干净地分开了。'
+    },
+    quiz: [
+      {
+        q: 'git status -sb 输出里的「M 」和「 M」有什么区别？',
+        options: [
+          '没有区别，只是对齐方式不同',
+          '前者改动已进暂存区，后者只改了工作区还没 add',
+          '前者是新增文件，后者是删除文件',
+          '前者表示文件被锁定，后者表示文件可编辑'
+        ],
+        answer: 1,
+        explain: '两个字符位左列代表暂存区、右列代表工作区。M 在左列说明改动已 add 待提交，在右列说明还留在工作区，commit 不会带走。记住左列管提交、右列管 add。'
+      },
+      {
+        q: '你执行了 git add .，发现把 .env 也加进了暂存区。正确的补救命令是什么？',
+        options: [
+          'git restore .env 把文件内容也恢复回去',
+          'git restore --staged .env 只从暂存区撤下，文件本身不动',
+          'git reset --hard 清空所有改动',
+          'git rm .env 从磁盘删除这个文件'
+        ],
+        answer: 1,
+        explain: 'restore --staged 只把条目从暂存区撤回工作区，文件内容原样保留，改动还在。不带 --staged 的 restore 才会用仓库里的版本覆盖文件，那一步不可撤销。'
+      },
+      {
+        q: '执行 git commit 后提示 nothing added to commit but untracked files present，问题出在哪？',
+        options: [
+          '新文件还没被 git add，暂存区里没有它们',
+          '仓库初始化失败，需要重新 git init',
+          '提交信息太短，被 Git 拒绝',
+          '当前分支受保护，不允许提交'
+        ],
+        answer: 0,
+        explain: '未跟踪文件不会自动进入提交。Git 已经明说 untracked files present，先 git add 想提交的那些文件，再 commit。'
+      }
+    ]
+  },
+  {
+    id: 'git-branch',
+    order: 10,
+    track: 'git',
+    title: '分支：并行工作的安全区',
+    subtitle: '分支只是一根指针，合并要先站对位置',
+    minutes: 14,
+    level: '基础',
+    goal: [
+      '说清分支为什么创建成本接近零',
+      '区分快进合并与三方合并的结果',
+      '记住合并方向：先切到要接收的分支',
+      '安全地删除已经合并的分支'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '分支不是复制一份代码',
+        html: '<p>从「复制文件夹」习惯过来的人，常以为开分支等于把整个项目复制一遍。Git 里不是：分支就是一个写着提交哈希的文件，41 个字节，切换只是改 HEAD 指向哪一行。</p><p>所以「先开个分支试试」的成本几乎为零。验证一个思路、给客户做定制、同时修两个 bug，都可以直接开分支，不用考虑磁盘。</p><p>真正危险的不是分支本身，而是你对它的操作：切错分支改代码、在错误方向合并、删掉还没合并的分支。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '看本机有哪些分支',
+        command: 'git branch -vv',
+        output: '  feature/login  9a1c3f7 feat: 增加登录页\n* main           4d8e2f1 [origin/main: ahead 1] docs: 补充第二节的例子\n  fix/typo       8c1d0a7 chore: 初始化项目',
+        note: '星号是当前分支。-vv 顺带显示每个分支最后一条提交和跟踪关系，ahead 1 表示本地这条分支比远程多一条提交。'
+      },
+      {
+        type: 'code',
+        title: '创建、切换、删除',
+        lang: 'bash',
+        text: `git switch -c feature/login      # 从当前位置新建分支并切过去
+git switch main                  # 切回 main
+git switch -                     # 切回上一个分支，来回跳很方便
+git branch -m old-name new-name  # 重命名分支
+git branch -d feature/login      # 删除已合并的分支
+git branch -D feature/login      # 强制删除，未合并的提交失去分支引用`,
+        note: '老教程里的 git checkout -b 仍然能用，但 checkout 还能顺手切换文件内容，误操作代价大。2.23 之后优先用 switch 和 restore。'
+      },
+      {
+        type: 'table',
+        title: 'merge 会得到三种结果',
+        head: ['情况', '合并结果', '历史长什么样'],
+        rows: [
+          ['main 上没有新提交', '快进（fast-forward），只把指针挪过去', '一条直线，不产生合并提交'],
+          ['两边都有新提交', '三方合并（three-way merge），生成合并提交', '分叉再合流，多一个合并节点'],
+          ['两边改了同一文件的同一行', '冲突（conflict），合并停在半路等你处理', '合并未完成，要 add 后再 commit']
+        ]
+      },
+      {
+        type: 'terminal',
+        title: '情况一：快进',
+        command: 'git switch main && git merge feature/login',
+        output: "Switched to branch 'main'\nUpdating 8c1d0a7..9a1c3f7\nFast-forward\n src/login.js | 42 ++++++++++++++++++++++++++++++++++++++\n 1 file changed, 42 insertions(+)",
+        note: 'Fast-forward 说明这次只是把 main 的指针挪到 feature 的位置，没有产生新提交。前提是开分支之后 main 上没有别的提交，所以合并前先确认 main 是不是落后了。'
+      },
+      {
+        type: 'terminal',
+        title: '情况二：三方合并',
+        command: 'git merge feature/search',
+        output: "Merge made by the 'ort' strategy.\n src/search.js | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++\n 1 file changed, 61 insertions(+)",
+        note: 'ort 是 Git 现在的默认合并策略，替代了旧的 recursive。看到 Merge made by 就说明生成了合并提交，而合并提交落在你当前所在的分支上。'
+      },
+      {
+        type: 'text',
+        title: '方向：你想让谁变，就先站到谁那里',
+        html: '<p>合并只有一条规则：<strong>合并结果落在你当前所在的分支上</strong>。所以「把 feature 并进 main」的正确顺序是：先站到 main 上，再 merge feature。</p><p>完整动作：<code>git switch main</code> → <code>git pull</code> 拿到远程最新 → <code>git merge feature/login</code> → <code>git push</code>。</p><p>搞反了会怎样：你在 feature 上 merge main，结果是 main 的新提交被拉进了 feature 分支，而 main 一点都没动。这时候 push 上去，PR 页面会显示一堆本不属于这个分支的提交，review 的人根本看不懂。</p>'
+      },
+      {
+        type: 'compare',
+        title: '两种方向，两种结果',
+        left: {
+          label: '搞反：站在 feature 上 merge main',
+          items: [
+            'git switch feature/login 然后 git merge main',
+            'main 的提交被拉进 feature 分支',
+            'main 上仍然没有你的功能',
+            'PR 里混进别人的提交，review 无法进行',
+            '还得再合一次才能真正进 main'
+          ]
+        },
+        right: {
+          label: '正确：站在 main 上 merge feature',
+          items: [
+            'git switch main 然后 git pull 再 git merge feature/login',
+            '合并提交落在 main 上，历史清楚',
+            'feature 分支不受影响，还能继续改',
+            'PR 页面直接显示合并按钮',
+            '合并后 git branch -d 删掉分支即可'
+          ]
+        },
+        note: '一句话记法：你想让谁变，就先切到谁。想把功能合进 main，就站在 main 上敲 merge。'
+      },
+      {
+        type: 'warn',
+        title: '删除分支的两种后果',
+        html: '<p><code>git branch -d</code> 是带检查的删除：分支上的提交如果还没合并进当前分支，它会拒绝，报 <code>error: The branch feature/login is not fully merged</code>。</p><p>加 <code>-D</code> 就跳过检查直接删。提交不会立刻消失，但失去分支引用之后，只能靠 reflog 或记住哈希找回，过了保留期就被回收。删之前先跑 <code>git log --oneline main..feature/login</code> 看一眼。</p><p>删除远程分支是另一条命令：<code>git push origin --delete feature/login</code>，这条会删掉所有人看到的那条分支引用。</p>'
+      },
+      {
+        type: 'code',
+        title: '哪些分支已经合并了',
+        lang: 'bash',
+        text: `git branch --merged                    # 已合并进当前分支，可以安全删
+git branch --no-merged                 # 还没合并，删之前先看内容
+git log --oneline main..feature/login  # 这个分支上有哪些 main 没有的提交`,
+        note: '--merged 判断的是相对当前分支。你现在站在 main 上，看到的就是已经合进 main 的分支列表。'
+      },
+      {
+        type: 'steps',
+        title: '一次完整的特性分支流程',
+        items: [
+          {
+            title: '从最新的 main 开分支',
+            html: '<p><code>git switch main && git pull && git switch -c feature/login</code>。先 pull 再开分支，能少一次后面的合并冲突。</p>'
+          },
+          {
+            title: '小步提交',
+            html: '<p>每完成一个可验证的小块就 commit 一次。分支上的提交可以随便改，合并进 main 之后就不能随便动了。</p>'
+          },
+          {
+            title: '合并前先让 main 追上远程',
+            html: '<p>切回 main，<code>git pull</code>，再 <code>git merge feature/login</code>。团队协作时这一步通常在 GitHub 上以 PR 形式完成。</p>'
+          },
+          {
+            title: '删除分支并推送',
+            html: '<p><code>git branch -d feature/login</code>，然后 <code>git push</code>。分支删了，提交依然在 main 的历史里。</p>'
+          }
+        ]
+      },
+      {
+        type: 'tip',
+        title: 'main 上不要直接写代码',
+        html: '<p>把 main 当成发布线：它上面永远是可用的状态。所有改动从分支进，测试过了才合并。</p><p>GitHub 仓库可以在 Settings → Branches 里给 main 加保护规则：禁止直接推送、必须走 PR、必须通过 CI。开了保护之后，误操作在服务端就被拦住，比靠自觉可靠。</p><p>一个人写的小项目也建议这么干。你今天省下的那一次切分支，往往就是半年后翻不出来的那次改动。</p>'
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '在一个有两个提交的仓库里开分支、改文件、合并回 main，再从 merged 列表里确认它已经安全合并。',
+      items: [
+        { text: '建仓库并提交一次，作为 main 的起点', cmd: 'mkdir branch-lab && cd branch-lab && git init && echo v1 > app.txt && git add . && git commit -m "chore: 初始化"' },
+        { text: '开分支、改文件、提交', cmd: 'git switch -c feature/greeting && echo hello >> app.txt && git commit -am "feat: 增加问候语"' },
+        { text: '切回 main 合并，观察是否出现 Fast-forward', cmd: 'git switch main && git merge feature/greeting' },
+        { text: '确认哪些分支已合并，再安全删除', cmd: 'git branch --merged && git branch -d feature/greeting && git log --oneline --graph --all' }
+      ],
+      done: '合并输出里出现 Fast-forward，branch --merged 能看到那条分支，删掉后历史仍在。'
+    },
+    quiz: [
+      {
+        q: 'git switch -c feature/x 之后，feature/x 与 main 的关系是什么？',
+        options: [
+          '两条指向同一个提交的指针，HEAD 现在指向 feature/x',
+          'feature/x 复制了 main 的全部文件，之后互不影响',
+          'feature/x 是 main 的只读副本，改动会同步回去',
+          'main 被暂时隐藏，切回去时自动恢复'
+        ],
+        answer: 0,
+        explain: '新分支从当前提交起步，一开始和 main 指向同一个位置。此后各自的 commit 只移动自己的指针，另一个分支原地不动，两条线才会慢慢分开。'
+      },
+      {
+        q: '你在 feature/login 分支上执行 git merge main，会发生什么？',
+        options: [
+          'main 得到 feature/login 的提交，直接可以推送',
+          'main 的提交被合进 feature/login，main 本身没有任何变化',
+          '两条分支互换内容',
+          'Git 会拒绝执行，因为方向错误'
+        ],
+        answer: 1,
+        explain: '合并结果永远落在当前分支上。站在 feature 上 merge main，只是把 main 的提交拉进来，main 本身一点没变，要等你切回去再合一次才会更新。'
+      },
+      {
+        q: 'git branch -d 报 error: The branch is not fully merged，说明什么？',
+        options: [
+          '分支已经被远程删除，本地还留着',
+          '分支上有提交还没合并进当前分支，删了会失去引用',
+          '分支名拼写错误',
+          '仓库处于分离头指针状态'
+        ],
+        answer: 1,
+        explain: '-d 会先检查是否已合并。这个报错是保护机制，先 git log main..分支名 看内容，确认不要了再用 -D 强删。'
+      }
+    ]
+  },
+  {
+    id: 'git-remote',
+    order: 11,
+    track: 'git',
+    title: '远程仓库与协作',
+    subtitle: 'fetch、pull、push 到底谁动了你的文件',
+    minutes: 15,
+    level: '基础',
+    goal: [
+      '看清 remote、origin 与跟踪分支的关系',
+      '分清 fetch 与 pull 的副作用',
+      '读懂 -u 写入的两行配置',
+      '独立走完一次 fork 到 PR 的流程'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '远程只是一个地址',
+        html: '<p>远程仓库（remote）不是别人替你托管的一台机器，它只是你本地仓库里存着的一个名字加一个地址。默认名字叫 origin，指向 GitHub、GitLab 或公司内网的某个仓库。</p><p><code>git push</code> 不是「上传文件夹」，而是把本地的新提交送过去，再把远程那条分支指针往前挪。<code>git fetch</code> 反过来，把远程的新提交拉下来。</p><p>一个仓库可以挂多个远程：origin 指向你自己的 fork，upstream 指向原项目。名字只是别名，命令里写哪个都行。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '先看挂了哪些地址',
+        command: 'git remote -v',
+        output: 'origin\tgit@github.com:lin/blog.git (fetch)\norigin\tgit@github.com:lin/blog.git (push)\nupstream\tgit@github.com:team/blog.git (fetch)\nupstream\tgit@github.com:team/blog.git (push)',
+        note: '同名两行是同一个仓库，分别用于 fetch 和 push。fork 场景下 origin 是你自己的仓库，upstream 是原项目，PR 就是从前者提到后者。'
+      },
+      {
+        type: 'text',
+        title: 'clone 下来的到底是什么',
+        html: '<p>clone 不是下载最新一版文件。它下载<strong>全部历史</strong>，然后做四件事：创建 origin 远程；把默认分支检出到工作区；让本地 main 跟踪 origin/main；留下一个只读的远程分支引用 origin/main。</p><p>origin/main 不是你能提交的分支，它是「上次同步时远程长什么样」的本地快照。你能动的只有本地 main。</p><p>所以 clone 完直接改代码、commit 是安全的，提交先落在本地。要等到 push，远程才看得见。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '第一次推送记得带 -u',
+        command: 'git push -u origin main',
+        output: "Enumerating objects: 12, done.\nWriting objects: 100% (7/7), 1.21 KiB | 1.21 MiB/s, done.\nTo github.com:lin/blog.git\n * [new branch]      main -> main\nbranch 'main' set up to track 'origin/main'.",
+        note: '最后一行是关键：-u 顺手把本地 main 和 origin/main 绑成跟踪关系。此后 git push 和 git pull 都不用再写 origin main。'
+      },
+      {
+        type: 'text',
+        title: '-u 改的是哪两行',
+        html: '<p><code>-u</code> 是 <code>--set-upstream</code> 的简写。它往 <code>.git/config</code> 里写 <code>branch.main.remote=origin</code> 和 <code>branch.main.merge=refs/heads/main</code> 两条。</p><p>写完之后的三个变化：<code>git push</code> 不带参数也知道往哪推；<code>git pull</code> 知道从哪拉；<code>git status</code> 能告诉你 ahead 2、behind 1。</p><p>没带 -u 的典型报错：<code>fatal: The current branch main has no upstream branch</code>，下面会直接给出补救命令 <code>git push --set-upstream origin main</code>，照抄即可。</p>'
+      },
+      {
+        type: 'table',
+        title: '三条命令，各自动了什么',
+        head: ['命令', '下载远程提交', '改你的工作区', '会不会多出合并提交'],
+        rows: [
+          ['git fetch', '会', '不会，一行不动', '不会'],
+          ['git pull', '会', '会，用 merge 合进来', '本地有分叉时会'],
+          ['git pull --rebase', '会', '会，把本地提交重放一遍', '不会，但本地提交的哈希会变']
+        ]
+      },
+      {
+        type: 'text',
+        title: 'fetch 与 pull 的分界线',
+        html: '<p><code>git fetch</code> 只更新 origin/main 这个引用和一堆对象，工作区、暂存区、本地 main 全都不动。它没有副作用，随便跑。</p><p><code>git pull</code> 等于 fetch 加 merge：拉下来之后立刻合进你当前分支，所以它可能冲突，也可能弹出编辑器让你写合并说明。</p><p>代码改到一半、跑一半的测试还挂着的时候不要 pull。想看远程有什么新东西，先 fetch，再用 <code>git log --oneline HEAD..origin/main</code> 看差了多少。</p>'
+      },
+      {
+        type: 'terminal',
+        title: 'fetch 之后只动了引用',
+        command: 'git fetch',
+        output: 'remote: Enumerating objects: 12, done.\nremote: Counting objects: 100% (12/12), done.\nFrom github.com:lin/blog\n   8c1d0a7..4d8e2f1  main       -> origin/main',
+        note: '箭头表示 origin/main 从 8c1d0a7 前进到 4d8e2f1，被更新的只有这个引用。你自己的 main 还停在原地，这就是 fetch 安全的原因。'
+      },
+      {
+        type: 'warn',
+        title: '推送被拒不是网络问题',
+        html: '<p>完整报错：<code>! [rejected] main -> main (non-fast-forward)</code>，下面跟 error: failed to push some refs to 地址，还有一行提示先 pull。</p><p>原因：远程有你本地没有的提交，直接推会盖掉别人的工作，Git 拦住你。正确做法是 <code>git pull --rebase</code>，处理可能的冲突，再 push。</p><p>不要用 <code>--force</code> 消掉这个报错。它会把远程退回到你的版本，同事的提交从分支上消失，对方得自己去 reflog 里捞。只有你自己独占的分支才谈得上 <code>--force-with-lease</code>。</p>'
+      },
+      {
+        type: 'text',
+        title: '跟踪分支：ahead 与 behind 的来源',
+        html: '<p>跟踪分支（tracking branch）就是本地分支与某个远程分支绑在一起。看谁和谁绑着：<code>git branch -vv</code>，方括号里那段就是。</p><p>远程已经有的分支，直接 <code>git switch feature/login</code> 就会建同名本地分支并自动跟踪 origin/feature/login，不用手写。</p><p>status 里的 ahead 和 behind 是判断要不要推、要不要拉的全部依据，比凭感觉靠谱。</p>'
+      },
+      {
+        type: 'steps',
+        title: '在 GitHub 上开一个 PR',
+        items: [
+          {
+            title: 'fork 并 clone 自己的那份',
+            html: '<p>在项目页点 Fork，然后 <code>git clone git@github.com:你的用户名/blog.git</code>。如果想让本地能同步原项目，再加一个 upstream：<code>git remote add upstream git@github.com:team/blog.git</code>。</p>'
+          },
+          {
+            title: '从最新 main 开一条功能分支',
+            html: '<p><code>git switch main && git pull && git switch -c feature/fix-typo</code>。分支名要能看出做什么，别用 test、dev、新分支。</p>'
+          },
+          {
+            title: '提交并推送',
+            html: '<p>小步 commit，然后 <code>git push -u origin feature/fix-typo</code>。第一次推送的输出里会带一条 GitHub 的链接，直接点开就是创建 PR 的页面。</p>'
+          },
+          {
+            title: '写清 PR 描述',
+            html: '<p>标题说明改了什么，正文写动机、做法、怎么验证（跑了哪条命令、点了哪个页面）。截图能省掉一半来回。关联 issue 写 Closes #12。</p>'
+          },
+          {
+            title: '等 review，合并，收尾',
+            html: '<p>reviewer 提了意见就继续 commit 再 push，PR 会自动更新。通过后点 Squash and merge，删掉远程分支，回到本地 <code>git switch main && git pull</code>。</p>'
+          }
+        ]
+      },
+      {
+        type: 'tip',
+        title: '把 pull --rebase 设成默认',
+        html: '<p><code>git config --global pull.rebase true</code> 之后，pull 会把你的本地提交挪到远程提交后面，而不是生成一条「Merge branch main of github.com」的合并提交。</p><p>代价是你本地还没推的提交哈希会变。所以规则要一致：已经推送到共享分支的提交，不要 rebase。</p><p>每天开工先 pull 一次，收工前 push 一次。这两条做到，八成「代码不见了」的惊慌不会发生。</p>'
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '用两个本地仓库模拟远程：一个当服务器，一个 clone 下来，走一遍改、推、拉，再看清 fetch 与 pull 的区别。',
+      items: [
+        { text: '建一个裸仓库当作远程，再 clone 到工作目录', cmd: 'git init --bare /tmp/blog-remote.git && git clone /tmp/blog-remote.git blog' },
+        { text: '在 clone 里提交并首次推送，注意跟踪关系', cmd: 'cd blog && echo hi > README.md && git add . && git commit -m "docs: 第一条提交" && git push -u origin main' },
+        { text: '在另一个 clone 里提交推送，回到第一个仓库只 fetch 不合并', cmd: 'git fetch && git status -sb && git log --oneline HEAD..origin/main' },
+        { text: '确认工作区没变之后，再 pull 把变化合进来', cmd: 'git pull --rebase && git log --oneline --graph --all' }
+      ],
+      done: 'fetch 之后 status 显示 behind，但文件内容没变；pull 之后文件才被更新。'
+    },
+    quiz: [
+      {
+        q: 'git push -u origin main 里的 -u 做了什么？',
+        options: [
+          '强制推送，覆盖远程已有的提交',
+          '把本地 main 与 origin/main 绑定为跟踪关系，之后 push 可省略参数',
+          '在远程创建一个空的 main 分支但不推送内容',
+          '切换到远程分支的只读副本'
+        ],
+        answer: 1,
+        explain: '-u 即 --set-upstream，写进 .git/config 两行跟踪配置。绑定之后 git push、git pull 都不用再写远程名和分支名，status 也会显示 ahead 与 behind。'
+      },
+      {
+        q: '为什么说 git fetch 比 git pull 安全？',
+        options: [
+          'fetch 会先备份工作区再合并',
+          'fetch 只更新 origin/main 等远程引用，不碰工作区和本地分支',
+          'fetch 会自动跳过有冲突的文件',
+          'fetch 会把改动存到暂存区，等你确认'
+        ],
+        answer: 1,
+        explain: 'fetch 只下载对象并移动 origin/ 开头的引用，本地分支与工作区都不动。pull 是 fetch 加 merge，会直接改你正在编辑的文件。'
+      },
+      {
+        q: 'push 报 ! [rejected] main -> main (non-fast-forward)，正确的处理顺序是？',
+        options: [
+          '直接 git push --force 覆盖远程',
+          '先 git pull --rebase 把远程提交接上，解决冲突后再 push',
+          '删除本地仓库重新 clone',
+          '把远程分支删掉再重建'
+        ],
+        answer: 1,
+        explain: '被拒说明远程有你没有的提交。先拉下来把自己提交重放到后面，冲突当场解决，再推送就是快进，别人的工作一条都不会丢。'
+      }
+    ]
+  },
+  {
+    id: 'git-conflict',
+    order: 12,
+    track: 'git',
+    title: '冲突：为什么发生、怎么解决',
+    subtitle: '两个人改了同一行，Git 停下来让你拍板',
+    minutes: 15,
+    level: '进阶',
+    goal: [
+      '看懂冲突标记每一段是谁的版本',
+      '按编辑、add、commit 三步收尾',
+      '知道 merge --abort 与 rebase --continue 的差别',
+      '在冲突里不做会扩大损失的操作'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '冲突不是故障',
+        html: '<p>冲突（conflict）的意思是：同一段内容被两边改成了不同的样子，Git 没有依据判断该留哪一个。它不会猜，直接把两版都塞进文件，让你决定。</p><p>所以看到 CONFLICT 不要慌，这只是流程里一个正常的停顿点。真正要做的事只有三件：打开文件、改成一个正确的版本、告诉 Git 你已经处理完。</p><p>冲突的范围通常很小，往往就是几行。Git 已经把两份内容摆在一起，你比它多知道的是业务上应该怎么选。</p>'
+      },
+      {
+        type: 'terminal',
+        title: '合并时撞上冲突',
+        command: 'git merge feature/slow-api',
+        output: 'Auto-merging src/request.js\nCONFLICT (content): Merge conflict in src/request.js\nAutomatic merge failed; fix conflicts and then commit the result.',
+        note: 'Auto-merging 说明 Git 先自动合了一遍，能合的已经合好；CONFLICT 那行给出撞上的文件。此时合并处于「未完成」状态，不能切分支继续别的活。'
+      },
+      {
+        type: 'terminal',
+        title: 'status 会告诉你还差什么',
+        command: 'git status',
+        output: 'On branch main\nYou have unmerged paths.\n  (fix conflicts and run "git commit")\n  (use "git merge --abort" to abort the merge)\n\nUnmerged paths:\n  (use "git add <file>..." to mark resolution)\n\tboth modified:   src/request.js',
+        note: 'both modified 就是两边都改过的文件。Git 连补救命令都写在括号里：改完 git add，或者 git merge --abort 整个放弃。'
+      },
+      {
+        type: 'code',
+        title: '冲突文件长什么样',
+        lang: 'diff',
+        text: `function request(url) {
+  const options = {
+<<<<<<< HEAD
+    timeout: 3000,
+    retries: 1,
+=======
+    timeout: 5000,
+    retries: 3,
+>>>>>>> feature/slow-api
+  };
+  return fetch(url, options);
+}`,
+        note: '注意上下没被改动的行是干净的，只有冲突区间被包装起来。这些标记是文件里的真实字符，必须全部删掉，留下你选定的内容。'
+      },
+      {
+        type: 'table',
+        title: '四组标记逐段解释',
+        head: ['标记', '含义'],
+        rows: [
+          ['<<<<<<< HEAD', '从这里开始是你当前所在分支的那一版'],
+          ['=======', '两侧内容的分界线'],
+          ['>>>>>>> feature/slow-api', '到这里结束，这是被合并进来的那一版'],
+          ['||||||| 8c1d0a7', '只有开了 diff3 才出现，是两边共同的祖先版本']
+        ]
+      },
+      {
+        type: 'steps',
+        title: '解决冲突的三步',
+        items: [
+          {
+            title: '编辑文件，留一个正确的版本',
+            html: '<p>不是二选一。你可以只留上面、只留下面，也可以两边都要再改写成一段新逻辑。删掉所有 &lt;&lt;&lt;&lt;&lt;&lt;&lt;、=======、&gt;&gt;&gt;&gt;&gt;&gt;&gt; 标记。</p>'
+          },
+          {
+            title: 'git add 标记为已解决',
+            html: '<p><code>git add src/request.js</code>。这一步是告诉 Git「这个文件我处理完了」，它才会进入下一次提交的内容里。</p>'
+          },
+          {
+            title: 'git commit 收尾',
+            html: '<p>merge 场景用 <code>git commit --no-edit</code> 接受默认的合并信息；rebase 场景用 <code>git rebase --continue</code>，不要自己 commit。</p>'
+          }
+        ]
+      },
+      {
+        type: 'terminal',
+        title: '收尾的样子',
+        command: 'git add src/request.js && git commit --no-edit',
+        output: "[main 2f7c9a1] Merge branch 'feature/slow-api'",
+        note: '提交成功后合并结束，HEAD 回到正常状态。--no-edit 表示直接用默认的合并信息，不想用它就把 --no-edit 去掉，手动写说明。'
+      },
+      {
+        type: 'text',
+        title: 'rebase 的冲突不一样',
+        html: '<p>rebase 是把你的提交一个个重放到新基线上，所以它可能<strong>冲突好几次</strong>：解决完第一个，继续时下一个又撞上。</p><p>流程是：解决当前文件 → <code>git add</code> → <code>git rebase --continue</code>。中途想放弃，用 <code>git rebase --abort</code> 回到开始前的样子，一条命令全撤。</p><p>还有个反直觉的点：rebase 时 ours 指上游分支，theirs 指你正在重放的提交，和 merge 时的含义正好相反。用 <code>git checkout --ours 文件名</code> 之前先想清楚。' ,
+      },
+      {
+        type: 'warn',
+        title: '冲突时别做的三件事',
+        html: '<p>一、别 <code>git commit -a</code> 直接盲提交。冲突标记会原样进仓库，页面上出现满屏的 &lt;&lt;&lt;&lt;&lt;&lt;&lt;。</p><p>二、别为了省事无脑 <code>git checkout --ours .</code>。那等于一键丢掉对方的全部改动，而且不报错、不提示，等对方发现时已经过去几天。</p><p>三、别在冲突没解决时 force push。合并未完成的状态下推送上去，远程会是坏掉的内容。</p>'
+      },
+      {
+        type: 'text',
+        title: '把冲突变少的具体做法',
+        html: '<p>冲突无法根除，但可以变少：分支活得短，一条分支不超过两三天，越久越容易撞。</p><p>开工前先从主分支拉一次，把差异控制在小范围内。约定谁负责哪块文件，两个人同时大改同一文件必然冲突。</p><p>还有格式化：别人用 Prettier 跑一遍、你用编辑器自带格式化跑一遍，整文件都会变成冲突。团队统一格式化工具，并把它写进 .gitattributes 与编辑器配置。</p>'
+      },
+      {
+        type: 'tip',
+        title: '打开 diff3，看清祖先版本',
+        html: '<p><code>git config --global merge.conflictStyle zdiff3</code> 之后，冲突块里会多出 <code>|||||||</code> 那一段，显示两边共同祖先原本是什么样。</p><p>有了它你才能判断：这一行是对方删掉的，还是你新增的。只有两版而没有祖先版本时，很多人会把删除误当成修改。</p><p>VS Code 里打开冲突文件会有 Accept Current Change、Accept Incoming Change、Accept Both 三个按钮，效果等于手工删标记，改完记得保存。' ,
+      },
+      {
+        type: 'terminal',
+        title: '一次列出所有还冲突的文件',
+        command: 'git diff --name-only --diff-filter=U',
+        output: 'src/request.js\nsrc/config.json',
+        note: 'U 表示 unmerged。文件多的时候别靠滚动 status 找，这条命令直接给出待处理清单。处理完一个就 add 一个，再跑一次看剩下的。'
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '故意制造一次冲突：两条分支改同一个文件的同一行，合并时手工解决，再用 abort 重来一次看清退出路径。',
+      items: [
+        { text: '建仓库并在主分支写一行配置', cmd: 'mkdir conflict-lab && cd conflict-lab && git init && printf "timeout=3000\\n" > config.txt && git add . && git commit -m "chore: 初始配置"' },
+        { text: '开分支改成 5000 并提交', cmd: 'git switch -c feature/slow && printf "timeout=5000\\n" > config.txt && git commit -am "feat: 放宽超时"' },
+        { text: '切回 main 改成 1000 并提交，然后合并，观察冲突标记', cmd: 'git switch main && printf "timeout=1000\\n" > config.txt && git commit -am "fix: 收紧超时" && git merge feature/slow' },
+        { text: '看完标记后用 abort 退出，再重来一次手工解决并提交', cmd: 'git merge --abort && git merge feature/slow' }
+      ],
+      done: 'merge --abort 后 status 恢复干净；重新合并并手工改完后，add 加 commit 能顺利结束合并。'
+    },
+    quiz: [
+      {
+        q: '冲突文件里 <<<<<<< HEAD 与 >>>>>>> feature/x 之间夹着的是什么？',
+        options: [
+          'Git 自动挑出来的推荐版本',
+          '你当前分支与被合并分支两侧的内容，需要你手工选或改写',
+          '冲突发生前的祖先版本',
+          'Git 生成的一份补丁，可以直接应用'
+        ],
+        answer: 1,
+        explain: '标记之间先是 HEAD 一侧的内容，======= 之后是被合并分支的内容。Git 不做选择，把两版摆在一起等你决定，标记本身必须删干净。'
+      },
+      {
+        q: 'merge 冲突解决完之后，正确的收尾命令是什么？',
+        options: [
+          'git add 冲突文件，然后 git commit --no-edit',
+          'git rebase --continue',
+          'git merge --abort',
+          'git commit -a 直接提交，让 Git 自己清理标记'
+        ],
+        answer: 0,
+        explain: 'merge 的收尾是 add 标记已解决再 commit。rebase 才是 --continue，abort 是放弃，commit -a 会把冲突标记原样提交进仓库。'
+      },
+      {
+        q: 'rebase 过程中遇到冲突，想彻底放弃回到开始前的状态，用哪条命令？',
+        options: [
+          'git reset --hard 然后重新 pull',
+          'git rebase --abort 回到 rebase 开始之前',
+          'git merge --abort',
+          'git checkout --theirs 全部覆盖'
+        ],
+        answer: 1,
+        explain: 'rebase --abort 会把 HEAD 与分支还原到 rebase 开始时的位置，中间重放的提交一并撤销。merge --abort 只对应合并状态，用错会报 no merge in progress。'
+      }
+    ]
+  },
+  {
+    id: 'git-undo',
+    order: 13,
+    track: 'git',
+    title: '后悔药：撤销与回滚',
+    subtitle: '改错了、提交早了、推错了，分别该用哪条命令',
+    minutes: 18,
+    level: '进阶',
+    goal: [
+      '分清工作区、暂存区、历史三种撤销',
+      '知道 restore、reset、revert 各自的边界',
+      '误删提交时能用 reflog 把它找回来'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '三种「撤销」，其实是三件事',
+        html: `<p>Git 里没有统一的一个「撤销」按钮，因为你的改动可能停在三个不同的地方：<strong>工作区</strong>（你眼前正在编辑的文件）、<strong>暂存区</strong>（下一次提交的清单）、<strong>历史</strong>（已经提交的快照）。</p><p>在哪一层出的错，就要用哪一层的命令去撤。用错层的典型后果是：想撤掉一次提交，结果把一整天没提交的代码一起删了。</p><p>所以动手前先跑一次 <code>git status</code>，看清楚每个文件现在处于哪个状态，再决定用哪条命令。</p>`
+      },
+      {
+        type: 'table',
+        title: '我想撤销什么，该用哪条',
+        head: ['我想撤销…', '命令', '会不会丢东西'],
+        rows: [
+          ['工作区里还没 add 的改动', 'git restore 文件名', '会丢，而且不进回收站'],
+          ['文件在暂存区里（改动保留）', 'git restore --staged 文件名', '不会丢，改动回到工作区'],
+          ['最后一次提交（改动保留）', 'git reset --soft HEAD~1', '不会丢，改动留在暂存区'],
+          ['最后一次提交和全部改动', 'git reset --hard HEAD~1', '会丢，几乎无法恢复'],
+          ['一条已经推送的提交', 'git revert 提交号', '不会丢，会生成一条反向提交'],
+          ['误删的分支或提交', 'git reflog，再 git branch 恢复', '通常能找回']
+        ]
+      },
+      {
+        type: 'terminal',
+        title: '丢弃工作区里的改动',
+        command: 'git diff src/app.js\ngit restore src/app.js',
+        output: 'diff --git a/src/app.js b/src/app.js\n-const port = 3000;\n+const port = 3001;',
+        note: `<p>先用 <code>git diff</code> 看清要丢的是什么，再 restore。这一步没有确认提示，执行完就回不去了。</p>`
+      },
+      {
+        type: 'terminal',
+        title: '只把文件移出暂存区',
+        command: 'git restore --staged src/app.js\ngit status -sb',
+        output: ' M src/app.js',
+        note: `<p>注意状态列的位置：<code>M </code> 在第一列表示「已暂存」，<code> M</code> 在第二列表示「工作区有改动但没暂存」。一排空格的位置就是这一列的含义。</p>`
+      },
+      {
+        type: 'text',
+        title: 'reset 的三种模式，只差在重置到哪一层',
+        html: `<p>三条命令都移动 HEAD，区别只是顺带重置了哪些区域：</p><ul><li><strong>--soft</strong>：只移动 HEAD，暂存区和工作区不动。改动还在暂存区里，适合「提交信息写错了，想重新提交一次」。</li><li><strong>--mixed</strong>（默认）：移动 HEAD 并清空暂存区，工作区不动。改动变回未暂存状态。</li><li><strong>--hard</strong>：三者一起重置。工作区的改动直接消失。</li></ul><p>记住一句话：<span class="hl">reset 是改写本地历史，只适合还没推送的提交</span>。</p>`
+      },
+      {
+        type: 'compare',
+        title: '已经推送的提交，不要用 reset',
+        left: {
+          label: '错误做法',
+          items: [
+            'git reset --hard 之后 git push --force',
+            '队友本地的历史和你对不上，pull 下来一片混乱',
+            '强制推送会覆盖别人基于这条分支做的工作',
+            '代码评审记录里的提交凭空消失'
+          ]
+        },
+        right: {
+          label: '正确做法',
+          items: [
+            'git revert 提交号，生成一条反向提交',
+            '历史只增不改，所有人都能正常 pull',
+            '评审记录完整保留，谁撤的、为什么撤一目了然',
+            '真需要强制推送时，至少用 --force-with-lease'
+          ]
+        },
+        note: `<p>原则：<strong>本地没推送的历史可以改写，已经推送的历史只能追加</strong>。别人可能已经拉过那条提交，改写等于把他们的历史和你的历史劈成两条。</p>`
+      },
+      {
+        type: 'terminal',
+        title: 'revert 一条已经推送的提交',
+        command: 'git revert 3f2a9c1',
+        output: '[main 8c41d20] Revert "feat: 首页加登录横幅"\n 1 file changed, 3 deletions(-)',
+        note: `<p>revert 不会删掉原来那条提交，而是新增一条把它的效果抵消掉的提交。历史里两条都在，因果关系清楚。</p>`
+      },
+      {
+        type: 'steps',
+        title: '误删提交后，用 reflog 找回来',
+        items: [
+          { title: '先看 reflog', html: `<p><code>git reflog</code> 记录的是 HEAD 的每一次移动，包括 reset、merge、切分支。找到那条被删提交的短 SHA。</p>` },
+          { title: '确认内容是对的', html: `<p><code>git show 3f2a9c1</code> 看一眼提交信息和文件改动，别救错。</p>` },
+          { title: '挂一个分支把它固定住', html: `<p><code>git branch rescue 3f2a9c1</code>。这比直接 reset 安全，原来的分支状态一点不动。</p>` },
+          { title: '确认无误再合并回来', html: `<p><code>git merge rescue</code>，或者 cherry-pick 你真正需要的那一条。</p>` }
+        ]
+      },
+      {
+        type: 'warn',
+        title: 'reset --hard 是这里唯一真正危险的命令',
+        html: `<p>它会同时重置 HEAD、暂存区和工作区。已经提交过的内容理论上还能靠 reflog 捞回来，但<strong>从未提交过的工作区改动，Git 根本不认识，丢了就是丢了</strong>。</p><p>执行前至少做一件事：<code>git status</code> 确认没有未提交的改动，或者先 <code>git stash</code> 收起来。</p>`
+      },
+      {
+        type: 'tip',
+        title: '拿不准的时候，先备份再动手',
+        html: `<p>最省事的保险：把整个项目目录复制一份，或者在干净状态下 <code>git stash</code>。这些操作比事后找数据便宜得多。</p><p>另外，<code>git reflog</code> 默认保留 90 天，足够你反应过来。</p>`
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '在一个随便建的练习仓库里，把工作区、暂存区、历史三种撤销各做一遍，亲手感受它们的区别。',
+      items: [
+        { text: '改一个文件后用 git diff 看清改动，再丢弃它', cmd: 'git restore .' },
+        { text: '再改一次，git add 之后移出暂存区，确认改动还在', cmd: 'git restore --staged .' },
+        { text: '提交这次改动，用软重置撤销提交，确认改动回到暂存区', cmd: 'git reset --soft HEAD~1' },
+        { text: '用 reflog 找到刚才那条提交的短 SHA', cmd: 'git reflog' }
+      ],
+      done: '能用一句话说清 restore、reset --soft、revert 各自改变的是哪个区域。'
+    },
+    quiz: [
+      {
+        q: '一条已经推送到远程、同事也拉过的提交写错了，应该怎么撤？',
+        options: [
+          'git reset --hard 退回上一个提交，然后强制推送',
+          'git revert 那条提交，生成一条反向提交',
+          'git commit --amend 改掉它，再正常 push',
+          '删掉远程仓库重新建一个'
+        ],
+        answer: 1,
+        explain: '已推送的历史不要改写，revert 通过追加一条反向提交来抵消效果，所有人的历史依然一致。reset 加强制推送会让同事的本地历史对不上。'
+      },
+      {
+        q: '执行 git reset --soft HEAD~1 之后，你刚才的改动在哪里？',
+        options: [
+          '已经被删除，需要重新写',
+          '回到工作区，处于未暂存状态',
+          '还在暂存区里，可以直接重新提交',
+          '已经推送到了远程仓库'
+        ],
+        answer: 2,
+        explain: '--soft 只移动 HEAD，不碰暂存区和工作区，所以改动仍然停留在暂存区，改一句提交信息就能重新提交。--mixed 才是退回工作区。'
+      },
+      {
+        q: '误删了一个还没合并的分支，最可能把它找回来的第一步是？',
+        options: [
+          'git reflog，找到那个提交的 SHA',
+          'git log --all，直接列出被删的分支',
+          'git restore --staged 分支名',
+          '重新 clone 一遍远程仓库'
+        ],
+        answer: 0,
+        explain: 'reflog 记录了 HEAD 的移动轨迹，分支删掉后提交对象通常还在。找到 SHA 后用 git branch 名字 SHA 就能恢复。log --all 只显示还挂着的引用。'
+      }
+    ]
+  },
+  {
+    id: 'git-workflow',
+    order: 14,
+    track: 'git',
+    title: '提交规范与团队工作流',
+    subtitle: '让别人（和三个月后的你）看得懂这些提交',
+    minutes: 15,
+    level: '进阶',
+    goal: [
+      '把一次提交控制在只做一件事',
+      '写出能一眼看懂的提交信息',
+      '走通一个功能分支从开工到合并的流程'
+    ],
+    sections: [
+      {
+        type: 'text',
+        title: '提交信息是写给未来的',
+        html: `<p>三个月后你会回来查：「这行代码为什么这么改？」如果提交信息写的是「改一下」「fix」，你只能逐行读 diff。如果写的是「fix(login): 修复验证码过期后仍可提交」，三秒就能定位。</p><p>提交信息不是给 Git 看的，是给<strong>排查问题的人</strong>看的。而那个人大概率是你自己。</p>`
+      },
+      {
+        type: 'compare',
+        title: '一次巨型提交 vs 小步提交',
+        left: {
+          label: '一次大提交',
+          items: [
+            '一条提交里有登录、样式和依赖升级',
+            '出问题时不知道是哪部分引起的',
+            '想单独回滚登录功能，只能手工挑代码',
+            'diff 上千行，评审的人直接点通过'
+          ]
+        },
+        right: {
+          label: '小步提交',
+          items: [
+            '每条提交只做一件事，说明写清做了什么',
+            '出问题可以用 bisect 精确定位到某一条',
+            '回滚一条提交就是回滚一个功能',
+            'diff 小，评审真的会看'
+          ]
+        },
+        note: `<p>判断标准很简单：<strong>能不能用一句话说清这条提交做了什么；出问题时能不能单独撤掉它而不影响别的</strong>。两个都能，就够小了。</p>`
+      },
+      {
+        type: 'text',
+        title: '一条提交只做一件事',
+        html: `<p>常见误区是把「改 bug」和「顺手格式化整个文件」放在一条提交里。结果回滚 bug 修复时，格式化也跟着被撤掉，diff 里一半是空格变化。</p><p>如果确实顺手改了很多地方，用 <code>git add -p</code> 分块暂存，或者分几次提交。提交数量多一点不是问题，混乱才是。</p>`
+      },
+      {
+        type: 'code',
+        title: '提交信息的结构',
+        lang: 'text',
+        text: '类型(范围): 一句话说明做了什么\n\n可选正文：为什么这么改，而不是怎么改（代码本身已经说明怎么改）\n\n可选脚注：关联 issue，例如 Closes #128',
+        note: `<p>第一行控制在 50 个字符以内，用祈使句（「修复」「新增」），结尾不加句号。正文和标题之间空一行。</p>`
+      },
+      {
+        type: 'table',
+        title: 'Conventional Commits 的常见类型',
+        head: ['类型', '含义', '例子'],
+        rows: [
+          ['feat', '新增功能', 'feat(auth): 支持邮箱验证码登录'],
+          ['fix', '修复缺陷', 'fix(upload): 修复大文件上传超时'],
+          ['docs', '只改文档', 'docs: 补充本地启动步骤'],
+          ['refactor', '重构，不改行为', 'refactor(api): 抽出统一的请求封装'],
+          ['test', '新增或修改测试', 'test(cart): 补充金额计算的边界用例'],
+          ['chore', '杂项：依赖、配置、脚本', 'chore: 升级 vite 到 6.0'],
+          ['perf', '性能优化', 'perf(list): 长列表改为虚拟滚动']
+        ]
+      },
+      {
+        type: 'text',
+        title: '分支命名：让人一眼知道它要干什么',
+        html: `<p>推荐用「类型/简短描述」：<code>feature/login-page</code>、<code>fix/upload-timeout</code>、<code>chore/bump-deps</code>。全小写、用短横线连接，不要用中文、空格和日期。</p><p>分支名会出现在 PR 列表、CI 日志和别人的终端里，它是一条信息，不是随手起的文件夹名。</p>`
+      },
+      {
+        type: 'steps',
+        title: '一个功能从开工到合并',
+        items: [
+          { title: '先同步主干', html: `<p><code>git switch main && git pull</code>，保证你是从最新的代码开分支。</p>` },
+          { title: '开一条短分支', html: `<p><code>git switch -c feature/login-page</code>。分支生命周期越短，冲突越少。</p>` },
+          { title: '小步提交', html: `<p>每完成一小块就提交一次，信息按上面的格式写。提交前 <code>git diff --staged</code> 自查一遍。</p>` },
+          { title: '推送并开 PR', html: `<p><code>git push -u origin feature/login-page</code>，然后在平台上发起 Pull Request，写清改了什么、怎么验证。</p>` },
+          { title: '评审通过后合并并删分支', html: `<p>合并后删掉远端分支，本地 <code>git branch -d</code> 清理，回到 main 再 pull 一次。</p>` }
+        ]
+      },
+      {
+        type: 'terminal',
+        title: '提交前的三行自查',
+        command: 'git status -sb\ngit diff --staged\ngit log --oneline -5',
+        output: '## feature/login-page\n M src/login.js\n\n+ export function login() {',
+        note: `<p>第一行看分支和文件状态，第二行看即将提交的完整改动，第三行看最近五条提交，确认风格一致、没有重复提交。</p>`
+      },
+      {
+        type: 'warn',
+        title: '这些东西永远不要提交',
+        html: `<p><code>.env</code> 和各种密钥、<code>node_modules</code>、构建产物、个人编辑器配置、几百 MB 的素材文件。</p><p>如果已经提交过一次，光加 .gitignore 是不够的——文件还在历史里。正确顺序是：<strong>立刻轮换泄露的密钥</strong>，然后 <code>git rm --cached 文件</code> 提交移除，再补上 .gitignore。历史里的旧版本仍然需要清理工具处理。</p>`
+      },
+      {
+        type: 'text',
+        title: '主干开发，还是 Git Flow',
+        html: `<p>小团队和大多数项目用<strong>主干开发</strong>就够了：只有 main 一条长期分支，功能分支活一两天，通过 PR 合并，合并即部署。</p><p>Git Flow 那套 develop / release / hotfix 分支，适合发布周期固定、需要同时维护多个线上版本的项目。多一层分支就多一层同步成本，没有对应需求时不要照搬。</p>`
+      },
+      {
+        type: 'tip',
+        title: '发 PR 之前问自己四个问题',
+        html: `<ul><li>这个 PR 只做一件事吗？能不能用一句话说清？</li><li>diff 里有没有混进调试代码、注释掉的旧逻辑、无关的格式化？</li><li>别人拿到这个分支，知道怎么跑起来、怎么验证吗？</li><li>有没有提交不该进仓库的文件？</li></ul>`
+      }
+    ],
+    exercise: {
+      title: '动手练一练',
+      brief: '找一个你自己的仓库，把最近一次提交改成规范写法，再按规范开一条新分支。',
+      items: [
+        { text: '用 amend 把最近一次提交的信息改成「类型(范围): 说明」格式', cmd: 'git commit --amend' },
+        { text: '按规范新建一条功能分支', cmd: 'git switch -c feature/your-task' },
+        { text: '检查 .gitignore 里是否包含 .env 和 node_modules' },
+        { text: '用 git log --oneline -5 回头看这五条信息是否都能看懂' }
+      ],
+      done: '提交历史里每一条都能让局外人看懂做了什么，分支名能看出要做什么。'
+    },
+    quiz: [
+      {
+        q: '提交信息「feat(auth): 支持邮箱验证码登录」里的 feat 表示什么？',
+        options: ['修复了一个缺陷', '新增了一个功能', '只改了文档', '重构了代码结构'],
+        answer: 1,
+        explain: 'feat 是 feature 的缩写，表示新增功能。fix 是修复，docs 是文档，refactor 是不改变行为的重构。'
+      },
+      {
+        q: '把三个互不相关的改动塞进同一条提交，最大的问题是什么？',
+        options: [
+          '提交信息会超过一行',
+          '出问题时无法单独回滚其中一项',
+          'Git 会拒绝提交',
+          '推送速度会变慢'
+        ],
+        answer: 1,
+        explain: '提交是回滚的最小单位。混在一起，想撤掉其中一项就只能手工挑代码，而且评审时 diff 太大容易被直接放过。'
+      },
+      {
+        q: '团队采用主干开发时，功能分支应该保持什么状态？',
+        options: [
+          '长期保留，作为功能开发的独立空间',
+          '生命周期尽量短，完成后尽快合并回主干',
+          '直接在 main 上开发，不需要分支',
+          '只在本地存在，永远不推送'
+        ],
+        answer: 1,
+        explain: '分支活得越久，和主干分叉越远，合并冲突越难处理。主干开发的关键就是短分支、频繁合并、合并即部署。'
+      }
+    ]
+  }
+);

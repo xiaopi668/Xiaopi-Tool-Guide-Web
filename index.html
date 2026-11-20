@@ -1,76 +1,114 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>提示词学校 · 一步一步学会和 AI 说话</title>
-<meta name="description" content="提示词学校：10 节循序渐进的课程，把写 AI 提示词的方法拆成可照抄的步骤。学会让 AI 先提问再做项目、先出方案再动手、把输出格式写死，并配套模板库与提示词体检器。">
-<meta name="theme-color" content="#5b5bd6">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%235b5bd6'/%3E%3Ctext x='32' y='45' font-size='38' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='white'%3EP%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/css/style.css">
+<title>工具学校 · 把电脑用成一把工具</title>
+<meta name="description" content="工具学校：终端、Git、VS Code、开发环境与排错，29 节短课把每天要用的计算机工具讲明白。配真实命令、快捷键和报错解法，纯静态、离线可用。">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Crect x='6.5' y='6.5' width='51' height='51' rx='11' fill='none' stroke='%23fff' stroke-opacity='.28'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='23' fill='%23fff' text-anchor='middle'%3E%3E_%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/glass.css">
+<link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
+
 <a class="skip-link" href="#main">跳到正文</a>
 
-<header class="topbar">
-  <button class="icon-btn menu-btn" id="menuBtn" aria-label="打开课程目录" aria-expanded="false">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-  </button>
-  <a class="brand" href="#/">
-    <span class="brand-mark" aria-hidden="true">P</span>
-    <span class="brand-text">提示词学校<em>Prompt School</em></span>
-  </a>
-  <nav class="topnav" aria-label="主导航">
-    <a href="#/" data-nav="/">首页</a>
-    <a href="#/templates" data-nav="/templates">模板库</a>
-    <a href="#/cheatsheet" data-nav="/cheatsheet">技巧速查</a>
-    <a href="#/playground" data-nav="/playground">工作台</a>
-  </nav>
-  <div class="topbar-right">
-    <a class="progress-pill" href="#/" id="progressPill" title="学习进度">
-      <span class="ring" id="progressRing" style="--p:0"><b id="progressPct">0%</b></span>
-      <span class="progress-label">学习进度</span>
+<header class="topbar" id="topbar">
+  <div class="progressive" id="topbarBlur" aria-hidden="true"></div>
+  <div class="progressive__wash" aria-hidden="true"></div>
+  <div class="topbar__inner">
+    <a class="brand" href="#/" aria-label="工具学校首页">
+      <span class="brand__mark" aria-hidden="true">&gt;_</span>
+      <span class="brand__text"><b>工具学校</b><em>Tool School</em></span>
     </a>
-    <button class="icon-btn" id="themeBtn" aria-label="切换深色模式" title="切换深色模式">
-      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
-      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
-    </button>
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="#/" data-nav="home">课程</a>
+      <a href="#/commands" data-nav="commands">命令速查</a>
+      <a href="#/shortcuts" data-nav="shortcuts">快捷键</a>
+      <a href="#/glossary" data-nav="glossary">术语表</a>
+    </nav>
+    <div class="topbar__right">
+      <button class="searchbtn" id="paletteBtn" type="button" aria-label="搜索（⌘K）">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <span>搜索</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <div class="progress-chip" title="学习进度">
+        <span class="progress-chip__track" aria-hidden="true"><i id="progressFill"></i></span>
+        <span id="progressPct">0%</span>
+      </div>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="打开课程目录" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
   </div>
-  <div class="progress-bar-mobile" aria-hidden="true"><i id="progressBarMobile" style="width:0%"></i></div>
+  <div class="readbar" id="readbar" aria-hidden="true"></div>
 </header>
 
-<div class="layout">
-  <aside class="sidebar" id="sidebar" aria-label="课程目录">
-    <div class="sidebar-inner">
-      <label class="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
-        <input type="search" id="lessonSearch" placeholder="搜索课程…" aria-label="搜索课程">
-      </label>
-      <nav class="lesson-nav" id="lessonNav"></nav>
-      <div class="sidebar-foot">
-        <a class="side-link" href="#/templates">提示词模板库</a>
-        <a class="side-link" href="#/cheatsheet">技巧速查表</a>
-        <a class="side-link" href="#/glossary">术语表</a>
-        <button class="side-link as-button" id="resetProgress" type="button">清空学习进度</button>
-      </div>
-    </div>
-  </aside>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="课程目录"></aside>
   <div class="scrim" id="scrim" hidden></div>
-
-  <main id="main" tabindex="-1"></main>
+  <main class="main" id="main" tabindex="-1"></main>
 </div>
 
-<footer class="site-foot">
-  <p><strong>提示词学校</strong> · 纯本地静态页面，不上传任何数据，学习进度只存在你的浏览器里。</p>
-  <p class="dim">核心主张：与其背咒语，不如把需求说清楚，并且先让 AI 问你问题。</p>
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <a class="brand" href="#/">
+        <span class="brand__mark" aria-hidden="true">&gt;_</span>
+        <span class="brand__text"><b>工具学校</b><em>Tool School</em></span>
+      </a>
+      <p>把每天要用的计算机工具讲明白：终端、Git、VS Code、开发环境与排错。纯静态页面，不联网也能学，进度只存在你的浏览器里。</p>
+    </div>
+    <div class="footer__cols">
+      <div class="footer__col">
+        <b>学习</b>
+        <a href="#/">全部课程</a>
+        <a href="#/lesson/terminal-intro">从第一课开始</a>
+        <a href="#/glossary">术语表</a>
+      </div>
+      <div class="footer__col">
+        <b>速查</b>
+        <a href="#/commands">命令速查</a>
+        <a href="#/shortcuts">快捷键</a>
+        <a href="#/shortcuts">快捷键挑战</a>
+      </div>
+      <div class="footer__col">
+        <b>说明</b>
+        <a href="README.md">项目与数据说明</a>
+        <span class="dim" style="font-size:12.5px">29 节课 · 5 条轨道</span>
+      </div>
+    </div>
+  </div>
 </footer>
+
+<div class="palette" id="palette" hidden>
+  <div class="palette__scrim" data-palette-close></div>
+  <div class="palette__panel lg-surface lg-surface--menu" role="dialog" aria-modal="true" aria-label="搜索">
+    <div class="palette__input-row">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input id="paletteInput" type="text" placeholder="搜索课程、命令、页面…" autocomplete="off" spellcheck="false">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="palette__results" id="paletteResults"></div>
+    <div class="palette__foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>↵</kbd> 打开</span>
+      <span><kbd>Esc</kbd> 关闭</span>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/js/data-lessons-a.js"></script>
-<script src="assets/js/data-lessons-b.js"></script>
-<script src="assets/js/data-extra.js"></script>
-<script src="assets/js/checker.js"></script>
+<script src="assets/js/data-terminal.js"></script>
+<script src="assets/js/data-git.js"></script>
+<script src="assets/js/data-vscode.js"></script>
+<script src="assets/js/data-dev.js"></script>
+<script src="assets/js/data-efficiency.js"></script>
+<script src="assets/js/data-refs.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

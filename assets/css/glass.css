@@ -1,0 +1,150 @@
+/* ============================================================================
+   液态玻璃组件层
+   数值来自参考设计系统实测值：玻璃只用于「浮在内容之上」的层级信号
+   （顶栏、搜索框、菜单、浮层），底色永远是纯黑，玻璃本身是哑光的。
+   禁止：顶部 inset 高光、亮边、彩虹描边、跟手光斑、大投影。
+   ========================================================================== */
+
+.lg-surface {
+  --lg-tint: var(--surface-2, #171717);
+  --lg-tint-alpha: 70%;
+  --lg-blur: 24px;
+  --lg-sat: 140%;
+  --lg-radius: var(--radius-lg);
+  --lg-border: rgba(255, 255, 255, 0.1);
+
+  position: relative;
+  border: 1px solid var(--lg-border);
+  border-radius: var(--lg-radius);
+  background: color-mix(in oklab, var(--lg-tint) var(--lg-tint-alpha), transparent);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28), 0 1px 2px -1px rgba(0, 0, 0, 0.28);
+  isolation: isolate;
+}
+@supports not (backdrop-filter: blur(2px)) {
+  .lg-surface { background: color-mix(in oklab, var(--lg-tint) 92%, transparent); }
+}
+
+.lg-surface--strong { --lg-tint-alpha: 85%; --lg-blur: 24px; }
+.lg-surface--thin { --lg-tint-alpha: 55%; --lg-blur: 20px; }
+.lg-surface--chrome {
+  --lg-tint-alpha: 65%;
+  --lg-blur: 20px;
+  --lg-sat: 150%;
+  --lg-radius: 0px;
+  border-width: 0 0 1px 0;
+}
+.lg-surface--menu {
+  --lg-tint: var(--surface-2, #171717);
+  --lg-tint-alpha: 96%;
+  --lg-blur: 24px;
+  --lg-radius: var(--radius-md);
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+/* 药丸胶囊 */
+.lg-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hairline);
+  background: color-mix(in oklab, var(--surface-2) 55%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast), transform 0.16s ease;
+}
+.lg-pill:hover { background: color-mix(in oklab, var(--surface-2) 85%, transparent); border-color: rgba(255, 255, 255, 0.18); }
+.lg-pill:active { transform: translateY(1px); }
+
+.lg-pill--nav {
+  height: 34px;
+  min-height: 34px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  gap: 6px;
+}
+
+/* 主行动：实心白胶囊，与玻璃面形成实-虚对比 */
+.lg-pill--solid {
+  background: #ffffff;
+  color: #000000;
+  border-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-weight: 600;
+}
+.lg-pill--solid:hover { background: #e5e5e5; border-color: transparent; }
+
+/* 大号主按钮（官网口径：min-height 50 / padding 15 26 / 15px） */
+.lg-pill--cta {
+  height: 50px;
+  padding: 0 26px;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.lg-pill--ghost {
+  background: transparent;
+  color: var(--text-2);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.lg-pill--ghost:hover { background: var(--surface-2); color: #fff; }
+
+/* 哑光镜片（标签 / 小块信息） */
+.lg-lens {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  padding: 7px 14px;
+  border: 1px solid var(--hairline);
+  background: color-mix(in oklab, var(--surface-2) 78%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  color: var(--text-2);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28), 0 1px 2px -1px rgba(0, 0, 0, 0.28);
+}
+
+/* ---------------------------------------------------------------- 顶栏玻璃 */
+/*
+   递进模糊：9 个绝对定位层，blur 从 10px 递减到 0，再用 mask 局部生效。
+   解决单层大 blur 在深色底上的边缘硬切。层由 app.js 的 mountProgressiveBlur 生成。
+*/
+.progressive {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.progressive__layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  -webkit-backdrop-filter: blur(var(--blur, 0px));
+  backdrop-filter: blur(var(--blur, 0px));
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+}
+.progressive__wash {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0));
+  pointer-events: none;
+  z-index: 1;
+}
