@@ -317,12 +317,12 @@ window.PS.lessons.push(
     order: 33,
     track: 'agents',
     title: 'dsh：DeepSeek Harness',
-    subtitle: '桌面端 agent，工作区、会话、工具与多代理',
+    subtitle: '桌面端 agent：工作区、会话、技能、插件与 MCP',
     minutes: 12,
     level: '基础',
     goal: [
       '理解 dsh 的工作区与会话模型',
-      '知道它能调用哪些工具',
+      '知道技能、插件与 MCP 能扩展什么',
       '会用权限与沙箱控制风险'
     ],
     sections: [
@@ -342,11 +342,6 @@ window.PS.lessons.push(
           ['权限策略', '哪些操作需要你确认，哪些直接执行'],
           ['沙箱模式', '允许改的范围：仅工作区，或整台机器']
         ]
-      },
-      {
-        type: 'text',
-        title: '它能调用的工具',
-        html: `<p>和终端类 agent 类似，但工具是内置的：读文件、写文件、精确编辑、按模式找文件、按内容搜索、执行命令、抓取网页，以及<strong>运行一段 TypeScript 程序</strong>来编排多个工具调用。</p>`
       },
       {
         type: 'table',
@@ -377,8 +372,25 @@ window.PS.lessons.push(
       },
       {
         type: 'text',
-        title: '多代理与技能',
-        html: `<p>dsh 支持把任务拆给<strong>子代理</strong>并行处理，也支持<strong>技能包</strong>（成组的操作说明与脚本）。做大型重构或调研时，可以让子代理分别读不同模块，最后汇总。技能适合把「每次都一样的流程」固化下来。</p>`
+        title: '技能：把重复流程打包',
+        html: "<p>技能是一份带 frontmatter 的 <code>SKILL.md</code>，放在 <code>~/.dsh/skills/名字/</code> 下，里面可以写步骤、判据，也可以带脚本。它和提示词的区别是<strong>按需加载</strong>：平时不占上下文，匹配到场景才展开。</p><p>适合固化的东西：出卷、发版检查、周报生成、数据清洗。把「每次都一样的流程」写进去，比每次重新描述稳定得多。</p>",
+      },
+      {
+        type: 'code',
+        title: 'SKILL.md 的结构',
+        lang: 'text',
+        text: "---\nname: weekly-report\ndescription: 把一周的 commit 与 issue 整理成周报草稿\nwhenToUse: 用户要求写周报、汇总本周进展时\n---\n\n# 周报生成\n\n1. 读取 worklog/*.md 与 git log --since=\"7 days ago\" --oneline\n2. 按「完成 / 进行中 / 风险」三组归类，每条一句话\n3. 输出 Markdown，不超过 300 字；风险部分必须写清影响面",
+        note: "<p>frontmatter 里的 <code>description</code> 和 <code>whenToUse</code> 决定它什么时候被加载，写清楚触发场景比写漂亮话重要。</p>"
+      },
+      {
+        type: 'text',
+        title: '插件与插件市场',
+        html: "<p>dsh 是<strong>插件化</strong>的：插件能给 agent 加工具、加连接器、加界面。安装走 <code>dsh plugin</code> 命令或应用内的市场入口；插件市场里的条目通常带着来源地址，装之前先看它来自哪个仓库、要什么权限。</p><p>典型例子是浏览器控制插件：它桥接你正在用的 Chrome / Firefox，让 agent 读页面、点控件、切标签，同时保留你的登录状态。这类插件能力很强，也意味着更大的权限面——只装你信得过的来源。</p>",
+      },
+      {
+        type: 'text',
+        title: 'MCP：接外部工具与数据',
+        html: "<p>MCP（Model Context Protocol）是给 agent 接外部能力的协议。通过 MCP 服务器，可以把数据库、内部 API、文档系统接进来，这些能力会以工具的形式出现在会话里。</p><p>配置时守住两条：只接需要的服务器，给它最小的访问范围；优先本地或可信来源，不要随手接一个来路不明的公网服务。</p>",
       },
       {
         type: 'tip',
@@ -396,11 +408,6 @@ window.PS.lessons.push(
         lang: 'text',
         text: '目标：给设置页加上「导出配置」按钮，导出当前设置为 JSON。\n范围：只改 src/pages/settings 与 src/lib/export.ts，不要动路由。\n验收：点击后下载 settings.json，内容包含主题与语言两项；补一个单测。',
         note: '`<p>工作区、范围、验收都写清楚，子代理并行时也不会改到同一批文件。</p>`'
-      },
-      {
-        type: 'text',
-        title: '附件与长任务',
-        html: '`<p>需要它看截图、日志或设计稿时，把文件作为附件放进会话，比口头描述准确。长任务分阶段推进：先方案、再实现、最后验收，每阶段结束让它复述当前状态，避免上下文漂移。</p>`'
       },
     ],
     exercise: {
