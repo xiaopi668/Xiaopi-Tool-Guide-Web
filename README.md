@@ -11,6 +11,8 @@
 - ⌘K / Ctrl+K 全局搜索课程、命令和页面
 - 纯静态、零依赖、离线可用；学习进度只存在你自己的浏览器里
 
+配套的 Markdown 版指南：[Xiaopi-Tool-Guide](https://github.com/xiaopi668/Xiaopi-Tool-Guide)，同样的 29 节内容，适合通读、离线阅读或放进团队文档。
+
 ## 怎么打开
 
 不需要安装、不需要联网、不需要构建：
