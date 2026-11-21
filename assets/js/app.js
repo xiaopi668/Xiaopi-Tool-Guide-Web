@@ -125,6 +125,61 @@
   function platform() { return state.platform || detectPlatform(); }
   function platformLabel() { return platform() === 'mac' ? 'macOS' : 'Windows'; }
 
+  /* ------------------------------------------------------------ 入场动画 */
+  var REVEAL = (function () {
+    var supported = false;
+    try { supported = !!(window.CSS && CSS.supports && CSS.supports('translate', '0 1px')); } catch (err) {}
+    var reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (err) {}
+    var hasIO = typeof window.IntersectionObserver === 'function';
+    var enabled = supported && !reduce && hasIO;
+    if (enabled) document.documentElement.classList.add('js');
+    var io = null;
+
+    function showNow(nodes) {
+      nodes.forEach(function (el) {
+        el.classList.add('in', 'no-anim');
+        el.style.willChange = 'auto';
+      });
+    }
+
+    function setup(skip) {
+      var nodes = qa('.reveal');
+      if (!nodes.length) return;
+      if (!enabled || skip) { showNow(nodes); return; }
+      if (!io) {
+        io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (!en.isIntersecting) return;
+            var el = en.target;
+            var delay = el.getAttribute('data-delay');
+            if (delay) el.style.setProperty('--reveal-delay', delay + 'ms');
+            el.classList.add('in');
+            io.unobserve(el);
+            el.addEventListener('transitionend', function () {
+              el.style.willChange = 'auto';
+            }, { once: true });
+          });
+        }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+      }
+      io.disconnect();
+      nodes.forEach(function (el) {
+        if (el.classList.contains('in')) return;
+        var parent = el.parentNode;
+        if (!el.hasAttribute('data-delay') && parent && parent.hasAttribute && parent.hasAttribute('data-stagger')) {
+          var sibs = Array.prototype.filter.call(parent.children, function (n) {
+            return n.classList && n.classList.contains('reveal');
+          });
+          var idx = sibs.indexOf(el);
+          if (idx > 0) el.setAttribute('data-delay', String(Math.min(idx, 6) * 70));
+        }
+        io.observe(el);
+      });
+    }
+
+    return { setup: setup };
+  })();
+
   function currentRoute() {
     var h = (location.hash || '').replace(/^#/, '');
     var parts = h.split('/').filter(function (x) { return x.length; });
@@ -227,6 +282,7 @@
     paintNav(r);
     if (r.name === 'commands') initCommandsView();
     if (r.name === 'shortcuts') initShortcutsView();
+    REVEAL.setup(keepScroll === true);
     updateReadbar();
     if (!keepScroll) window.scrollTo(0, 0);
   }
@@ -250,28 +306,28 @@
     var out = [];
     out.push('<div class="container">');
     out.push('<section class="hero enter">');
-    out.push('<div class="hero__grid">');
-    out.push('<div>');
-    out.push('<p class="hero__eyebrow meta"><span class="dot"></span>计算机工具教程 · Tool School</p>');
-    out.push('<h1 class="display">把电脑<br><span class="nowrap">用成一把工具</span></h1>');
-    out.push('<p class="hero__lede lede">终端、Git、VS Code、开发环境、排错手册。' +
+    out.push('<div class="hero__grid" data-stagger>');
+    out.push('<div data-stagger>');
+    out.push('<p class="hero__eyebrow meta reveal"><span class="dot"></span>计算机工具教程 · Tool School</p>');
+    out.push('<h1 class="display reveal">把电脑<br><span class="nowrap">用成一把工具</span></h1>');
+    out.push('<p class="hero__lede lede reveal">终端、Git、VS Code、开发环境、排错手册。' +
       lessons.length + ' 节短课，每节 10 到 15 分钟，配真实命令、快捷键和报错解法。不讲概念，只讲怎么用。</p>');
-    out.push('<div class="hero__cta">');
+    out.push('<div class="hero__cta reveal">');
     out.push('<a class="lg-pill lg-pill--solid lg-pill--cta" href="#/lesson/' + (lessons[0] ? lessons[0].id : 'terminal-intro') + '">从第一课开始 <span aria-hidden="true">→</span></a>');
     out.push('<a class="lg-pill lg-pill--ghost lg-pill--cta" href="#/commands">浏览命令速查</a>');
     out.push('</div>');
-    out.push('<div class="hero__meta">');
+    out.push('<div class="hero__meta reveal">');
     out.push('<div><b>' + lessons.length + '</b><span>节课</span></div>');
     out.push('<div><b>' + TRACKS.length + '</b><span>条学习轨道</span></div>');
     out.push('<div><b>' + PS.commands.length + '</b><span>条命令</span></div>');
     out.push('<div><b>' + PS.shortcuts.length + '</b><span>个快捷键</span></div>');
     out.push('</div>');
     out.push('</div>');
-    out.push('<div class="enter enter-2">' + heroTerminal() + '</div>');
+    out.push('<div class="reveal right">' + heroTerminal() + '</div>');
     out.push('</div></section></div>');
 
     out.push('<section class="section" id="tracks"><div class="container">');
-    out.push('<div class="section__head"><div><span class="meta">Learning Path</span>' +
+    out.push('<div class="section__head reveal"><div><span class="meta">Learning Path</span>' +
       '<h2 class="h2">五条轨道，<br>从终端走到能自己解决问题</h2>' +
       '<p>按顺序学最稳，也可以直接跳到你现在卡住的那一块。每节课都能单独看。</p></div>' +
       '<a class="section__link" href="#/lesson/' + (lessons[0] ? lessons[0].id : 'terminal-intro') + '">从第一课开始 <span aria-hidden="true">→</span></a></div>');
@@ -279,7 +335,7 @@
       var list = trackLessons[track.key] || [];
       if (!list.length) return;
       var first = list[0];
-      out.push('<article class="track">');
+      out.push('<article class="track reveal">');
       out.push('<div class="track__num">0' + (ti + 1) + '</div>');
       out.push('<div><h3><a href="#/lesson/' + first.id + '">' + esc(track.name) + '</a></h3>');
       out.push('<p>' + esc(track.desc) + '</p>');
@@ -295,25 +351,25 @@
     out.push('</div></section>');
 
     out.push('<section class="section"><div class="container">');
-    out.push('<div class="section__head"><div><span class="meta">Toolkit</span><h2 class="h2">学的时候顺手用</h2>' +
+    out.push('<div class="section__head reveal"><div><span class="meta">Toolkit</span><h2 class="h2">学的时候顺手用</h2>' +
       '<p>三件随时可以查的东西：命令、快捷键、报错解法。</p></div></div>');
-    out.push('<div class="feature-grid">');
+    out.push('<div class="feature-grid" data-stagger>');
     out.push(featureCard('命令速查', '查询 ' + PS.commands.length + ' 条常用命令，按工具分类，点一下就复制。', '#/commands', 'COMMANDS'));
     out.push(featureCard('快捷键挑战', '随机出题，从四个组合里选出正确的那个，把肌肉记忆练出来。', '#/shortcuts', 'SHORTCUTS'));
     out.push(featureCard('报错排查手册', '端口被占用、找不到模块、push 被拒：最常见的报错怎么读懂、怎么解。', '#/lesson/troubleshoot', 'TROUBLESHOOT'));
     out.push('</div></div></section>');
 
-    out.push('<section class="cta"><div class="container">');
+    out.push('<section class="cta"><div class="container" data-stagger>');
     out.push('<span class="meta">Start Here</span>');
-    out.push('<h2 class="silver">打开终端，<br>从第一条命令开始。</h2>');
-    out.push('<p>不用先学完再动手。每节课都有一组可以马上在你自己电脑上跑的命令。</p>');
-    out.push('<div class="cta__actions"><a class="lg-pill lg-pill--solid lg-pill--cta" href="#/lesson/' + (lessons[0] ? lessons[0].id : 'terminal-intro') + '">开始学习</a>' +
+    out.push('<h2 class="silver reveal">打开终端，<br>从第一条命令开始。</h2>');
+    out.push('<p class="reveal">不用先学完再动手。每节课都有一组可以马上在你自己电脑上跑的命令。</p>');
+    out.push('<div class="cta__actions reveal"><a class="lg-pill lg-pill--solid lg-pill--cta" href="#/lesson/' + (lessons[0] ? lessons[0].id : 'terminal-intro') + '">开始学习</a>' +
       '<a class="lg-pill lg-pill--cta" href="#/glossary">先看看术语表</a></div>');
     out.push('</div></section>');
     return out.join('');
   }
   function featureCard(title, desc, href, tag) {
-    return '<a class="feature" href="' + href + '">' +
+    return '<a class="feature reveal" href="' + href + '">' +
       '<span class="meta">' + esc(tag) + '</span>' +
       '<h3>' + esc(title) + '</h3><p>' + esc(desc) + '</p>' +
       '<span class="feature__go">打开 <span aria-hidden="true">→</span></span></a>';
@@ -333,7 +389,7 @@
     var out = [];
     out.push('<article class="lesson">');
     out.push('<div class="lesson__crumb"><a href="#/">课程</a><span class="sep">/</span><span>' + esc(track.name) + '</span><span class="sep">/</span><span>第 ' + pad2(l.order) + ' 课</span></div>');
-    out.push('<header class="lesson__head">');
+    out.push('<header class="lesson__head reveal">');
     out.push('<div class="lesson__eyebrow">' + chip(track.name, 'chip--solid') + chip('第 ' + pad2(l.order) + ' 课') + '</div>');
     out.push('<h1 class="lesson__title">' + esc(l.title) + '</h1>');
     out.push('<p class="lesson__sub">' + esc(l.subtitle) + '</p>');
@@ -354,11 +410,11 @@
     if (l.exercise) out.push(renderExercise(l));
     if (l.quiz && l.quiz.length) out.push(renderQuiz(l));
 
-    out.push('<div class="finish"><p>' + (state.done[l.id] ? '这一课已经标记完成。' : '学完了？标记一下，进度会存在你自己的浏览器里。') + '</p>' +
+    out.push('<div class="finish reveal"><p>' + (state.done[l.id] ? '这一课已经标记完成。' : '学完了？标记一下，进度会存在你自己的浏览器里。') + '</p>' +
       '<button class="lg-pill ' + (state.done[l.id] ? 'lg-pill--ghost' : 'lg-pill--solid') + '" type="button" data-mark-done="' + l.id + '">' +
       (state.done[l.id] ? '取消完成标记' : '标记为已完成') + '</button></div>');
 
-    out.push('<nav class="pager" aria-label="课程翻页">');
+    out.push('<nav class="pager reveal" aria-label="课程翻页">');
     if (prev) out.push('<a href="#/lesson/' + prev.id + '"><span class="dir">上一课</span><span class="title">' + esc(prev.title) + '</span></a>');
     else out.push('<a class="is-empty" aria-hidden="true"></a>');
     if (next) out.push('<a class="next" href="#/lesson/' + next.id + '"><span class="dir">下一课</span><span class="title">' + esc(next.title) + '</span></a>');
@@ -372,11 +428,11 @@
     if (!s || !s.type) return '';
     if (s.type === 'text') {
       var n = s.title ? nextNo() : 0;
-      return '<section class="sec">' + sectionHead(s.title, n) + '<div class="prose">' + s.html + '</div></section>';
+      return '<section class="sec reveal">' + sectionHead(s.title, n) + '<div class="prose">' + s.html + '</div></section>';
     }
     if (s.type === 'tip' || s.type === 'warn') {
       var isWarn = s.type === 'warn';
-      return '<div class="callout callout--' + (isWarn ? 'warn' : 'tip') + '">' +
+      return '<div class="callout reveal callout--' + (isWarn ? 'warn' : 'tip') + '">' +
         '<div class="callout__head"><span class="callout__icon">' + (isWarn ? '!' : '✓') + '</span>' + esc(s.title || (isWarn ? '注意' : '要点')) + '</div>' +
         '<div class="callout__body">' + s.html + '</div></div>';
     }
@@ -386,7 +442,7 @@
         return '<div class="step"><div class="step__n">' + pad2(idx + 1) + '</div><div>' +
           '<h4>' + esc(it.title || '') + '</h4><div class="step__body">' + (it.html || '') + '</div></div></div>';
       }).join('');
-      return '<section class="sec">' + sectionHead(s.title, sn) + '<div class="steps">' + steps + '</div></section>';
+      return '<section class="sec reveal">' + sectionHead(s.title, sn) + '<div class="steps">' + steps + '</div></section>';
     }
     if (s.type === 'table') {
       var tn = s.title ? nextNo() : 0;
@@ -394,7 +450,7 @@
       var rows = (s.rows || []).map(function (row) {
         return '<tr>' + row.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>';
       }).join('');
-      return '<section class="sec">' + sectionHead(s.title, tn) +
+      return '<section class="sec reveal">' + sectionHead(s.title, tn) +
         '<div class="tablewrap"><table class="tbl"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></section>';
     }
     if (s.type === 'code') return renderCode(s);
@@ -406,7 +462,7 @@
           '<span class="sc__keys">' + keysHtml(it.mac) + '</span>' +
           '<span class="sc__keys sc__keys--win">' + keysHtml(it.win) + '</span></div>';
       }).join('');
-      return '<section class="sec">' + sectionHead(s.title, kn) +
+      return '<section class="sec reveal">' + sectionHead(s.title, kn) +
         '<div class="sc"><div class="sc__head"><span>操作</span><span>macOS</span><span>Windows</span></div>' + rowsS + '</div></section>';
     }
     if (s.type === 'compare') {
@@ -414,7 +470,7 @@
       var left = s.left || { label: '错误做法', items: [] };
       var right = s.right || { label: '正确做法', items: [] };
       var lis = function (arr) { return (arr || []).map(function (x) { return '<li>' + inline(x) + '</li>'; }).join(''); };
-      return '<section class="sec">' + sectionHead(s.title, cn) +
+      return '<section class="sec reveal">' + sectionHead(s.title, cn) +
         '<div class="compare">' +
         '<div class="compare__col compare__col--bad"><div class="compare__label">' + esc(left.label) + '</div><ul>' + lis(left.items) + '</ul></div>' +
         '<div class="compare__col compare__col--good"><div class="compare__label">' + esc(right.label) + '</div><ul>' + lis(right.items) + '</ul></div>' +
@@ -451,7 +507,7 @@
   function renderCode(s) {
     var text = s.text || '';
     var note = s.note ? '<figcaption class="term__note">' + s.note + '</figcaption>' : '';
-    return '<figure class="code">' +
+    return '<figure class="code reveal">' +
       '<div class="code__head"><span class="code__title">' + esc(s.title || '代码') + '</span>' +
       '<span class="code__lang">' + esc(s.lang || 'text') + '</span>' + copyButton(text) + '</div>' +
       '<pre>' + highlightCode(text, s.lang) + '</pre>' + note + '</figure>';
@@ -459,7 +515,7 @@
   function renderTerminal(s) {
     var cmd = s.command || '';
     var note = s.note ? '<figcaption class="term__note">' + s.note + '</figcaption>' : '';
-    return '<figure class="term">' +
+    return '<figure class="term reveal">' +
       '<div class="term__head"><span class="term__dots"><i></i><i></i><i></i></span>' +
       '<span class="term__label">' + esc(s.title || '终端') + '</span>' + copyButton(cmd) + '</div>' +
       '<div class="term__body"><div class="term__line"><span class="term__prompt">$</span>' +
@@ -476,7 +532,7 @@
         '<input class="exercise__check" type="checkbox" data-practice="' + l.id + '" data-idx="' + idx + '"' + (saved[idx] ? ' checked' : '') + '>' +
         '<span>' + inline(it.text) + (it.cmd ? ' <code>' + esc(it.cmd) + '</code>' : '') + '</span></label>';
     }).join('');
-    return '<section class="exercise" id="exercise">' +
+    return '<section class="exercise reveal" id="exercise">' +
       '<div class="exercise__top"><h3>' + esc(ex.title || '动手练一练') + '</h3><span class="meta">Practice</span></div>' +
       '<p class="exercise__brief">' + esc(ex.brief || '') + '</p>' +
       '<div class="exercise__list">' + items + '</div>' +
@@ -492,7 +548,7 @@
       return '<div class="quiz__q" data-qbox="' + qi + '"><h4>' + (qi + 1) + '. ' + esc(item.q) + '</h4>' +
         '<div class="quiz__opts">' + opts + '</div><div class="quiz__explain" hidden></div></div>';
     }).join('');
-    return '<section class="quiz" id="quiz"><h2 class="sec__title">小测验：确认你真的看懂</h2>' + qs + '</section>';
+    return '<section class="quiz reveal" id="quiz"><h2 class="sec__title">小测验：确认你真的看懂</h2>' + qs + '</section>';
   }
 
   function answerQuiz(l, qi, oi) {
@@ -544,18 +600,18 @@
     });
     var out = [];
     out.push('<div class="page">');
-    out.push('<header class="page__head"><span class="meta">Command Reference</span>');
+    out.push('<header class="page__head reveal"><span class="meta">Command Reference</span>');
     out.push('<h1 class="page__title">命令速查</h1>');
     out.push('<p class="page__sub">按工具分组，点右侧按钮直接复制。不确定命令会不会闯祸时，先看说明再执行。</p></header>');
-    out.push('<div class="searchfield"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
+    out.push('<div class="searchfield reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
       '<input id="cmdSearch" type="text" placeholder="搜索命令或用途，例如 rebase、端口、venv…" autocomplete="off" spellcheck="false"><kbd>/</kbd></div>');
-    out.push('<div class="filters" id="cmdFilters"><button class="filter is-active" type="button" data-tool="all">全部</button>');
+    out.push('<div class="filters reveal" id="cmdFilters"><button class="filter is-active" type="button" data-tool="all">全部</button>');
     tools.forEach(function (t) {
       out.push('<button class="filter" type="button" data-tool="' + esc(t) + '">' + esc(toolName(t)) + '</button>');
     });
     out.push('</div>');
     tools.forEach(function (t) {
-      out.push('<section class="cmd-group" data-group-tool="' + esc(t) + '">');
+      out.push('<section class="cmd-group reveal" data-group-tool="' + esc(t) + '">');
       out.push('<h2 class="cmd-group__title">' + esc(toolName(t)) + '<b>' + groups[t].length + ' 条</b></h2>');
       out.push('<div class="cmd-list">');
       groups[t].forEach(function (c) {
@@ -621,15 +677,15 @@
     var apps = Object.keys(groups);
     var out = [];
     out.push('<div class="page">');
-    out.push('<header class="page__head"><span class="meta">Keyboard Shortcuts</span>');
+    out.push('<header class="page__head reveal"><span class="meta">Keyboard Shortcuts</span>');
     out.push('<h1 class="page__title">快捷键</h1>');
     out.push('<p class="page__sub">先把最常用的十几个练成肌肉记忆，剩下的用的时候再查。下面还有一个小挑战。</p></header>');
 
-    out.push('<section class="trainer" id="trainer"><div class="trainer__top">' +
+    out.push('<section class="trainer reveal" id="trainer"><div class="trainer__top">' +
       '<span class="meta">快捷键挑战</span>' +
       '<span class="trainer__score" id="trScore">得分 0 / 0</span></div><div id="trainerBody"></div></section>');
 
-    out.push('<div class="shortcut-tools">');
+    out.push('<div class="shortcut-tools reveal">');
     out.push('<div class="searchfield" style="flex:1;min-width:240px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
       '<input id="scSearch" type="text" placeholder="搜索动作，例如 注释、命令面板、终端…" autocomplete="off" spellcheck="false"></div>');
     out.push('<div class="platform-toggle" id="platformToggle">' +
@@ -637,14 +693,14 @@
       '<button type="button" data-platform="win" class="' + (platform() === 'win' ? 'is-active' : '') + '">Windows</button></div>');
     out.push('</div>');
 
-    out.push('<div class="filters" id="scFilters"><button class="filter is-active" type="button" data-cat="all">全部</button>');
+    out.push('<div class="filters reveal" id="scFilters"><button class="filter is-active" type="button" data-cat="all">全部</button>');
     apps.forEach(function (app) {
       out.push('<button class="filter" type="button" data-cat="' + esc(app) + '">' + esc(app) + '</button>');
     });
     out.push('</div>');
 
     apps.forEach(function (app) {
-      out.push('<section class="cmd-group" data-group-cat="' + esc(app) + '">');
+      out.push('<section class="cmd-group reveal" data-group-cat="' + esc(app) + '">');
       out.push('<h2 class="cmd-group__title">' + esc(app) + '<b>' + groups[app].length + ' 个</b></h2>');
       out.push('<div class="cmd-list">');
       groups[app].forEach(function (s) {
@@ -770,9 +826,9 @@
   function viewGlossary() {
     var out = [];
     out.push('<div class="page">');
-    out.push('<header class="page__head"><span class="meta">Glossary</span><h1 class="page__title">术语表</h1>' +
+    out.push('<header class="page__head reveal"><span class="meta">Glossary</span><h1 class="page__title">术语表</h1>' +
       '<p class="page__sub">看课时遇到不认识的词，回这里查。都是大白话，不抄定义。</p></header>');
-    out.push('<div class="gloss">');
+    out.push('<div class="gloss reveal">');
     PS.glossary.forEach(function (g) {
       out.push('<div class="gloss__item"><div class="gloss__term">' + esc(g.term) +
         (g.en ? '<em>' + esc(g.en) + '</em>' : '') + '</div>' +

@@ -207,6 +207,34 @@ code, pre, kbd { font-family: var(--font-mono); }
 .enter-2 { animation-delay: 0.12s; }
 .enter-3 { animation-delay: 0.18s; }
 
+/* ---------------------------------------------------------------- 滚动入场 */
+/*
+   进入视口时淡入并上移。位移用独立的 translate 属性而不是 transform，
+   这样 transform 可以继续留给 hover / active 的交互，两者互不覆盖。
+   逐项延迟由 app.js 按同组顺序写入 --reveal-delay。
+*/
+@supports (translate: 0 1px) {
+  .js .reveal {
+    opacity: 0;
+    translate: 0 56px;
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 0.7, 0.3, 1),
+      translate 0.9s cubic-bezier(0.22, 0.7, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, translate;
+  }
+  .js .reveal.left { translate: -64px 0; }
+  .js .reveal.right { translate: 64px 0; }
+  .js .reveal.in { opacity: 1; translate: 0 0; }
+  .js .reveal.no-anim { transition: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal { opacity: 1 !important; translate: none !important; transition: none !important; }
+}
+@media print {
+  .reveal { opacity: 1 !important; translate: none !important; }
+}
+
 .skip-link {
   position: fixed;
   top: -80px;

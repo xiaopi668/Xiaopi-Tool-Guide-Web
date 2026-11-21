@@ -97,6 +97,7 @@
 - 玻璃只用在「浮在内容之上」的位置：顶栏、搜索框、命令面板；并且是哑光的，没有高光、亮边和彩虹描边
 - 顶栏用 9 层递进模糊（blur 10px → 0），解决单层大模糊在深色底上的边缘硬切
 - 大标题用负字距（`-0.055em`），中文行高单独放宽到 1.2
+- 元素进入视口时淡入上移：IntersectionObserver 触发、同组错峰 70ms、位移用 `translate` 属性以免占用 `transform`，并尊重 `prefers-reduced-motion`
 
 设计令牌在 `assets/css/tokens.css`，玻璃组件在 `assets/css/glass.css`，页面组件在 `assets/css/app.css`。
 
@@ -140,7 +141,7 @@ node tools/verify.mjs --shots # 顺便把各页面截图写到 screenshots/
 chrome --headless=new --remote-debugging-port=9222 --user-data-dir=/tmp/ts-profile about:blank
 ```
 
-当前 30 项检查全部通过：数据契约、29 课逐课渲染、测验与自动完成、练习勾选与本地保存、复制反馈、命令筛选与搜索、快捷键挑战、平台切换、⌘K 面板、术语表、移动端目录，以及运行期零 JS 报错。
+当前 33 项检查全部通过：数据契约、29 课逐课渲染、测验与自动完成、练习勾选与本地保存、复制反馈、命令筛选与搜索、快捷键挑战、平台切换、⌘K 面板、术语表、移动端目录、滚动入场动画（触发、错峰、降级），以及运行期零 JS 报错。
 
 ## 说明
 

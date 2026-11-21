@@ -194,7 +194,22 @@ await goto(client, '#/lesson/terminal-intro');
 const mob = JSON.parse(await evaluate(client, 'JSON.stringify((function(){var btn=document.getElementById("menuBtn");var vis=btn?getComputedStyle(btn).display:"none";btn.click();var open=document.body.classList.contains("nav-open");var side=getComputedStyle(document.getElementById("sidebar")).transform;return {btn:vis,open:open,width:document.documentElement.clientWidth,side:side};})())'));
 check('移动端目录可打开', mob.btn !== 'none' && mob.open, '按钮 ' + mob.btn + ' / 抽屉 ' + mob.side);
 
-console.log('\n== 7. 运行期错误 ==');
+console.log('\n== 7. 入场动画 ==');
+await goto(client, '#/');
+const rv = JSON.parse(await evaluate(client, 'JSON.stringify((function(){var h=document.querySelector(".hero h1");return {js:document.documentElement.classList.contains("js"),count:document.querySelectorAll(".reveal").length,inHero:h.classList.contains("in"),dur:getComputedStyle(h).transitionDuration};})())'));
+check('入场动画已启用', rv.js && rv.count >= 18 && rv.inHero && rv.dur !== '0s', rv.count + ' 个元素 / ' + rv.dur);
+await goto(client, '#/lesson/git-undo');
+const revBefore = await evaluate(client, 'document.querySelectorAll(".reveal.in").length');
+await evaluate(client, 'window.scrollTo(0, document.body.scrollHeight)');
+await new Promise((r) => setTimeout(r, 1000));
+const revAfter = await evaluate(client, 'document.querySelectorAll(".reveal.in").length');
+check('滚动后元素继续入场', revAfter > revBefore, revBefore + ' → ' + revAfter);
+await goto(client, '#/');
+const delayed = await evaluate(client, 'JSON.stringify((function(){var els=document.querySelectorAll("[data-stagger] [data-delay]");var vals=[];for(var i=0;i<els.length;i++)vals.push(els[i].getAttribute("data-delay"));return vals;})())');
+const dv = JSON.parse(delayed);
+check('横向同组元素有错峰延迟', dv.length > 3 && dv.indexOf('70') >= 0, dv.slice(0, 6).join(' / ') + ' ms');
+
+console.log('\n== 8. 运行期错误 ==');
 check('无 JS 报错', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | ') || '0 个错误');
 
 if (WANT_SHOTS) {
@@ -205,6 +220,8 @@ if (WANT_SHOTS) {
   const shots = [['#/', '01-home'], ['#/lesson/git-undo', '02-lesson'], ['#/lesson/vscode-editing', '03-shortcuts-lesson'], ['#/commands', '04-commands'], ['#/shortcuts', '05-shortcuts'], ['#/glossary', '06-glossary']];
   for (const [hash, name] of shots) {
     await goto(client, hash);
+    await evaluate(client, 'document.querySelectorAll(".reveal").forEach(function(e){e.classList.add("in","no-anim");e.style.willChange="auto"})');
+    await new Promise((r) => setTimeout(r, 260));
     await shot(client, name);
   }
   await goto(client, '#/');
