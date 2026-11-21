@@ -161,6 +161,9 @@ check('命令搜索生效', search.n > 0 && search.n < 20 && search.empty, '命�
 const emptyHint = JSON.parse(await evaluate(client, 'JSON.stringify((function(){document.querySelectorAll("#cmdFilters .filter")[1].click();var i=document.getElementById("cmdSearch");i.value="rebase";i.dispatchEvent(new Event("input",{bubbles:true}));var out={text:document.getElementById("cmdEmpty").textContent,hidden:document.getElementById("cmdEmpty").hidden};document.querySelectorAll("#cmdFilters .filter")[0].click();i.value="";i.dispatchEvent(new Event("input",{bubbles:true}));return out;})())'));
 check('筛选下搜不到时提示当前范围', !emptyHint.hidden && emptyHint.text.indexOf('当前只在') >= 0, emptyHint.text);
 
+const cmdPlat = JSON.parse(await evaluate(client, 'JSON.stringify((function(){document.querySelector("#cmdPlatform [data-platform=win]").click();var rows=document.querySelectorAll(".cmd-row[data-tool]");var ls=null,uni=null;for(var i=0;i<rows.length;i++){var row=rows[i];var code=row.querySelector(".cmd-row__code").textContent;if(code.indexOf("Get-ChildItem -Force")>=0)ls=row;if(code.indexOf("chmod +x")>=0)uni=row;}var out={buttons:document.querySelectorAll("#cmdPlatform [data-platform]").length,ls:!!ls,unixTag:uni?uni.textContent.indexOf("仅 macOS / Linux")>=0:false};document.querySelector("#cmdPlatform [data-platform=linux]").click();return out;})())'));
+check('命令速查有系统切换并显示对应写法', cmdPlat.buttons === 3 && cmdPlat.ls && cmdPlat.unixTag, 'ls → Get-ChildItem / 仅限标签 ' + (cmdPlat.unixTag ? '有' : '无'));
+
 console.log('\n== 5. 快捷键与挑战 ==');
 await goto(client, '#/shortcuts');
 const sc = JSON.parse(await evaluate(client, 'JSON.stringify((function(){return {rows:document.querySelectorAll(".cmd-row[data-cat]").length,q:!!document.querySelector(".trainer__q"),opts:document.querySelectorAll(".trainer__opt").length,kbds:document.querySelectorAll(".cmd-row[data-cat] kbd").length};})())'));

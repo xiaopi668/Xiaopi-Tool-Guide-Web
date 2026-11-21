@@ -690,6 +690,7 @@ kbd {
 .cmd-row__desc { font-size: 13.5px; color: var(--text-2); line-height: 1.6; }
 .cmd-row__side { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 .tag { font-size: 9.5px; letter-spacing: 0.04em; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; white-space: nowrap; }
+.tag--warn { color: #fff; border-color: #5c5c5c; }
 .cmd-row--shortcut { grid-template-columns: minmax(0, 1fr) auto; }
 .cmd-row--shortcut .cmd-row__desc { color: #fff; font-size: 14px; }
 .cmd-row__keys { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }

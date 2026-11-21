@@ -128,6 +128,20 @@
   function platformLabel() {
     return { mac: 'macOS', win: 'Windows', linux: 'Linux' }[platform()] || 'Windows';
   }
+  function platformButtons() {
+    var p = platform();
+    var names = { mac: 'macOS', win: 'Windows', linux: 'Linux' };
+    return ['mac', 'win', 'linux'].map(function (k) {
+      return '<button type="button" data-platform="' + k + '" class="' + (p === k ? 'is-active' : '') + '">' + names[k] + '</button>';
+    }).join('');
+  }
+  function commandFor(c, p) {
+    return (p === 'win' && c && c.win) ? c.win : (c ? c.cmd : '');
+  }
+  function osLabel(os) {
+    var names = { mac: 'macOS', win: 'Windows', linux: 'Linux' };
+    return (os || []).map(function (k) { return names[k] || k; }).join(' / ');
+  }
   function keysOf(shortcut, p) {
     if (!shortcut) return [];
     if (p === 'mac') return shortcut.mac || [];
@@ -612,9 +626,10 @@
     out.push('<div class="page">');
     out.push('<header class="page__head reveal"><span class="meta">Command Reference</span>');
     out.push('<h1 class="page__title">命令速查</h1>');
-    out.push('<p class="page__sub">按工具分组，点右侧按钮直接复制。不确定命令会不会闯祸时，先看说明再执行。</p></header>');
-    out.push('<div class="searchfield reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
-      '<input id="cmdSearch" type="text" placeholder="搜索命令或用途，例如 rebase、端口、venv…" autocomplete="off" spellcheck="false"><kbd>/</kbd></div>');
+    out.push('<p class="page__sub">按工具分组，点右侧按钮直接复制。命令按当前系统显示对应写法，Windows 一列默认使用 PowerShell。</p></header>');
+    out.push('<div class="shortcut-tools reveal"><div class="searchfield" style="flex:1;min-width:240px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
+      '<input id="cmdSearch" type="text" placeholder="搜索命令或用途，例如 rebase、端口、venv…" autocomplete="off" spellcheck="false"><kbd>/</kbd></div>' +
+      '<div class="platform-toggle" id="cmdPlatform">' + platformButtons() + '</div></div>');
     out.push('<div class="filters reveal" id="cmdFilters"><button class="filter is-active" type="button" data-tool="all">全部</button>');
     tools.forEach(function (t) {
       out.push('<button class="filter" type="button" data-tool="' + esc(t) + '">' + esc(toolName(t)) + '</button>');
@@ -625,13 +640,16 @@
       out.push('<h2 class="cmd-group__title">' + esc(toolName(t)) + '<b>' + groups[t].length + ' 条</b></h2>');
       out.push('<div class="cmd-list">');
       groups[t].forEach(function (c) {
-        var search = ((c.cmd || '') + ' ' + (c.desc || '') + ' ' + ((c.tags || []).join(' '))).toLowerCase();
+        var p = platform();
+        var effective = commandFor(c, p);
+        var limited = c.os && c.os.indexOf(p) < 0;
+        var search = ((c.cmd || '') + ' ' + (c.win || '') + ' ' + (c.desc || '') + ' ' + ((c.tags || []).join(' '))).toLowerCase();
+        var tags = (c.tags || []).slice(0, 2).map(function (tag) { return '<span class="tag">' + esc(tag) + '</span>'; }).join('');
+        if (limited) tags += '<span class="tag tag--warn">仅 ' + esc(osLabel(c.os)) + '</span>';
         out.push('<div class="cmd-row" data-tool="' + esc(t) + '" data-search="' + esc(search) + '">' +
-          '<div class="cmd-row__code">' + esc(c.cmd) + '</div>' +
+          '<div class="cmd-row__code">' + esc(effective) + '</div>' +
           '<div class="cmd-row__desc">' + inline(c.desc) + '</div>' +
-          '<div class="cmd-row__side">' +
-          (c.tags || []).slice(0, 2).map(function (tag) { return '<span class="tag">' + esc(tag) + '</span>'; }).join('') +
-          copyButton(c.cmd, '复制') + '</div></div>');
+          '<div class="cmd-row__side">' + tags + copyButton(effective, '复制') + '</div></div>');
       });
       out.push('</div></section>');
     });
@@ -698,10 +716,7 @@
     out.push('<div class="shortcut-tools reveal">');
     out.push('<div class="searchfield" style="flex:1;min-width:240px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
       '<input id="scSearch" type="text" placeholder="搜索动作，例如 注释、命令面板、终端…" autocomplete="off" spellcheck="false"></div>');
-    out.push('<div class="platform-toggle" id="platformToggle">' +
-      '<button type="button" data-platform="mac" class="' + (platform() === 'mac' ? 'is-active' : '') + '">macOS</button>' +
-      '<button type="button" data-platform="win" class="' + (platform() === 'win' ? 'is-active' : '') + '">Windows</button>' +
-      '<button type="button" data-platform="linux" class="' + (platform() === 'linux' ? 'is-active' : '') + '">Linux</button></div>');
+    out.push('<div class="platform-toggle" id="platformToggle">' + platformButtons() + '</div>');
     out.push('</div>');
 
     out.push('<div class="filters reveal" id="scFilters"><button class="filter is-active" type="button" data-cat="all">全部</button>');
