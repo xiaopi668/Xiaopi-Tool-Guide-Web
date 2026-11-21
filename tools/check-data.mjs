@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const files = ['data-terminal.js','data-git.js','data-vscode.js','data-dev.js','data-efficiency.js'];
+const files = ['data-terminal.js','data-git.js','data-vscode.js','data-dev.js','data-efficiency.js','data-agents.js','data-ai.js'];
 const sandbox = { window: {} };
 vm.createContext(sandbox);
 for (const f of files) {

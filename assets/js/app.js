@@ -19,7 +19,11 @@
     { key: 'dev', name: '开发环境与工具链', en: 'Toolchain',
       desc: 'Node、Python、浏览器开发者工具、Docker、SSH：让一个项目在本机跑起来需要的那一圈工具。' },
     { key: 'efficiency', name: '效率与排错', en: 'Efficiency',
-      desc: '别名、历史、报错排查、安全习惯。决定你走得快不快的，往往是这些不起眼的细节。' }
+      desc: '别名、历史、报错排查、安全习惯。决定你走得快不快的，往往是这些不起眼的细节。' },
+    { key: 'agents', name: 'AI 编程助手', en: 'Agents',
+      desc: 'Claude Code、Codex CLI、dsh：让 agent 读代码、改文件、跑命令，以及给它多大权限才安全。' },
+    { key: 'ai', name: 'AI 时代', en: 'AI Everyday',
+      desc: '聊天、搜索、写作、核查、本地模型：把 AI 用进日常工作，而不是只看演示。' }
   ];
   var TRACK_MAP = {};
   TRACKS.forEach(function (t) { TRACK_MAP[t.key] = t; });
@@ -329,6 +333,8 @@
     paintSidebar();
     paintProgress();
     paintNav(r);
+    var foot = document.getElementById('footStats');
+    if (foot) foot.textContent = lessons.length + ' 节课 · ' + TRACKS.length + ' 条轨道';
     if (r.name === 'commands') initCommandsView();
     if (r.name === 'shortcuts') initShortcutsView();
     REVEAL.setup(keepScroll === true);
@@ -377,7 +383,7 @@
 
     out.push('<section class="section" id="tracks"><div class="container">');
     out.push('<div class="section__head reveal"><div><span class="meta">Learning Path</span>' +
-      '<h2 class="h2">五条轨道，<br>从终端走到能自己解决问题</h2>' +
+      '<h2 class="h2">' + TRACKS.length + ' 条轨道，<br>从终端走到能自己解决问题</h2>' +
       '<p>按顺序学最稳，也可以直接跳到你现在卡住的那一块。每节课都能单独看。</p></div>' +
       '<a class="section__link" href="#/lesson/' + (lessons[0] ? lessons[0].id : 'terminal-intro') + '">从第一课开始 <span aria-hidden="true">→</span></a></div>');
     TRACKS.forEach(function (track, ti) {

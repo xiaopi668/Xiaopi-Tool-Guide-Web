@@ -107,19 +107,19 @@ console.log('\n== 1. 数据与首页 ==');
 await goto(client, '#/');
 const data = JSON.parse(await evaluate(client, 'JSON.stringify((function(){var P=window.PS;return {lessons:P.lessons.length,commands:P.commands.length,shortcuts:P.shortcuts.length,gloss:P.glossary.length,ids:P.lessons.map(function(l){return l.id}).join(","),tracks:P.lessons.reduce(function(a,l){a[l.track]=(a[l.track]||0)+1;return a},{}),orders:P.lessons.map(function(l){return l.order}).sort(function(a,b){return a-b}).join(",")};})())'));
 console.log('  课程 ' + data.lessons + ' 节 | 命令 ' + data.commands + ' 条 | 快捷键 ' + data.shortcuts + ' 个 | 术语 ' + data.gloss + ' 条');
-check('课程 29 节', data.lessons === 29, data.lessons);
-check('五条轨道齐全', Object.keys(data.tracks).length === 5, JSON.stringify(data.tracks));
+check('课程 39 节', data.lessons === 39, data.lessons);
+check('七条轨道齐全', Object.keys(data.tracks).length === 7, JSON.stringify(data.tracks));
 check('命令不少于 100 条', data.commands >= 100, data.commands);
 check('快捷键不少于 45 个', data.shortcuts >= 45, data.shortcuts);
 check('术语不少于 25 条', data.gloss >= 25, data.gloss);
-check('课程编号连续 1-29', data.orders === Array.from({length: 29}, (_, i) => i + 1).join(','), data.orders.slice(0, 30));
+check('课程编号连续 1-39', data.orders === Array.from({length: 39}, (_, i) => i + 1).join(','), data.orders.slice(0, 40));
 
 const schema = JSON.parse(await evaluate(client, 'JSON.stringify((function(){var P=window.PS;var bad=[];var allowed=["text","tip","warn","steps","table","code","terminal","shortcuts","compare"];P.lessons.forEach(function(l){var types=(l.sections||[]).map(function(s){return s.type});if(!(l.sections&&l.sections.length>=7&&l.sections.length<=12))bad.push(l.id+":sections="+(l.sections||[]).length);types.forEach(function(t){if(allowed.indexOf(t)<0)bad.push(l.id+":bad "+t)});if(types.indexOf("terminal")<0&&types.indexOf("code")<0)bad.push(l.id+":no term/code");if(types.indexOf("table")<0&&types.indexOf("shortcuts")<0)bad.push(l.id+":no table");(l.quiz||[]).forEach(function(q){if(q.options.length!==4)bad.push(l.id+":opt");if(!(q.answer>=0&&q.answer<=3))bad.push(l.id+":ans")});if(!(l.quiz&&l.quiz.length===3))bad.push(l.id+":quiz"+(l.quiz||[]).length);if(!(l.exercise&&l.exercise.items&&l.exercise.items.length>=2))bad.push(l.id+":ex");(l.sections||[]).forEach(function(s){if(s.type==="table")(s.rows||[]).forEach(function(r){if(r.length!==s.head.length)bad.push(l.id+":row")})})});return {bad:bad.slice(0,8),n:bad.length};})())'));
 check('全部课程符合数据契约', schema.n === 0, schema.n ? schema.bad.join('; ') : '0 处问题');
 
 const home = JSON.parse(await evaluate(client, 'JSON.stringify((function(){return {h1:(document.querySelector(".hero h1")||{}).textContent||"",tracks:document.querySelectorAll(".track").length,links:document.querySelectorAll(".track__lesson").length,features:document.querySelectorAll(".feature").length,term:document.querySelectorAll(".hero__terminal .term__line").length,nav:document.querySelectorAll(".sidebar__item").length,side:!!document.querySelector(".sidebar")&&getComputedStyle(document.querySelector(".sidebar")).display};})())'));
 check('首页渲染主标题', home.h1.replace(/\s/g, '').length > 6, home.h1.trim().replace(/\n/g, ' '));
-check('首页 5 条轨道 / 29 个课程入口', home.tracks === 5 && home.links === 29, home.tracks + ' / ' + home.links);
+check('首页 7 条轨道 / 39 个课程入口', home.tracks === 7 && home.links === 39, home.tracks + ' / ' + home.links);
 check('首页首屏终端示例', home.term === 3, home.term + ' 组命令');
 check('首页不显示侧边栏（整幅排版）', home.side === 'none', home.side);
 
