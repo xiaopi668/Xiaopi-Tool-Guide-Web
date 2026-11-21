@@ -56,7 +56,7 @@
     trackLessons[l.track].push(l);
   });
 
-  var UI = { cmdQuery: '', cmdTool: 'all', scQuery: '', scCat: 'all' };
+  var UI = { cmdQuery: '', cmdTool: 'all', cmdAllPlatforms: false, scQuery: '', scCat: 'all' };
 
   /* ------------------------------------------------------------ 工具函数 */
   function esc(s) {
@@ -136,7 +136,10 @@
     }).join('');
   }
   function commandFor(c, p) {
-    return (p === 'win' && c && c.win) ? c.win : (c ? c.cmd : '');
+    if (!c) return '';
+    if (p === 'win') return c.win || c.cmd;
+    if (p === 'mac') return c.mac || c.cmd;
+    return c.cmd;
   }
   function osLabel(os) {
     var names = { mac: 'macOS', win: 'Windows', linux: 'Linux' };
@@ -634,19 +637,22 @@
     tools.forEach(function (t) {
       out.push('<button class="filter" type="button" data-tool="' + esc(t) + '">' + esc(toolName(t)) + '</button>');
     });
+    out.push('<button class="filter" type="button" id="cmdAllPlatforms">显示其他系统</button>');
     out.push('</div>');
+    out.push('<p class="note" id="cmdOsNote" style="margin:-12px 0 18px"></p>');
     tools.forEach(function (t) {
       out.push('<section class="cmd-group reveal" data-group-tool="' + esc(t) + '">');
-      out.push('<h2 class="cmd-group__title">' + esc(toolName(t)) + '<b>' + groups[t].length + ' 条</b></h2>');
+      out.push('<h2 class="cmd-group__title">' + esc(toolName(t)) + '<b data-count>' + groups[t].length + ' 条</b></h2>');
       out.push('<div class="cmd-list">');
       groups[t].forEach(function (c) {
         var p = platform();
         var effective = commandFor(c, p);
         var limited = c.os && c.os.indexOf(p) < 0;
+        var osAttr = c.os ? ' data-os="' + esc(c.os.join(',')) + '"' : '';
         var search = ((c.cmd || '') + ' ' + (c.win || '') + ' ' + (c.desc || '') + ' ' + ((c.tags || []).join(' '))).toLowerCase();
         var tags = (c.tags || []).slice(0, 2).map(function (tag) { return '<span class="tag">' + esc(tag) + '</span>'; }).join('');
         if (limited) tags += '<span class="tag tag--warn">仅 ' + esc(osLabel(c.os)) + '</span>';
-        out.push('<div class="cmd-row" data-tool="' + esc(t) + '" data-search="' + esc(search) + '">' +
+        out.push('<div class="cmd-row" data-tool="' + esc(t) + '"' + osAttr + ' data-search="' + esc(search) + '">' +
           '<div class="cmd-row__code">' + esc(effective) + '</div>' +
           '<div class="cmd-row__desc">' + inline(c.desc) + '</div>' +
           '<div class="cmd-row__side">' + tags + copyButton(effective, '复制') + '</div></div>');
@@ -660,17 +666,36 @@
   function applyCmdFilter() {
     var query = UI.cmdQuery.trim().toLowerCase();
     var tool = UI.cmdTool;
+    var p = platform();
     var visible = 0;
+    var otherOs = [];
     qa('.cmd-row[data-tool]').forEach(function (row) {
       var okTool = tool === 'all' || row.getAttribute('data-tool') === tool;
       var okQuery = !query || (row.getAttribute('data-search') || '').indexOf(query) >= 0;
-      var show = okTool && okQuery;
+      var os = row.getAttribute('data-os');
+      var okOs = !os || os.split(',').indexOf(p) >= 0;
+      if (!okOs && UI.cmdAllPlatforms) okOs = true;
+      if (!okOs) { otherOs.push(os); }
+      var show = okTool && okQuery && okOs;
       row.hidden = !show;
       if (show) visible += 1;
     });
     qa('.cmd-group[data-group-tool]').forEach(function (group) {
-      group.hidden = !qa('.cmd-row', group).some(function (r) { return !r.hidden; });
+      var rows = qa('.cmd-row', group);
+      var shown = rows.filter(function (r) { return !r.hidden; }).length;
+      group.hidden = shown === 0;
+      var counter = q('b[data-count]', group);
+      if (counter) counter.textContent = shown + ' 条';
     });
+    var note = document.getElementById('cmdOsNote');
+    if (note) {
+      var uniq = [];
+      otherOs.forEach(function (o) { if (o && uniq.indexOf(o) < 0) uniq.push(o); });
+      var labels = uniq.map(function (o) { return osLabel(o.split(',')); }).join('、');
+      if (!otherOs.length) note.textContent = '';
+      else if (UI.cmdAllPlatforms) note.textContent = '正在显示其他系统的 ' + otherOs.length + ' 条命令；标着「仅 …」的在当前系统上不可用。';
+      else note.textContent = '已隐藏 ' + otherOs.length + ' 条只在 ' + labels + ' 上提供的命令；点「显示其他系统」可以查看。';
+    }
     var empty = document.getElementById('cmdEmpty');
     if (empty) {
       empty.hidden = visible !== 0;
@@ -680,6 +705,8 @@
           : '当前只在「' + toolName(tool) + '」里搜索，点「全部」可以搜所有命令。';
       }
     }
+    var allBtn = document.getElementById('cmdAllPlatforms');
+    if (allBtn) allBtn.classList.toggle('is-active', UI.cmdAllPlatforms);
   }
   function initCommandsView() {
     var input = document.getElementById('cmdSearch');
@@ -1015,6 +1042,11 @@
       return;
     }
 
+    if (t.closest('#cmdAllPlatforms')) {
+      UI.cmdAllPlatforms = !UI.cmdAllPlatforms;
+      applyCmdFilter();
+      return;
+    }
     var cmdFilter = t.closest('#cmdFilters .filter');
     if (cmdFilter) {
       UI.cmdTool = cmdFilter.getAttribute('data-tool');

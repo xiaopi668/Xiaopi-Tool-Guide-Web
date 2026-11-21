@@ -26,7 +26,7 @@ window.PS.commands = [
   { tool: 'terminal', cmd: 'kill -15 PID', win: 'Stop-Process -Id 1234', desc: '请求进程正常退出，先礼后兵', tags: ['进程'] },
   { tool: 'terminal', cmd: 'kill -9 PID', win: 'Stop-Process -Id 1234 -Force', desc: '强制杀死进程，可能留下脏数据', tags: ['进程', '危险'] },
   { tool: 'terminal', cmd: 'lsof -i :3000', win: 'Get-NetTCPConnection -LocalPort 3000', desc: '查看谁占用了 3000 端口', tags: ['端口'] },
-  { tool: 'terminal', cmd: 'ss -ltnp', win: 'Get-NetTCPConnection -State Listen', desc: '列出本机所有监听端口和对应进程', tags: ['端口'] },
+  { tool: 'terminal', cmd: 'ss -ltnp', mac: 'lsof -iTCP -sTCP:LISTEN -P -n', win: 'Get-NetTCPConnection -State Listen', desc: '列出本机所有监听端口和对应进程（macOS 用 lsof）', tags: ['端口'] },
   { tool: 'terminal', cmd: 'chmod +x script.sh', desc: '给脚本添加可执行权限', tags: ['权限'], os: ['mac', 'linux'] },
   { tool: 'terminal', cmd: 'chmod 644 file', desc: '所有者可读写，其他人只读', tags: ['权限'], os: ['mac', 'linux'] },
   { tool: 'terminal', cmd: 'sudo command', win: 'Start-Process pwsh -Verb RunAs -ArgumentList "command"', desc: '以管理员权限执行，执行前看清命令', tags: ['权限', '危险'] },
@@ -40,7 +40,7 @@ window.PS.commands = [
   { tool: 'terminal', cmd: 'tar -czf out.tar.gz dir', desc: '把目录打包并 gzip 压缩', tags: ['压缩'] },
   { tool: 'terminal', cmd: 'tar -xzf out.tar.gz', desc: '解开 .tar.gz 压缩包', tags: ['压缩'] },
   { tool: 'terminal', cmd: 'man ls', win: 'Get-Help ls', desc: '查看命令的完整手册，q 退出', tags: ['帮助'] },
-  { tool: 'terminal', cmd: 'ls --help', win: 'Get-Help ls -Detailed', desc: '快速查看命令支持的参数', tags: ['帮助'] },
+  { tool: 'terminal', cmd: 'ls --help', win: 'Get-Help ls -Detailed', desc: '快速查看命令支持的参数（GNU 选项，macOS 用 man ls）', tags: ['帮助'], os: ['linux', 'win'] },
 
   /* ---------------- Git ---------------- */
   { tool: 'git', cmd: 'git --version', desc: '确认 Git 已安装及版本', tags: ['安装'] },
