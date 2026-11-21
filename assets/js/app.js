@@ -33,7 +33,7 @@
   var STORE_KEY = 'toolschool-v1';
 
   /* ------------------------------------------------------------ 状态 */
-  var state = { done: {}, practice: {}, platform: null };
+  var state = { done: {}, practice: {}, platform: null, cmdOs: null };
   try {
     var rawStored = localStorage.getItem(STORE_KEY);
     if (rawStored) {
@@ -41,6 +41,7 @@
       state.done = parsed.done || {};
       state.practice = parsed.practice || {};
       state.platform = parsed.platform || null;
+      state.cmdOs = parsed.cmdOs || null;
     }
   } catch (err) { /* 隐私模式或 file:// 限制，忽略 */ }
   function save() {
@@ -144,6 +145,27 @@
   function osLabel(os) {
     var names = { mac: 'macOS', win: 'Windows', linux: 'Linux' };
     return (os || []).map(function (k) { return names[k] || k; }).join(' / ');
+  }
+  function cmdPlatform() {
+    if (state.cmdOs === 'win' || state.cmdOs === 'posix') return state.cmdOs;
+    return platform() === 'win' ? 'win' : 'posix';
+  }
+  function cmdPlatformButtons() {
+    var p = cmdPlatform();
+    return '<button type="button" data-cmd-os="posix" class="' + (p === 'posix' ? 'is-active' : '') + '">macOS / Linux</button>' +
+      '<button type="button" data-cmd-os="win" class="' + (p === 'win' ? 'is-active' : '') + '">Windows</button>';
+  }
+  function osBadge(c) {
+    var os = c.os || ['mac', 'linux', 'win'];
+    if (cmdPlatform() === 'win') {
+      return os.indexOf('win') < 0 ? '仅 ' + osLabel(os) : '';
+    }
+    var hasMac = os.indexOf('mac') >= 0;
+    var hasLinux = os.indexOf('linux') >= 0;
+    if (hasLinux && !hasMac) return '仅 Linux';
+    if (hasMac && !hasLinux) return '仅 macOS';
+    if (!hasMac && !hasLinux) return '仅 Windows';
+    return '';
   }
   function keysOf(shortcut, p) {
     if (!shortcut) return [];
@@ -629,10 +651,10 @@
     out.push('<div class="page">');
     out.push('<header class="page__head reveal"><span class="meta">Command Reference</span>');
     out.push('<h1 class="page__title">命令速查</h1>');
-    out.push('<p class="page__sub">按工具分组，点右侧按钮直接复制。命令按当前系统显示对应写法，Windows 一列默认使用 PowerShell。</p></header>');
+    out.push('<p class="page__sub">按工具分组，点右侧按钮直接复制。macOS 与 Linux 合并为一档，只在两者写法不同时标注「仅 Linux」或「仅 macOS」；Windows 一档默认使用 PowerShell。</p></header>');
     out.push('<div class="shortcut-tools reveal"><div class="searchfield" style="flex:1;min-width:240px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>' +
       '<input id="cmdSearch" type="text" placeholder="搜索命令或用途，例如 rebase、端口、venv…" autocomplete="off" spellcheck="false"><kbd>/</kbd></div>' +
-      '<div class="platform-toggle" id="cmdPlatform">' + platformButtons() + '</div></div>');
+      '<div class="platform-toggle" id="cmdPlatform">' + cmdPlatformButtons() + '</div></div>');
     out.push('<div class="filters reveal" id="cmdFilters"><button class="filter is-active" type="button" data-tool="all">全部</button>');
     tools.forEach(function (t) {
       out.push('<button class="filter" type="button" data-tool="' + esc(t) + '">' + esc(toolName(t)) + '</button>');
@@ -645,13 +667,13 @@
       out.push('<h2 class="cmd-group__title">' + esc(toolName(t)) + '<b data-count>' + groups[t].length + ' 条</b></h2>');
       out.push('<div class="cmd-list">');
       groups[t].forEach(function (c) {
-        var p = platform();
-        var effective = commandFor(c, p);
-        var limited = c.os && c.os.indexOf(p) < 0;
+        var cp = cmdPlatform();
+        var effective = cp === 'win' ? (c.win || c.cmd) : c.cmd;
         var osAttr = c.os ? ' data-os="' + esc(c.os.join(',')) + '"' : '';
         var search = ((c.cmd || '') + ' ' + (c.win || '') + ' ' + (c.desc || '') + ' ' + ((c.tags || []).join(' '))).toLowerCase();
         var tags = (c.tags || []).slice(0, 2).map(function (tag) { return '<span class="tag">' + esc(tag) + '</span>'; }).join('');
-        if (limited) tags += '<span class="tag tag--warn">仅 ' + esc(osLabel(c.os)) + '</span>';
+        var badge = osBadge(c);
+        if (badge) tags += '<span class="tag tag--warn">' + esc(badge) + '</span>';
         out.push('<div class="cmd-row" data-tool="' + esc(t) + '"' + osAttr + ' data-search="' + esc(search) + '">' +
           '<div class="cmd-row__code">' + esc(effective) + '</div>' +
           '<div class="cmd-row__desc">' + inline(c.desc) + '</div>' +
@@ -666,14 +688,17 @@
   function applyCmdFilter() {
     var query = UI.cmdQuery.trim().toLowerCase();
     var tool = UI.cmdTool;
-    var p = platform();
+    var cp = cmdPlatform();
     var visible = 0;
     var otherOs = [];
     qa('.cmd-row[data-tool]').forEach(function (row) {
       var okTool = tool === 'all' || row.getAttribute('data-tool') === tool;
       var okQuery = !query || (row.getAttribute('data-search') || '').indexOf(query) >= 0;
       var os = row.getAttribute('data-os');
-      var okOs = !os || os.split(',').indexOf(p) >= 0;
+      var list = os ? os.split(',') : ['mac', 'linux', 'win'];
+      var okOs;
+      if (cp === 'win') okOs = list.indexOf('win') >= 0;
+      else okOs = list.indexOf('mac') >= 0 || list.indexOf('linux') >= 0;
       if (!okOs && UI.cmdAllPlatforms) okOs = true;
       if (!okOs) { otherOs.push(os); }
       var show = okTool && okQuery && okOs;
@@ -689,12 +714,25 @@
     });
     var note = document.getElementById('cmdOsNote');
     if (note) {
-      var uniq = [];
-      otherOs.forEach(function (o) { if (o && uniq.indexOf(o) < 0) uniq.push(o); });
-      var labels = uniq.map(function (o) { return osLabel(o.split(',')); }).join('、');
-      if (!otherOs.length) note.textContent = '';
-      else if (UI.cmdAllPlatforms) note.textContent = '正在显示其他系统的 ' + otherOs.length + ' 条命令；标着「仅 …」的在当前系统上不可用。';
-      else note.textContent = '已隐藏 ' + otherOs.length + ' 条只在 ' + labels + ' 上提供的命令；点「显示其他系统」可以查看。';
+      var union = {};
+      otherOs.forEach(function (o) {
+        (o || '').split(',').forEach(function (k) { if (k) union[k] = true; });
+      });
+      var parts = [];
+      if (union.mac && union.linux) parts.push('macOS / Linux');
+      else if (union.mac) parts.push('macOS');
+      else if (union.linux) parts.push('Linux');
+      if (union.win) parts.push('Windows');
+      var labels = parts.join('、') || '其他系统';
+      if (!otherOs.length) {
+        note.textContent = cp === 'win'
+          ? ''
+          : '标着「仅 Linux」「仅 macOS」的命令在另一系统上写法不同，说明里给了替代命令。';
+      } else if (UI.cmdAllPlatforms) {
+        note.textContent = '正在显示其他系统的 ' + otherOs.length + ' 条命令；标着「仅 …」的在当前系统上不可用。';
+      } else {
+        note.textContent = '已隐藏 ' + otherOs.length + ' 条只在 ' + labels + ' 上提供的命令；点「显示其他系统」可以查看。';
+      }
     }
     var empty = document.getElementById('cmdEmpty');
     if (empty) {
@@ -1042,6 +1080,13 @@
       return;
     }
 
+    var cmdOsBtn = t.closest('[data-cmd-os]');
+    if (cmdOsBtn) {
+      state.cmdOs = cmdOsBtn.getAttribute('data-cmd-os');
+      save();
+      render(true);
+      return;
+    }
     if (t.closest('#cmdAllPlatforms')) {
       UI.cmdAllPlatforms = !UI.cmdAllPlatforms;
       applyCmdFilter();
