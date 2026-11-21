@@ -172,6 +172,8 @@ const nextQ = JSON.parse(await evaluate(client, 'JSON.stringify((function(){docu
 check('下一题重置选项', nextQ.opts === 4 && nextQ.disabled === 0, nextQ.opts + ' 个新选项');
 const plat = JSON.parse(await evaluate(client, 'JSON.stringify((function(){var before=document.querySelector(".cmd-row[data-cat] kbd").textContent;document.querySelector("[data-platform=mac]").click();var after=document.querySelector(".cmd-row[data-cat] kbd").textContent;return {before:before,after:after};})())'));
 check('平台切换改变按键显示', plat.before !== plat.after && plat.after === '⌘', plat.before + ' → ' + plat.after);
+const linux = JSON.parse(await evaluate(client, 'JSON.stringify((function(){document.querySelector("[data-platform=linux]").click();var rows=document.querySelectorAll(".cmd-row--shortcut");var row=null;for(var i=0;i<rows.length;i++){if(rows[i].textContent.indexOf("复制选中")>=0){row=rows[i];break}}var keys=[];if(row){var ks=row.querySelectorAll("kbd");for(var j=0;j<ks.length;j++)keys.push(ks[j].textContent)}var btn=document.querySelector("[data-platform=linux]");return {keys:keys,active:btn?btn.classList.contains("is-active"):false,count:document.querySelectorAll("[data-platform]").length};})())'));
+check('Linux 平台按键显示正确', linux.active && linux.count === 3 && linux.keys.join('') === 'CtrlShiftC', linux.count + ' 个平台按钮 / ' + linux.keys.join(' + '));
 await evaluate(client, 'document.querySelector("[data-platform=win]").click()');
 
 console.log('\n== 6. 搜索面板 / 术语 / 移动端 ==');

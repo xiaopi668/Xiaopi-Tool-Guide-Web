@@ -120,10 +120,20 @@
   function detectPlatform() {
     var p = '';
     try { p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''; } catch (err) {}
-    return /mac|iphone|ipad|ipod/i.test(p) ? 'mac' : 'win';
+    if (/mac|iphone|ipad|ipod/i.test(p)) return 'mac';
+    if (/linux|android|ubuntu|fedora|debian/i.test(p)) return 'linux';
+    return 'win';
   }
   function platform() { return state.platform || detectPlatform(); }
-  function platformLabel() { return platform() === 'mac' ? 'macOS' : 'Windows'; }
+  function platformLabel() {
+    return { mac: 'macOS', win: 'Windows', linux: 'Linux' }[platform()] || 'Windows';
+  }
+  function keysOf(shortcut, p) {
+    if (!shortcut) return [];
+    if (p === 'mac') return shortcut.mac || [];
+    if (p === 'linux') return shortcut.linux || shortcut.win || [];
+    return shortcut.win || [];
+  }
 
   /* ------------------------------------------------------------ 入场动画 */
   var REVEAL = (function () {
@@ -690,7 +700,8 @@
       '<input id="scSearch" type="text" placeholder="搜索动作，例如 注释、命令面板、终端…" autocomplete="off" spellcheck="false"></div>');
     out.push('<div class="platform-toggle" id="platformToggle">' +
       '<button type="button" data-platform="mac" class="' + (platform() === 'mac' ? 'is-active' : '') + '">macOS</button>' +
-      '<button type="button" data-platform="win" class="' + (platform() === 'win' ? 'is-active' : '') + '">Windows</button></div>');
+      '<button type="button" data-platform="win" class="' + (platform() === 'win' ? 'is-active' : '') + '">Windows</button>' +
+      '<button type="button" data-platform="linux" class="' + (platform() === 'linux' ? 'is-active' : '') + '">Linux</button></div>');
     out.push('</div>');
 
     out.push('<div class="filters reveal" id="scFilters"><button class="filter is-active" type="button" data-cat="all">全部</button>');
@@ -707,7 +718,7 @@
         var search = ((s.action || '') + ' ' + (s.cat || '') + ' ' + app).toLowerCase();
         out.push('<div class="cmd-row cmd-row--shortcut" data-cat="' + esc(app) + '" data-search="' + esc(search) + '">' +
           '<div class="cmd-row__desc">' + esc(s.action) + '</div>' +
-          '<div class="cmd-row__keys">' + keysHtml(platform() === 'mac' ? s.mac : s.win) + '</div></div>');
+          '<div class="cmd-row__keys">' + keysHtml(keysOf(s, platform())) + '</div></div>');
       });
       out.push('</div></section>');
     });
@@ -765,19 +776,19 @@
   }
   function newTrainerRound() {
     var pool = PS.shortcuts.filter(function (s) {
-      return s.mac && s.mac.length && s.win && s.win.length;
+      return s.mac && s.mac.length && s.win && s.win.length && keysOf(s, platform()).length;
     });
     if (!pool.length) return;
     var p = platform();
     var q0 = pool[Math.floor(Math.random() * pool.length)];
     var seen = {};
-    seen[q0[p].join('+')] = true;
+    seen[keysOf(q0, p).join('+')] = true;
     var opts = [q0];
     var guard = 0;
     while (opts.length < 4 && guard < 300) {
       guard += 1;
       var cand = pool[Math.floor(Math.random() * pool.length)];
-      var k = cand[p].join('+');
+      var k = keysOf(cand, p).join('+');
       if (seen[k]) continue;
       seen[k] = true;
       opts.push(cand);
@@ -794,7 +805,7 @@
     if (!body || !trainer.q) return;
     var p = platform();
     var opts = trainer.opts.map(function (o, i) {
-      return '<button class="trainer__opt" type="button" data-tr="' + i + '">' + keysHtml(o[p]) + '</button>';
+      return '<button class="trainer__opt" type="button" data-tr="' + i + '">' + keysHtml(keysOf(o, p)) + '</button>';
     }).join('');
     body.innerHTML = '<p class="trainer__q">' + esc(trainer.q.action) +
       '<span class="dim" style="font-size:12px;font-weight:400"> — ' + esc(trainer.q.app) + '（' + platformLabel() + '）</span></p>' +
@@ -817,7 +828,7 @@
     var score = document.getElementById('trScore');
     if (score) score.textContent = '得分 ' + trainer.correct + ' / ' + trainer.total;
     var hint = document.getElementById('trHint');
-    if (hint) hint.textContent = correct ? '正确。' : '正确答案是 ' + trainer.opts[trainer.correctIdx][platform()].join(' + ');
+    if (hint) hint.textContent = correct ? '正确。' : '正确答案是 ' + keysOf(trainer.opts[trainer.correctIdx], platform()).join(' + ');
     var next = document.getElementById('trNext');
     if (next) next.hidden = false;
   }

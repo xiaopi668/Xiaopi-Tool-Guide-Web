@@ -42,7 +42,7 @@ window.PS.lessons.push(
 5. `{ type: 'table', title?: string, head: string[], rows: string[][] }` 表格，每行长度等于表头
 6. `{ type: 'code', title?: string, lang: 'bash' | 'json' | 'text' | 'diff', text: string, note?: string }` 可复制代码块
 7. `{ type: 'terminal', title?: string, command: string, output?: string, note?: string }` 终端块：command 是用 `$` 提示符展示并复制的命令，output 是模拟输出（可选，纯文本，保留换行）
-8. `{ type: 'shortcuts', title?: string, items: { action: string, mac: string[], win: string[], note?: string }[] }` 快捷键表；mac/win 是按键数组，如 `['⌘','⇧','P']`、`['Ctrl','Shift','P']`
+8. `{ type: 'shortcuts', title?: string, items: { action: string, mac: string[], win: string[], linux?: string[], note?: string }[] }` 快捷键表；mac/win 是按键数组，如 `['⌘','⇧','P']`、`['Ctrl','Shift','P']`；linux 可选，省略时按 win 显示
 9. `{ type: 'compare', title?: string, left: { label: string, items: string[] }, right: { label: string, items: string[] }, note?: string }` 左错右对（或左旧右新）对照
 
 html / text / output 字段内允许的标签仅有：`<p>` `<strong>` `<em>` `<code>` `<span class="hl">` `<ul><li>` `<br>`

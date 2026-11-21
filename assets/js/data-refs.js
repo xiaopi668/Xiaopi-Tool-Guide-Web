@@ -193,6 +193,8 @@ window.PS.shortcuts = [
   { app: 'VS Code', cat: '调试', action: '停止调试', mac: ['⇧', 'F5'], win: ['Shift', 'F5'] },
 
   /* ---------------- 终端 ---------------- */
+  { app: '终端', cat: '操作', action: '复制选中的内容', mac: ['⌘', 'C'], win: ['Ctrl', 'Shift', 'C'], linux: ['Ctrl', 'Shift', 'C'] },
+  { app: '终端', cat: '操作', action: '粘贴到终端', mac: ['⌘', 'V'], win: ['Ctrl', 'Shift', 'V'], linux: ['Ctrl', 'Shift', 'V'] },
   { app: '终端', cat: '操作', action: '清屏', mac: ['⌘', 'K'], win: ['Ctrl', 'L'] },
   { app: '终端', cat: '操作', action: '中断当前命令', mac: ['⌃', 'C'], win: ['Ctrl', 'C'] },
   { app: '终端', cat: '操作', action: '挂起当前程序', mac: ['⌃', 'Z'], win: ['Ctrl', 'Z'] },
