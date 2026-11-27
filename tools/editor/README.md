@@ -12,6 +12,26 @@ python3 tools/editor/editor.py
 
 依赖：PyGObject、GTK 3、WebKit2 4.1、Node.js（用于生成数据文件）。
 
+### 安装到应用菜单
+
+```bash
+./tools/editor/install.sh
+```
+
+会安装三样东西：
+
+- 命令 `tool-school-editor`（`~/.local/bin`）
+- 菜单项「工具学校 · 内容编辑器」（`~/.local/share/applications`）
+- 图标（`~/.local/share/icons/hicolor`）
+
+之后可以从应用菜单打开，或直接运行 `tool-school-editor`。安装脚本记录的是当前仓库路径，仓库移动后重新运行一次即可。
+
+卸载：
+
+```bash
+./tools/editor/uninstall.sh
+```
+
 ## 能改什么
 
 - **课程**：标题、副标题、轨道、顺序、时长、难度、学习目标

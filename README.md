@@ -129,6 +129,15 @@ screenshots/                页面截图
 
 编辑器会先把 `content/` 备份到 `tools/editor/backups/`，再写回 JSON 并重新生成 `assets/js/data-*.js`。切到「预览」标签能直接看真实页面；改错了可以点「撤销上次保存」回滚。
 
+想从应用菜单打开，先安装一次：
+
+```bash
+./tools/editor/install.sh     # 安装命令、菜单项与图标
+./tools/editor/uninstall.sh   # 卸载
+```
+
+之后搜索「工具学校」，或在终端运行 `tool-school-editor`。
+
 ![内容编辑器](screenshots/editor.jpg)
 
 也可以直接改 JSON 再构建：
