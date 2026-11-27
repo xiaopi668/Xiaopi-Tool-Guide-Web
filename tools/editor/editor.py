@@ -96,6 +96,19 @@ def section(title, child):
     return frame
 
 
+def focus_first(container):
+    def walk(w):
+        if isinstance(w, (Gtk.Entry, Gtk.TextView)) and w.get_visible() and w.get_sensitive():
+            w.grab_focus()
+            return True
+        if isinstance(w, Gtk.Container):
+            for c in w.get_children():
+                if walk(c):
+                    return True
+        return False
+    return walk(container)
+
+
 def split_list(text):
     parts = re.split(r"[,，、\n]", text or "")
     return [p.strip() for p in parts if p.strip()]
@@ -194,6 +207,7 @@ class LessonEditor(Gtk.Box):
         sw.set_shadow_type(Gtk.ShadowType.IN)
         sw.set_size_request(-1, 150)
         sw.add(self.listbox)
+        self.sections_scroll = sw
 
         bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self.type_combo = Gtk.ComboBoxText()
@@ -242,7 +256,24 @@ class LessonEditor(Gtk.Box):
         if self.listbox.get_children():
             idx = min(self.section_index, len(self.listbox.get_children()) - 1)
             self.listbox.show_all()
-            self.listbox.select_row(self.listbox.get_children()[idx])
+            row = self.listbox.get_children()[idx]
+            self.listbox.select_row(row)
+
+            tries = {"n": 0}
+
+            def do_scroll():
+                tries["n"] += 1
+                alloc = row.get_allocation()
+                if alloc.y < 0 and tries["n"] < 20:
+                    return True
+                adj = self.sections_scroll.get_vadjustment()
+                if alloc.y >= 0:
+                    top = adj.get_value()
+                    bottom = top + adj.get_page_size()
+                    if alloc.y < top or alloc.y + alloc.height > bottom:
+                        adj.set_value(max(0, min(alloc.y - 12, adj.get_upper() - adj.get_page_size())))
+                return False
+            GLib.idle_add(do_scroll)
         else:
             self.clear_section_area()
 
@@ -304,6 +335,9 @@ class LessonEditor(Gtk.Box):
             box.pack_start(field("快捷键", self.shortcuts_text(s), "每行：操作 | mac 按键 | win 按键"), False, False, 0)
         self.section_area.pack_start(box, False, False, 0)
         self.section_area.show_all()
+        if getattr(self, "focus_next_section", False):
+            self.focus_next_section = False
+            focus_first(box)
 
     def head_entry(self, s):
         e = Gtk.Entry()
@@ -411,6 +445,7 @@ class LessonEditor(Gtk.Box):
         }
         self.lesson.setdefault("sections", []).append(templates.get(t, templates["text"]))
         self.section_index = len(self.lesson["sections"]) - 1
+        self.focus_next_section = True
         self.rebuild_sections()
 
     def move_section(self, delta):
@@ -555,6 +590,7 @@ class RefsEditor(Gtk.Box):
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.IN)
         sw.add(self.listbox)
+        self.scroll = sw
         side.pack_start(sw, True, True, 0)
 
         bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
@@ -608,9 +644,28 @@ class RefsEditor(Gtk.Box):
         if rows:
             idx = min(self.index, len(rows) - 1)
             self.listbox.show_all()
-            self.listbox.select_row(rows[idx])
+            row = rows[idx]
+            self.listbox.select_row(row)
+            self.scroll_to(row)
         else:
             self.build_form(None)
+
+    def scroll_to(self, row):
+        tries = {"n": 0}
+
+        def do_scroll():
+            tries["n"] += 1
+            alloc = row.get_allocation()
+            if alloc.y < 0 and tries["n"] < 20:
+                return True
+            adj = self.scroll.get_vadjustment()
+            if alloc.y >= 0:
+                top = adj.get_value()
+                bottom = top + adj.get_page_size()
+                if alloc.y < top or alloc.y + alloc.height > bottom:
+                    adj.set_value(max(0, min(alloc.y - 12, adj.get_upper() - adj.get_page_size())))
+            return False
+        GLib.idle_add(do_scroll)
 
     def on_row_selected(self, box, row):
         if row is None:
@@ -649,6 +704,9 @@ class RefsEditor(Gtk.Box):
                     self.os_checks.append((value, cb))
                 self.form.pack_start(field("可用系统", box, "不勾选表示全部"), False, False, 0)
         self.form.show_all()
+        if getattr(self, "focus_next", False):
+            self.focus_next = False
+            focus_first(self.form)
 
     def sync_os(self, item):
         chosen = [v for v, cb in self.os_checks if cb.get_active()]
@@ -668,6 +726,9 @@ class RefsEditor(Gtk.Box):
             item = {"term": "", "en": "", "desc": ""}
         self.items().append(item)
         self.index = len(self.items()) - 1
+        self.focus_next = True
+        if self.search.get_text():
+            self.search.set_text("")
         self.rebuild_list()
 
     def delete_item(self):
