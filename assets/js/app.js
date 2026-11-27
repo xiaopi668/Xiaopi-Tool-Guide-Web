@@ -21,9 +21,7 @@
     { key: 'efficiency', name: '效率与排错', en: 'Efficiency',
       desc: '别名、历史、报错排查、安全习惯。决定你走得快不快的，往往是这些不起眼的细节。' },
     { key: 'agents', name: 'AI 编程助手', en: 'Agents',
-      desc: 'Claude Code、Codex CLI、dsh：让 agent 读代码、改文件、跑命令，以及给它多大权限才安全。' },
-    { key: 'ai', name: 'AI 时代', en: 'AI Everyday',
-      desc: '聊天、搜索、写作、核查、本地模型：把 AI 用进日常工作，而不是只看演示。' }
+      desc: '导言：AI 从补全变成会动手的 agent。Claude Code、Codex CLI、dsh 三件工具，加上协作流程与权限边界。' }
   ];
   var TRACK_MAP = {};
   TRACKS.forEach(function (t) { TRACK_MAP[t.key] = t; });
