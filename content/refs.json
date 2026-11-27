@@ -1,0 +1,2096 @@
+{
+  "commands": [
+    {
+      "tool": "terminal",
+      "cmd": "pwd",
+      "win": "Get-Location",
+      "desc": "显示当前所在目录的绝对路径",
+      "tags": [
+        "目录"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "ls -la",
+      "win": "Get-ChildItem -Force",
+      "desc": "列出当前目录全部文件，包含隐藏文件和权限信息",
+      "tags": [
+        "目录"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "cd path/to/dir",
+      "win": "cd path\\to\\dir",
+      "desc": "进入指定目录；路径可以是相对或绝对",
+      "tags": [
+        "目录"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "cd -",
+      "desc": "回到上一个目录",
+      "tags": [
+        "目录"
+      ],
+      "os": [
+        "mac",
+        "linux"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "mkdir -p a/b/c",
+      "win": "New-Item -ItemType Directory -Force a\\b\\c",
+      "desc": "递归创建多层目录，已存在不会报错",
+      "tags": [
+        "目录"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "cp -r src dest",
+      "win": "Copy-Item -Recurse src dest",
+      "desc": "递归复制目录",
+      "tags": [
+        "文件"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "mv old new",
+      "win": "Move-Item old new",
+      "desc": "移动文件，也用来重命名",
+      "tags": [
+        "文件"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "rm -i file",
+      "win": "Remove-Item file -Confirm",
+      "desc": "删除前逐个确认，比 rm 安全",
+      "tags": [
+        "文件"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "rm -rf dir",
+      "win": "Remove-Item -Recurse -Force dir",
+      "desc": "递归强制删除且不进回收站，执行前确认路径",
+      "tags": [
+        "危险"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "cat file",
+      "win": "Get-Content file",
+      "desc": "一次输出文件全部内容",
+      "tags": [
+        "查看"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "less file",
+      "desc": "分页查看大文件，q 退出，/ 搜索",
+      "tags": [
+        "查看"
+      ],
+      "os": [
+        "mac",
+        "linux"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "head -n 20 file",
+      "win": "Get-Content file -TotalCount 20",
+      "desc": "只看文件前 20 行",
+      "tags": [
+        "查看"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "tail -f app.log",
+      "win": "Get-Content app.log -Wait -Tail 10",
+      "desc": "实时跟踪日志新增内容，Ctrl+C 退出",
+      "tags": [
+        "查看",
+        "日志"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "wc -l file",
+      "win": "(Get-Content file).Count",
+      "desc": "统计文件行数",
+      "tags": [
+        "查看"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "grep -rn \"keyword\" .",
+      "win": "Select-String -Path * -Pattern \"keyword\" -Recurse",
+      "desc": "递归搜索当前目录，输出行号",
+      "tags": [
+        "搜索"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "find . -name \"*.js\"",
+      "win": "Get-ChildItem -Recurse -Filter *.js",
+      "desc": "按文件名或通配符查找文件",
+      "tags": [
+        "搜索"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "du -sh dir",
+      "win": "(Get-ChildItem dir -Recurse | Measure-Object Length -Sum).Sum",
+      "desc": "查看目录占用的磁盘空间",
+      "tags": [
+        "磁盘"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "df -h",
+      "win": "Get-PSDrive -PSProvider FileSystem",
+      "desc": "查看各磁盘分区剩余空间",
+      "tags": [
+        "磁盘"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "ps aux | grep node",
+      "win": "Get-Process node",
+      "desc": "查找正在运行的 node 进程",
+      "tags": [
+        "进程"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "kill -15 PID",
+      "win": "Stop-Process -Id 1234",
+      "desc": "请求进程正常退出，先礼后兵",
+      "tags": [
+        "进程"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "kill -9 PID",
+      "win": "Stop-Process -Id 1234 -Force",
+      "desc": "强制杀死进程，可能留下脏数据",
+      "tags": [
+        "进程",
+        "危险"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "lsof -i :3000",
+      "win": "Get-NetTCPConnection -LocalPort 3000",
+      "desc": "查看谁占用了 3000 端口",
+      "tags": [
+        "端口"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "ss -ltnp",
+      "win": "Get-NetTCPConnection -State Listen",
+      "desc": "列出本机所有监听端口和对应进程（macOS 用 lsof -iTCP -sTCP:LISTEN -P -n）",
+      "tags": [
+        "端口"
+      ],
+      "os": [
+        "linux",
+        "win"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "chmod +x script.sh",
+      "desc": "给脚本添加可执行权限",
+      "tags": [
+        "权限"
+      ],
+      "os": [
+        "mac",
+        "linux"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "chmod 644 file",
+      "desc": "所有者可读写，其他人只读",
+      "tags": [
+        "权限"
+      ],
+      "os": [
+        "mac",
+        "linux"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "sudo command",
+      "win": "Start-Process pwsh -Verb RunAs -ArgumentList \"command\"",
+      "desc": "以管理员权限执行，执行前看清命令",
+      "tags": [
+        "权限",
+        "危险"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "echo $PATH",
+      "win": "$env:PATH",
+      "desc": "查看系统按什么顺序查找命令",
+      "tags": [
+        "环境变量"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "export PATH=\"$PATH:/new/path\"",
+      "win": "$env:PATH += \";C:\\new\\path\"",
+      "desc": "把新目录追加到 PATH，仅当前会话有效",
+      "tags": [
+        "环境变量"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "which node",
+      "win": "Get-Command node",
+      "desc": "查看命令实际来自哪个路径",
+      "tags": [
+        "环境变量"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "history",
+      "win": "Get-History",
+      "desc": "查看当前会话的历史命令",
+      "tags": [
+        "效率"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "alias ll=\"ls -la\"",
+      "win": "Set-Alias ll Get-ChildItem",
+      "desc": "给常用命令起短别名，写进 ~/.zshrc 永久生效",
+      "tags": [
+        "效率"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "curl -I https://example.com",
+      "win": "curl.exe -I https://example.com",
+      "desc": "只请求响应头，快速检查状态码",
+      "tags": [
+        "网络"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "curl -X POST -H \"Content-Type: application/json\" -d '{\"a\":1}' URL",
+      "win": "curl.exe -X POST -H \"Content-Type: application/json\" -d '{\"a\":1}' URL",
+      "desc": "发送 JSON POST 请求",
+      "tags": [
+        "网络"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "tar -czf out.tar.gz dir",
+      "desc": "把目录打包并 gzip 压缩",
+      "tags": [
+        "压缩"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "tar -xzf out.tar.gz",
+      "desc": "解开 .tar.gz 压缩包",
+      "tags": [
+        "压缩"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "man ls",
+      "win": "Get-Help ls",
+      "desc": "查看命令的完整手册，q 退出",
+      "tags": [
+        "帮助"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "ls --help",
+      "win": "Get-Help ls -Detailed",
+      "desc": "快速查看命令支持的参数（GNU 选项，macOS 用 man ls）",
+      "tags": [
+        "帮助"
+      ],
+      "os": [
+        "linux",
+        "win"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "open .",
+      "desc": "在 Finder 里打开当前目录（Linux 用 xdg-open .）",
+      "tags": [
+        "文件"
+      ],
+      "os": [
+        "mac"
+      ]
+    },
+    {
+      "tool": "terminal",
+      "cmd": "pbcopy < file.txt",
+      "desc": "把文件内容放进系统剪贴板（Linux 用 xclip -selection clipboard）",
+      "tags": [
+        "剪贴板"
+      ],
+      "os": [
+        "mac"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git --version",
+      "desc": "确认 Git 已安装及版本",
+      "tags": [
+        "安装"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git config --global user.name \"你的名字\"",
+      "desc": "设置提交记录里的作者名",
+      "tags": [
+        "配置"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git config --global user.email \"you@example.com\"",
+      "desc": "设置提交记录里的邮箱",
+      "tags": [
+        "配置"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git config --list",
+      "desc": "查看当前全部配置",
+      "tags": [
+        "配置"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git init",
+      "desc": "把当前目录变成 Git 仓库",
+      "tags": [
+        "仓库"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git clone URL",
+      "desc": "把远程仓库完整复制到本地",
+      "tags": [
+        "仓库"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git status",
+      "desc": "查看哪些文件改了、哪些已暂存",
+      "tags": [
+        "日常"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git status -sb",
+      "desc": "用短格式查看状态，适合频繁使用",
+      "tags": [
+        "日常"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git add file.txt",
+      "desc": "把指定文件加入暂存区",
+      "tags": [
+        "提交"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git add .",
+      "desc": "把当前目录所有改动加入暂存区",
+      "tags": [
+        "提交"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git diff",
+      "desc": "查看还没暂存的改动内容",
+      "tags": [
+        "提交"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git diff --staged",
+      "desc": "查看已经暂存、即将提交的改动",
+      "tags": [
+        "提交"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git commit -m \"说明\"",
+      "desc": "把暂存区内容提交成一条历史记录",
+      "tags": [
+        "提交"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git commit --amend",
+      "desc": "修补上一次提交（信息或漏掉的文件）",
+      "tags": [
+        "提交"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git log --oneline --graph --all",
+      "desc": "用图形化一行一条的方式看分支历史",
+      "tags": [
+        "历史"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git log -p file.txt",
+      "desc": "查看某个文件的每次改动内容",
+      "tags": [
+        "历史"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git show HEAD",
+      "desc": "查看最近一次提交的完整内容",
+      "tags": [
+        "历史"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git branch",
+      "desc": "列出本地分支，带 * 的是当前分支",
+      "tags": [
+        "分支"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git switch -c feature/login",
+      "desc": "新建分支并立刻切过去",
+      "tags": [
+        "分支"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git switch main",
+      "desc": "切换到已有分支",
+      "tags": [
+        "分支"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git merge feature/login",
+      "desc": "把指定分支合并进当前分支",
+      "tags": [
+        "分支"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git merge --abort",
+      "desc": "合并冲突时放弃合并，回到合并前",
+      "tags": [
+        "分支",
+        "冲突"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git branch -d feature/login",
+      "desc": "删除已经合并的分支",
+      "tags": [
+        "分支"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git remote -v",
+      "desc": "查看远程仓库地址",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git remote add origin URL",
+      "desc": "给本地仓库绑定一个远程仓库",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git push -u origin main",
+      "desc": "首次推送并建立跟踪关系，之后直接 git push",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git push",
+      "desc": "把本地提交推送到远程",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git pull",
+      "desc": "拉取远程更新并合并到当前分支",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git pull --rebase",
+      "desc": "拉取更新后用变基方式接在远程提交之后",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git fetch",
+      "desc": "只下载远程更新，不自动合并",
+      "tags": [
+        "远程"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git restore file.txt",
+      "desc": "丢弃工作区里这个文件的改动",
+      "tags": [
+        "撤销",
+        "危险"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git restore --staged file.txt",
+      "desc": "把文件移出暂存区，改动保留",
+      "tags": [
+        "撤销"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git reset --soft HEAD~1",
+      "desc": "撤销最后一次提交，改动留在暂存区",
+      "tags": [
+        "撤销"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git reset --hard HEAD~1",
+      "desc": "撤销提交并丢弃改动，不可恢复",
+      "tags": [
+        "撤销",
+        "危险"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git revert <commit>",
+      "desc": "生成一条反向提交，适合已推送的历史",
+      "tags": [
+        "撤销"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git reflog",
+      "desc": "查看 HEAD 移动记录，找回误删的提交",
+      "tags": [
+        "撤销"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git stash",
+      "desc": "把当前改动临时收起来，工作区变干净",
+      "tags": [
+        "临时"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git stash pop",
+      "desc": "把收起来的改动重新放出来",
+      "tags": [
+        "临时"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git rebase main",
+      "desc": "把当前分支的提交接到 main 最新提交之后",
+      "tags": [
+        "进阶"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git cherry-pick <commit>",
+      "desc": "只把某一条提交搬到当前分支",
+      "tags": [
+        "进阶"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git tag v1.0.0",
+      "desc": "给当前提交打一个版本标签",
+      "tags": [
+        "进阶"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git blame file.txt",
+      "desc": "逐行查看是谁、哪次提交改的",
+      "tags": [
+        "进阶"
+      ]
+    },
+    {
+      "tool": "git",
+      "cmd": "git clean -fd",
+      "desc": "删除未跟踪的文件和目录，先加 -n 预览",
+      "tags": [
+        "清理",
+        "危险"
+      ]
+    },
+    {
+      "tool": "vscode",
+      "cmd": "code .",
+      "desc": "用 VS Code 打开当前目录",
+      "tags": [
+        "CLI"
+      ]
+    },
+    {
+      "tool": "vscode",
+      "cmd": "code --diff a.txt b.txt",
+      "desc": "并排对比两个文件的差异",
+      "tags": [
+        "CLI"
+      ]
+    },
+    {
+      "tool": "vscode",
+      "cmd": "code --list-extensions",
+      "desc": "列出已安装的插件",
+      "tags": [
+        "CLI"
+      ]
+    },
+    {
+      "tool": "vscode",
+      "cmd": "code --install-extension ms-python.python",
+      "desc": "安装指定插件",
+      "tags": [
+        "CLI"
+      ]
+    },
+    {
+      "tool": "vscode",
+      "cmd": "code --reuse-window file.js",
+      "desc": "在当前窗口打开文件而不新开窗口",
+      "tags": [
+        "CLI"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "node -v",
+      "desc": "查看 Node.js 版本",
+      "tags": [
+        "环境"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm -v",
+      "desc": "查看 npm 版本",
+      "tags": [
+        "环境"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm init -y",
+      "desc": "快速生成默认的 package.json",
+      "tags": [
+        "项目"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm install",
+      "desc": "安装 package.json 里的全部依赖",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm install express",
+      "desc": "安装运行时依赖并写入 package.json",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm install -D vite",
+      "desc": "安装开发依赖，不进生产环境",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm uninstall express",
+      "desc": "卸载依赖",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm run dev",
+      "desc": "执行 package.json 里 scripts 中的 dev 脚本",
+      "tags": [
+        "脚本"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm run build",
+      "desc": "执行构建脚本",
+      "tags": [
+        "脚本"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npx create-vite@latest my-app",
+      "desc": "不全局安装，临时下载并执行脚手架",
+      "tags": [
+        "脚手架"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm config get registry",
+      "desc": "查看当前使用的镜像源",
+      "tags": [
+        "镜像"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "npm config set registry https://registry.npmmirror.com",
+      "desc": "切换到国内镜像源加速安装",
+      "tags": [
+        "镜像"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "pnpm install",
+      "desc": "用 pnpm 安装依赖，通过硬链接节省磁盘",
+      "tags": [
+        "pnpm"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "pnpm add -D typescript",
+      "desc": "用 pnpm 添加开发依赖",
+      "tags": [
+        "pnpm"
+      ]
+    },
+    {
+      "tool": "node",
+      "cmd": "node script.js",
+      "desc": "用 Node 直接运行一个脚本",
+      "tags": [
+        "运行"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "python3 -V",
+      "desc": "查看 Python 版本",
+      "tags": [
+        "环境"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "python3 -m venv .venv",
+      "desc": "在当前目录创建虚拟环境",
+      "tags": [
+        "虚拟环境"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "source .venv/bin/activate",
+      "desc": "macOS / Linux 激活虚拟环境",
+      "tags": [
+        "虚拟环境"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": ".venv\\Scripts\\activate",
+      "desc": "Windows PowerShell / CMD 激活虚拟环境",
+      "tags": [
+        "虚拟环境"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "deactivate",
+      "desc": "退出虚拟环境",
+      "tags": [
+        "虚拟环境"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "pip install requests",
+      "desc": "安装第三方包",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "pip install -r requirements.txt",
+      "desc": "按清单一次装齐所有依赖",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "pip freeze > requirements.txt",
+      "desc": "把当前环境依赖导出成清单",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "pip list",
+      "desc": "列出当前环境已安装的包",
+      "tags": [
+        "依赖"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "python3 -m http.server 8000",
+      "desc": "启动一个临时静态文件服务器",
+      "tags": [
+        "临时服务"
+      ]
+    },
+    {
+      "tool": "python",
+      "cmd": "pytest -q",
+      "desc": "安静模式运行测试",
+      "tags": [
+        "测试"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker --version",
+      "desc": "查看 Docker 版本",
+      "tags": [
+        "环境"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker pull nginx",
+      "desc": "下载镜像到本地",
+      "tags": [
+        "镜像"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker images",
+      "desc": "列出本地镜像",
+      "tags": [
+        "镜像"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker run -it --rm ubuntu bash",
+      "desc": "启动临时容器，退出后自动删除",
+      "tags": [
+        "容器"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker run -d -p 8080:80 nginx",
+      "desc": "后台运行并把容器 80 端口映射到本机 8080",
+      "tags": [
+        "容器"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker ps",
+      "desc": "查看正在运行的容器",
+      "tags": [
+        "容器"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker ps -a",
+      "desc": "查看所有容器，包括已停止的",
+      "tags": [
+        "容器"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker stop CONTAINER",
+      "desc": "停止指定容器",
+      "tags": [
+        "容器"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker logs -f CONTAINER",
+      "desc": "实时查看容器日志",
+      "tags": [
+        "容器",
+        "日志"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker build -t myapp .",
+      "desc": "按当前目录的 Dockerfile 构建镜像",
+      "tags": [
+        "构建"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker compose up -d",
+      "desc": "按 compose 文件后台启动整套服务",
+      "tags": [
+        "编排"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker compose down",
+      "desc": "停止并移除 compose 启动的容器",
+      "tags": [
+        "编排"
+      ]
+    },
+    {
+      "tool": "docker",
+      "cmd": "docker system prune -a",
+      "desc": "清理所有未使用的镜像和容器，先确认",
+      "tags": [
+        "清理",
+        "危险"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh-keygen -t ed25519 -C \"you@example.com\"",
+      "desc": "生成一对新的 SSH 密钥",
+      "tags": [
+        "密钥"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "cat ~/.ssh/id_ed25519.pub",
+      "desc": "查看公钥内容，用于粘贴到服务器或 GitHub",
+      "tags": [
+        "密钥"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh-copy-id user@host",
+      "desc": "把公钥上传到服务器，实现免密登录",
+      "tags": [
+        "密钥"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "chmod 600 ~/.ssh/id_ed25519",
+      "desc": "私钥权限必须是 600，否则 SSH 会拒绝使用",
+      "tags": [
+        "密钥"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh-add ~/.ssh/id_ed25519",
+      "desc": "把私钥加入 ssh-agent，免得反复输密码",
+      "tags": [
+        "密钥"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh user@host",
+      "desc": "登录远程服务器",
+      "tags": [
+        "连接"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh -p 2222 user@host",
+      "desc": "指定非默认端口登录",
+      "tags": [
+        "连接"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh user@host \"df -h\"",
+      "desc": "在服务器上执行一条命令后立即返回",
+      "tags": [
+        "连接"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "ssh -T git@github.com",
+      "desc": "测试 GitHub 的 SSH 连接是否配好",
+      "tags": [
+        "连接"
+      ]
+    },
+    {
+      "tool": "ssh",
+      "cmd": "scp file.txt user@host:~/",
+      "desc": "把本地文件复制到服务器",
+      "tags": [
+        "传输"
+      ]
+    }
+  ],
+  "shortcuts": [
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "打开命令面板",
+      "mac": [
+        "⌘",
+        "⇧",
+        "P"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "P"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "快速打开文件",
+      "mac": [
+        "⌘",
+        "P"
+      ],
+      "win": [
+        "Ctrl",
+        "P"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "打开设置",
+      "mac": [
+        "⌘",
+        ","
+      ],
+      "win": [
+        "Ctrl",
+        ","
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "打开集成终端",
+      "mac": [
+        "⌃",
+        "`"
+      ],
+      "win": [
+        "Ctrl",
+        "`"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "新建终端",
+      "mac": [
+        "⌃",
+        "⇧",
+        "`"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "`"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "显示 / 隐藏侧边栏",
+      "mac": [
+        "⌘",
+        "B"
+      ],
+      "win": [
+        "Ctrl",
+        "B"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "打开文件资源管理器",
+      "mac": [
+        "⌘",
+        "⇧",
+        "E"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "E"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "打开插件面板",
+      "mac": [
+        "⌘",
+        "⇧",
+        "X"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "X"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "打开源代码管理",
+      "mac": [
+        "⌃",
+        "⇧",
+        "G"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "G"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "全项目搜索",
+      "mac": [
+        "⌘",
+        "⇧",
+        "F"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "F"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "保存文件",
+      "mac": [
+        "⌘",
+        "S"
+      ],
+      "win": [
+        "Ctrl",
+        "S"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "关闭当前编辑器",
+      "mac": [
+        "⌘",
+        "W"
+      ],
+      "win": [
+        "Ctrl",
+        "W"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "重新打开刚关掉的编辑器",
+      "mac": [
+        "⌘",
+        "⇧",
+        "T"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "T"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "通用",
+      "action": "向右分屏",
+      "mac": [
+        "⌘",
+        "\\"
+      ],
+      "win": [
+        "Ctrl",
+        "\\"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "选中下一个相同的词",
+      "mac": [
+        "⌘",
+        "D"
+      ],
+      "win": [
+        "Ctrl",
+        "D"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "选中所有相同的词",
+      "mac": [
+        "⌘",
+        "⇧",
+        "L"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "L"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "在点击处加一个光标",
+      "mac": [
+        "⌥",
+        "点击"
+      ],
+      "win": [
+        "Alt",
+        "点击"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "向上 / 向下添加光标",
+      "mac": [
+        "⌘",
+        "⌥",
+        "↑"
+      ],
+      "win": [
+        "Ctrl",
+        "Alt",
+        "↑"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "把当前行上移 / 下移",
+      "mac": [
+        "⌥",
+        "↑"
+      ],
+      "win": [
+        "Alt",
+        "↑"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "向下复制当前行",
+      "mac": [
+        "⇧",
+        "⌥",
+        "↓"
+      ],
+      "win": [
+        "Shift",
+        "Alt",
+        "↓"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "删除当前行",
+      "mac": [
+        "⌘",
+        "⇧",
+        "K"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "K"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "切换行注释",
+      "mac": [
+        "⌘",
+        "/"
+      ],
+      "win": [
+        "Ctrl",
+        "/"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "格式化整个文件",
+      "mac": [
+        "⇧",
+        "⌥",
+        "F"
+      ],
+      "win": [
+        "Shift",
+        "Alt",
+        "F"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "重命名符号",
+      "mac": [
+        "F2"
+      ],
+      "win": [
+        "F2"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "快速修复 / 建议",
+      "mac": [
+        "⌘",
+        "."
+      ],
+      "win": [
+        "Ctrl",
+        "."
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "跳转到定义",
+      "mac": [
+        "F12"
+      ],
+      "win": [
+        "F12"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "返回上一个位置",
+      "mac": [
+        "⌃",
+        "-"
+      ],
+      "win": [
+        "Ctrl",
+        "-"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "折叠代码块",
+      "mac": [
+        "⌘",
+        "⌥",
+        "["
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "["
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "展开代码块",
+      "mac": [
+        "⌘",
+        "⌥",
+        "]"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "]"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "文件内查找",
+      "mac": [
+        "⌘",
+        "F"
+      ],
+      "win": [
+        "Ctrl",
+        "F"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "文件内替换",
+      "mac": [
+        "⌘",
+        "⌥",
+        "F"
+      ],
+      "win": [
+        "Ctrl",
+        "H"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "编辑",
+      "action": "跳到指定行",
+      "mac": [
+        "⌃",
+        "G"
+      ],
+      "win": [
+        "Ctrl",
+        "G"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "调试",
+      "action": "开始 / 继续调试",
+      "mac": [
+        "F5"
+      ],
+      "win": [
+        "F5"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "调试",
+      "action": "单步跳过（不进函数）",
+      "mac": [
+        "F10"
+      ],
+      "win": [
+        "F10"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "调试",
+      "action": "单步进入函数",
+      "mac": [
+        "F11"
+      ],
+      "win": [
+        "F11"
+      ]
+    },
+    {
+      "app": "VS Code",
+      "cat": "调试",
+      "action": "停止调试",
+      "mac": [
+        "⇧",
+        "F5"
+      ],
+      "win": [
+        "Shift",
+        "F5"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "复制选中的内容",
+      "mac": [
+        "⌘",
+        "C"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "C"
+      ],
+      "linux": [
+        "Ctrl",
+        "Shift",
+        "C"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "粘贴到终端",
+      "mac": [
+        "⌘",
+        "V"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "V"
+      ],
+      "linux": [
+        "Ctrl",
+        "Shift",
+        "V"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "清屏",
+      "mac": [
+        "⌘",
+        "K"
+      ],
+      "win": [
+        "Ctrl",
+        "L"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "中断当前命令",
+      "mac": [
+        "⌃",
+        "C"
+      ],
+      "win": [
+        "Ctrl",
+        "C"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "挂起当前程序",
+      "mac": [
+        "⌃",
+        "Z"
+      ],
+      "win": [
+        "Ctrl",
+        "Z"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "补全路径或命令",
+      "mac": [
+        "Tab"
+      ],
+      "win": [
+        "Tab"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "操作",
+      "action": "反向搜索历史命令",
+      "mac": [
+        "⌃",
+        "R"
+      ],
+      "win": [
+        "Ctrl",
+        "R"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "编辑",
+      "action": "光标跳到行首",
+      "mac": [
+        "⌃",
+        "A"
+      ],
+      "win": [
+        "Ctrl",
+        "A"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "编辑",
+      "action": "光标跳到行尾",
+      "mac": [
+        "⌃",
+        "E"
+      ],
+      "win": [
+        "Ctrl",
+        "E"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "编辑",
+      "action": "删除光标前的整行内容",
+      "mac": [
+        "⌃",
+        "U"
+      ],
+      "win": [
+        "Ctrl",
+        "U"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "编辑",
+      "action": "删除光标前的一个词",
+      "mac": [
+        "⌃",
+        "W"
+      ],
+      "win": [
+        "Ctrl",
+        "W"
+      ]
+    },
+    {
+      "app": "终端",
+      "cat": "编辑",
+      "action": "上一条 / 下一条历史命令",
+      "mac": [
+        "↑"
+      ],
+      "win": [
+        "↑"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "开发者工具",
+      "action": "打开开发者工具",
+      "mac": [
+        "⌘",
+        "⌥",
+        "I"
+      ],
+      "win": [
+        "F12"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "开发者工具",
+      "action": "打开控制台",
+      "mac": [
+        "⌘",
+        "⌥",
+        "J"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "J"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "开发者工具",
+      "action": "选择元素并检查",
+      "mac": [
+        "⌘",
+        "⇧",
+        "C"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "C"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "刷新页面",
+      "mac": [
+        "⌘",
+        "R"
+      ],
+      "win": [
+        "F5"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "强制刷新、忽略缓存",
+      "mac": [
+        "⌘",
+        "⇧",
+        "R"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "R"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "聚焦地址栏",
+      "mac": [
+        "⌘",
+        "L"
+      ],
+      "win": [
+        "Ctrl",
+        "L"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "新建标签页",
+      "mac": [
+        "⌘",
+        "T"
+      ],
+      "win": [
+        "Ctrl",
+        "T"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "关闭标签页",
+      "mac": [
+        "⌘",
+        "W"
+      ],
+      "win": [
+        "Ctrl",
+        "W"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "恢复刚关掉的标签页",
+      "mac": [
+        "⌘",
+        "⇧",
+        "T"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "T"
+      ]
+    },
+    {
+      "app": "浏览器",
+      "cat": "导航",
+      "action": "打开无痕窗口",
+      "mac": [
+        "⌘",
+        "⇧",
+        "N"
+      ],
+      "win": [
+        "Ctrl",
+        "Shift",
+        "N"
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "终端",
+      "en": "Terminal",
+      "desc": "一个让你输入文字命令的窗口。它本身不干活，只负责把你的命令交给 Shell 执行，再把结果打回来。"
+    },
+    {
+      "term": "Shell",
+      "en": "Shell",
+      "desc": "真正解释并执行命令的程序，常见的有 zsh、bash、PowerShell。终端是窗口，Shell 是窗口里那个翻译官。"
+    },
+    {
+      "term": "工作目录",
+      "en": "Working Directory",
+      "desc": "你当前所处的文件夹。相对路径都从这里开始算，pwd 就是查看它。"
+    },
+    {
+      "term": "路径",
+      "en": "PATH",
+      "desc": "两件不同的事：文件路径是文件在磁盘上的位置；环境变量 PATH 是系统查找命令时的目录清单。"
+    },
+    {
+      "term": "标准输出与标准错误",
+      "en": "stdout / stderr",
+      "desc": "命令正常结果为 stdout，报错信息为 stderr。两者默认都打到屏幕，所以可以用 2> 单独接走错误。"
+    },
+    {
+      "term": "退出码",
+      "en": "Exit Code",
+      "desc": "每条命令结束后返回的数字，0 表示成功，非 0 表示失败。脚本靠它判断上一步有没有出错。"
+    },
+    {
+      "term": "仓库",
+      "en": "Repository",
+      "desc": "Git 管理的项目目录。里面除了你的文件，还有一个隐藏的 .git 文件夹，存着全部历史。"
+    },
+    {
+      "term": "工作区",
+      "en": "Working Tree",
+      "desc": "你眼前能编辑的文件状态。改了还没 add，改动就只存在于工作区。"
+    },
+    {
+      "term": "暂存区",
+      "en": "Staging Area",
+      "desc": "准备进入下一次提交的改动清单。add 是往里放，commit 是把里面的内容定格成历史。"
+    },
+    {
+      "term": "提交",
+      "en": "Commit",
+      "desc": "一次带说明的快照，记录了那一刻全部文件的状态和它的父提交。历史就是由一串提交组成的。"
+    },
+    {
+      "term": "分支",
+      "en": "Branch",
+      "desc": "指向某条提交的可移动指针。新建分支不是复制整个项目，只是多了一个指针，所以非常便宜。"
+    },
+    {
+      "term": "HEAD",
+      "en": "HEAD",
+      "desc": "指向你当前所在分支或提交的指针。切换分支本质上就是移动 HEAD。"
+    },
+    {
+      "term": "远程仓库",
+      "en": "Remote",
+      "desc": "放在服务器上的仓库副本，比如 GitHub。push 是上传提交，pull 是下载并合并。"
+    },
+    {
+      "term": "合并冲突",
+      "en": "Merge Conflict",
+      "desc": "两条分支改了同一处内容，Git 不知道该听谁的，就把两边都标出来让你选。"
+    },
+    {
+      "term": "变基",
+      "en": "Rebase",
+      "desc": "把你的提交逐个搬到另一条分支的最新提交之后，历史会变成一条直线。别对已经推送的公共分支做。"
+    },
+    {
+      "term": "环境变量",
+      "en": "Environment Variable",
+      "desc": "操作系统传给程序的键值对配置，比如 PATH、HOME。程序启动时读取，修改后通常要新开终端才生效。"
+    },
+    {
+      "term": "依赖",
+      "en": "Dependency",
+      "desc": "你的项目运行所需要的别人的代码包。装在 node_modules 或虚拟环境里，不写进仓库。"
+    },
+    {
+      "term": "包管理器",
+      "en": "Package Manager",
+      "desc": "负责下载、安装、升级依赖的工具，比如 npm、pnpm、pip。它同时管理版本锁定文件。"
+    },
+    {
+      "term": "虚拟环境",
+      "en": "Virtual Environment",
+      "desc": "给一个 Python 项目单独准备的依赖目录，避免装到系统 Python 里互相打架。"
+    },
+    {
+      "term": "容器",
+      "en": "Container",
+      "desc": "把程序和它的运行环境一起打包的轻量隔离单元。换台机器也能用同样的方式跑起来。"
+    },
+    {
+      "term": "镜像",
+      "en": "Image",
+      "desc": "容器的只读模板。docker run 一个镜像，才会启动一个容器实例。"
+    },
+    {
+      "term": "SSH",
+      "en": "Secure Shell",
+      "desc": "加密的远程登录协议。用密钥代替密码，可以免密登录服务器，也是 Git 连接 GitHub 的方式之一。"
+    },
+    {
+      "term": "公钥与私钥",
+      "en": "Public / Private Key",
+      "desc": "一对配对的密钥。公钥可以随便发给别人，私钥必须只留在自己机器上，泄露等于把钥匙给了别人。"
+    },
+    {
+      "term": "断点",
+      "en": "Breakpoint",
+      "desc": "在代码某一行做的标记。调试器运行到那里会暂停，让你查看当时的变量和调用栈。"
+    },
+    {
+      "term": "开发者工具",
+      "en": "DevTools",
+      "desc": "浏览器内置的调试面板，能看页面结构、改样式、抓网络请求、打 JS 断点。前端排错的主战场。"
+    },
+    {
+      "term": "Lint",
+      "en": "Linter",
+      "desc": "静态检查工具，在运行前找出语法错误、可疑写法和风格问题，比如 ESLint。"
+    },
+    {
+      "term": "构建",
+      "en": "Build",
+      "desc": "把源码转换成能上线的产物，比如压缩、打包、转译。构建失败通常先看第一条错误。"
+    },
+    {
+      "term": "端口",
+      "en": "Port",
+      "desc": "一台机器上区分不同服务的数字编号。localhost:3000 的 3000 就是端口，被占用时服务起不来。"
+    }
+  ]
+}

@@ -107,27 +107,37 @@
 
 ```
 index.html                  页面骨架
-assets/css/tokens.css       设计令牌与排版刻度
-assets/css/glass.css        液态玻璃组件（顶栏 / 胶囊 / 递进模糊）
-assets/css/app.css          页面组件与响应式
-assets/js/data-terminal.js  终端轨道 6 课
-assets/js/data-git.js       Git 轨道 8 课
-assets/js/data-vscode.js    VS Code 轨道 6 课
-assets/js/data-dev.js       开发环境轨道 5 课
-assets/js/data-efficiency.js 效率与排错轨道 4 课
-assets/js/data-refs.js      命令 / 快捷键 / 术语数据
+assets/css/                 设计令牌、玻璃组件、页面样式
 assets/js/app.js            路由、渲染、进度、搜索面板、训练器
+assets/js/data-*.js         由 content/ 生成的数据文件（勿手改）
+content/lessons/*.json      课程内容源文件（按轨道）
+content/refs.json           命令 / 快捷键 / 术语源文件
+tools/editor/               GTK 桌面编辑器与构建脚本
 tools/check-data.mjs        课程数据契约校验
 tools/verify.mjs            端到端自检（真实浏览器）
 SCHEMA.md                   课程数据字段契约
 screenshots/                页面截图
 ```
 
-## 加一课
+## 改内容
 
-课程内容是数据，不是页面。照着 `SCHEMA.md` 在对应的 `data-*.js` 里追加一个对象，刷新就会出现在首页、侧边栏和上一课 / 下一课导航里。
+推荐用桌面编辑器，改完点保存即可：
 
-支持 9 种内容块：`text`、`tip`、`warn`、`steps`、`table`、`code`、`terminal`、`shortcuts`、`compare`。
+```bash
+./tools/editor/run.sh
+```
+
+编辑器会先把 `content/` 备份到 `tools/editor/backups/`，再写回 JSON 并重新生成 `assets/js/data-*.js`。切到「预览」标签能直接看真实页面；改错了可以点「撤销上次保存」回滚。
+
+![内容编辑器](screenshots/editor.jpg)
+
+也可以直接改 JSON 再构建：
+
+```bash
+node tools/editor/build-data.mjs
+```
+
+课程结构与 9 种内容块（`text`、`tip`、`warn`、`steps`、`table`、`code`、`terminal`、`shortcuts`、`compare`）见 `SCHEMA.md`。
 
 ## 自检
 

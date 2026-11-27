@@ -1,6 +1,11 @@
 # 由 node tools/verify.mjs --shots 生成的 PNG（仓库里只保留压缩后的 jpg）
 screenshots/*.png
 
+# 编辑器的本地备份与 Python 缓存
+tools/editor/backups/
+__pycache__/
+*.pyc
+
 # 系统与编辑器
 .DS_Store
 Thumbs.db

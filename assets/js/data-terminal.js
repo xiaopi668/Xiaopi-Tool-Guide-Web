@@ -1,820 +1,1421 @@
-/* 工具学校 · 终端与系统轨道（terminal） · 6 课 */
+/* 由 content/ 生成，请勿手改；修改内容请用 tools/editor 或改 content/*.json 后运行 build-data.mjs */
 window.PS = window.PS || {};
 window.PS.lessons = window.PS.lessons || [];
 window.PS.lessons.push(
-  {
-    id: 'terminal-intro',
-    order: 1,
-    track: 'terminal',
-    title: '终端、Shell 与一条命令的解剖',
-    subtitle: '从提示符开始，把一条命令拆成零件，顺手记住几个救命按键。',
-    minutes: 10,
-    level: '入门',
-    goal: [
-      '分清终端、Shell 和命令行这三个词',
-      '看懂提示符，知道自己站在哪个目录',
-      '把一条命令拆成程序名、选项、参数',
-      '遇到报错时先按哪几个键，心里有数'
-    ],
-    sections: [
-      {
-        type: 'text',
-        title: '三个词，先分清',
-        html: '<p><strong>终端</strong>（terminal）是你眼前这个能打字的窗口，它本身不执行任何命令，只负责把你的按键交给 Shell、把结果画回屏幕。macOS 自带 Terminal.app，也有 iTerm2；Windows 上是 Windows Terminal；VS Code 下面那个面板叫集成终端，本质一样。</p><p><strong>Shell</strong> 是躲在终端后面的解释器：读你这一行，解析成程序加参数，执行，再把结果送回来。macOS 默认 zsh，多数 Linux 默认 bash，Windows 的 PowerShell 是另一套语法。</p><p><strong>命令行</strong>（command line）不是某个软件，是一种「一行文字换一个动作」的交互方式。你用鼠标点十下能完成的事，这里一行写完。</p>'
-      },
-      {
-        type: 'table',
-        title: '谁坏了，你就看到什么',
-        head: ['概念', '它是什么', '坏掉时的症状'],
-        rows: [
-          ['终端', '承载输入输出的窗口程序', '字打不出来、中文乱码、窗口卡死'],
-          ['Shell', '解析并执行命令的解释器', '提示符变了、报 syntax error'],
-          ['命令', '一个可执行程序加它的选项和参数', 'command not found、illegal option']
-        ]
-      },
-      {
-        type: 'text',
-        title: '提示符在告诉你什么',
-        html: '<p>行首那串东西叫<strong>提示符</strong>（prompt），通常由用户名、主机名、当前目录拼成，家目录会缩写成 <code>~</code>。</p><p>结尾的符号最关键：<code>$</code> 表示你是普通用户，<code>#</code> 表示你已经是 root（超级用户）。zsh 的默认提示符长这样：<code>xiaopi@MacBook study %</code>，bash 长这样：<code>xiaopi@ubuntu:~/study$</code>。末尾的 <code>%</code> 也是普通用户，别被它吓到。</p><p>看到 <code>#</code> 就当作「这一行敲错，没有回收站」来对待。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '先确认自己在哪、用的是什么 Shell',
-        command: 'whoami; echo $SHELL; echo $ZSH_VERSION; pwd',
-        output: 'xiaopi\n/bin/zsh\n5.9\n/Users/xiaopi/study',
-        note: '用分号可以把几条命令写在一行，按顺序执行。$SHELL 是登录时记下的默认 Shell，$ZSH_VERSION 是当前这个 zsh 的版本；写 bash 的人用 echo $BASH_VERSION 看版本。'
-      },
-      {
-        type: 'text',
-        title: '一条命令的三个零件',
-        html: '<p>拆开看，永远是三块：<strong>程序名</strong>（跑哪个程序）、<strong>选项</strong>（怎么跑，通常以横线开头）、<strong>参数</strong>（对谁跑，通常是文件或目录）。</p><p><code>ls -la /tmp</code> 里，<code>ls</code> 是程序名，<code>-la</code> 是两个短选项合写（<code>-l</code> 长格式、<code>-a</code> 含隐藏文件），<code>/tmp</code> 是参数。短选项能合并，长选项不能：<code>--all</code> 只能单独写。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '拆一条真实命令',
-        command: 'ls -la /tmp | head -n 4',
-        output: 'total 0\ndrwxrwxrwt  12 root    wheel  384  3 14 09:21 .\ndrwxr-xr-x   6 root    wheel  192  3 14 09:20 ..\n-rw-r--r--   1 xiaopi  wheel  128  3 14 09:19 note.txt',
-        note: '程序名 ls，选项 -la，参数 /tmp。竖线后面是第二条命令，这一课先不管它，第四课专门拆。'
-      },
-      {
-        type: 'table',
-        title: '命令的四个部位',
-        head: ['部位', '例子', '规矩'],
-        rows: [
-          ['程序名', 'ls、grep、node、git', '必须能在 PATH 里找到'],
-          ['短选项', '-l、-a、-n 5', '单横线，可以合并成 -la'],
-          ['长选项', '--help、--version', '双横线，不能合并'],
-          ['参数', '/tmp、app.js、"my file.txt"', '空格是分隔符，有空格就加引号']
-        ]
-      },
-      {
-        type: 'shortcuts',
-        title: '终端里的救命键，先记五个',
-        items: [
-          { action: '补全命令或路径', mac: ['⇥'], win: ['Tab'], note: '按一次补全，按两次列出候选；补不出来说明路径打错了，别硬回车' },
-          { action: '调出上一条命令', mac: ['↑'], win: ['↑'], note: '连按往上翻；先敲几个字母再按 ↑，只会翻出以它开头的命令' },
-          { action: '中断当前程序', mac: ['⌃', 'C'], win: ['Ctrl', 'C'], note: '程序卡住、刷屏、等待输入时都按它，提示符会立刻回来' },
-          { action: '清屏', mac: ['⌃', 'L'], win: ['Ctrl', 'L'], note: '只清视觉，历史还在，按 ↑ 都能翻回来' },
-          { action: '反向搜索历史', mac: ['⌃', 'R'], win: ['Ctrl', 'R'], note: '输关键词即时匹配，再按一次继续往前找，回车即执行' },
-          { action: '退出当前 Shell', mac: ['⌃', 'D'], win: ['Ctrl', 'D'], note: '空提示符下按它等于敲 exit；在程序里按它是发送输入结束符' }
-        ]
-      },
-      {
-        type: 'warn',
-        title: 'command not found 不是命令写错，是找不到',
-        html: '<p>报错原文：<code>zsh: command not found: node</code>，bash 下是 <code>bash: node: command not found</code>。含义是 Shell 沿着 <code>PATH</code> 里列的每个目录找了一遍，没有找到叫 <code>node</code> 的可执行文件。</p><p>三种常见原因：真没装；装了但目录不在 PATH 里（nvm、Homebrew 最常踩）；装的是另一个名字（<code>python3</code> 而不是 <code>python</code>）。</p><p>排查顺序：<code>command -v node</code> 看能不能找到，<code>echo $PATH</code> 看找过哪些目录。第五课会拆开讲 PATH。</p>'
-      },
-      {
-        type: 'steps',
-        title: '五分钟自己走一遍',
-        items: [
-          { title: '看清单前状态', html: '敲 <code>pwd</code> 和 <code>echo $SHELL</code>，把路径和 Shell 名字记下来，后面出错时有用。' },
-          { title: '用 Tab 代替手打', html: '敲 <code>cd ~/Des</code> 然后按 Tab，路径会自动补全成 <code>~/Desktop</code>。补不上就停手看拼写，不要直接回车。' },
-          { title: '故意触发一次报错', html: '敲 <code>nodee --version</code>，看 command not found 的原文；再敲 <code>node --version</code> 对比成功的输出。' },
-          { title: '用 Ctrl+C 逃生', html: '敲 <code>ping 127.0.0.1</code>，它每秒刷一行；按 ⌃C（Windows 为 Ctrl+C）停下，看提示符回来。' }
-        ]
-      },
-      {
-        type: 'tip',
-        title: 'man 和 --help 怎么选',
-        html: '<p><code>man ls</code> 打开完整手册：<code>/</code> 搜索、<code>n</code> 下一个匹配、<code>q</code> 退出。输出太长想慢慢翻，<code>man ls | less</code> 效果一样。</p><p>不想离开当前屏幕就用 <code>ls --help</code> 打一份简表。注意 macOS 自带的部分命令（比如 <code>ls</code>）没有 <code>--help</code>，会回你 <code>ls: illegal option -- -</code>，这时只能 man。记不住选项先 <code>man 命令名</code>，比搜索快得多。</p>'
-      },
-      {
-        type: 'compare',
-        title: '三个新手误会',
-        left: {
-          label: '以为是这样',
-          items: ['终端就是命令行', '关掉窗口只是关掉显示', '按 Ctrl+C 会把电脑弄坏']
-        },
-        right: {
-          label: '实际是这样',
-          items: ['终端是窗口，命令行是交互方式，Shell 才是执行者', '窗口关掉，前台进程收到挂断信号一起结束', 'Ctrl+C 只是给前台进程发中断信号，系统毫发无损']
-        },
-        note: '这三个误会搞清楚了，你才敢在终端里随便试。'
-      }
-    ],
-    exercise: {
-      title: '动手练一练',
-      brief: '打开终端，按顺序做完下面四步。每步都先看清输出再往下走，卡住了就按 ⌃C 重来一次。',
-      items: [
-        { text: '确认当前目录与默认 Shell', cmd: 'pwd; echo $SHELL' },
-        { text: '用 Tab 补全进入你的项目目录', cmd: 'cd ~/Projects' },
-        { text: '翻一遍 ls 的手册，用 q 退出', cmd: 'man ls' },
-        { text: '故意触发一次 command not found 并解释原因', cmd: 'nodee --version' }
-      ],
-      done: '你能说出 $ 与 # 的区别，也知道报错时该先查 command -v 还是先看 PATH。'
+{
+  "id": "terminal-intro",
+  "order": 1,
+  "track": "terminal",
+  "title": "终端、Shell 与一条命令的解剖",
+  "subtitle": "从提示符开始，把一条命令拆成零件，顺手记住几个救命按键。",
+  "minutes": 10,
+  "level": "入门",
+  "goal": [
+    "分清终端、Shell 和命令行这三个词",
+    "看懂提示符，知道自己站在哪个目录",
+    "把一条命令拆成程序名、选项、参数",
+    "遇到报错时先按哪几个键，心里有数"
+  ],
+  "sections": [
+    {
+      "type": "text",
+      "title": "三个词，先分清",
+      "html": "<p><strong>终端</strong>（terminal）是你眼前这个能打字的窗口，它本身不执行任何命令，只负责把你的按键交给 Shell、把结果画回屏幕。macOS 自带 Terminal.app，也有 iTerm2；Windows 上是 Windows Terminal；VS Code 下面那个面板叫集成终端，本质一样。</p><p><strong>Shell</strong> 是躲在终端后面的解释器：读你这一行，解析成程序加参数，执行，再把结果送回来。macOS 默认 zsh，多数 Linux 默认 bash，Windows 的 PowerShell 是另一套语法。</p><p><strong>命令行</strong>（command line）不是某个软件，是一种「一行文字换一个动作」的交互方式。你用鼠标点十下能完成的事，这里一行写完。</p>"
     },
-    quiz: [
+    {
+      "type": "table",
+      "title": "谁坏了，你就看到什么",
+      "head": [
+        "概念",
+        "它是什么",
+        "坏掉时的症状"
+      ],
+      "rows": [
+        [
+          "终端",
+          "承载输入输出的窗口程序",
+          "字打不出来、中文乱码、窗口卡死"
+        ],
+        [
+          "Shell",
+          "解析并执行命令的解释器",
+          "提示符变了、报 syntax error"
+        ],
+        [
+          "命令",
+          "一个可执行程序加它的选项和参数",
+          "command not found、illegal option"
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "title": "提示符在告诉你什么",
+      "html": "<p>行首那串东西叫<strong>提示符</strong>（prompt），通常由用户名、主机名、当前目录拼成，家目录会缩写成 <code>~</code>。</p><p>结尾的符号最关键：<code>$</code> 表示你是普通用户，<code>#</code> 表示你已经是 root（超级用户）。zsh 的默认提示符长这样：<code>xiaopi@MacBook study %</code>，bash 长这样：<code>xiaopi@ubuntu:~/study$</code>。末尾的 <code>%</code> 也是普通用户，别被它吓到。</p><p>看到 <code>#</code> 就当作「这一行敲错，没有回收站」来对待。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "先确认自己在哪、用的是什么 Shell",
+      "command": "whoami; echo $SHELL; echo $ZSH_VERSION; pwd",
+      "output": "xiaopi\n/bin/zsh\n5.9\n/Users/xiaopi/study",
+      "note": "用分号可以把几条命令写在一行，按顺序执行。$SHELL 是登录时记下的默认 Shell，$ZSH_VERSION 是当前这个 zsh 的版本；写 bash 的人用 echo $BASH_VERSION 看版本。"
+    },
+    {
+      "type": "text",
+      "title": "一条命令的三个零件",
+      "html": "<p>拆开看，永远是三块：<strong>程序名</strong>（跑哪个程序）、<strong>选项</strong>（怎么跑，通常以横线开头）、<strong>参数</strong>（对谁跑，通常是文件或目录）。</p><p><code>ls -la /tmp</code> 里，<code>ls</code> 是程序名，<code>-la</code> 是两个短选项合写（<code>-l</code> 长格式、<code>-a</code> 含隐藏文件），<code>/tmp</code> 是参数。短选项能合并，长选项不能：<code>--all</code> 只能单独写。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "拆一条真实命令",
+      "command": "ls -la /tmp | head -n 4",
+      "output": "total 0\ndrwxrwxrwt  12 root    wheel  384  3 14 09:21 .\ndrwxr-xr-x   6 root    wheel  192  3 14 09:20 ..\n-rw-r--r--   1 xiaopi  wheel  128  3 14 09:19 note.txt",
+      "note": "程序名 ls，选项 -la，参数 /tmp。竖线后面是第二条命令，这一课先不管它，第四课专门拆。"
+    },
+    {
+      "type": "table",
+      "title": "命令的四个部位",
+      "head": [
+        "部位",
+        "例子",
+        "规矩"
+      ],
+      "rows": [
+        [
+          "程序名",
+          "ls、grep、node、git",
+          "必须能在 PATH 里找到"
+        ],
+        [
+          "短选项",
+          "-l、-a、-n 5",
+          "单横线，可以合并成 -la"
+        ],
+        [
+          "长选项",
+          "--help、--version",
+          "双横线，不能合并"
+        ],
+        [
+          "参数",
+          "/tmp、app.js、\"my file.txt\"",
+          "空格是分隔符，有空格就加引号"
+        ]
+      ]
+    },
+    {
+      "type": "shortcuts",
+      "title": "终端里的救命键，先记五个",
+      "items": [
+        {
+          "action": "补全命令或路径",
+          "mac": [
+            "⇥"
+          ],
+          "win": [
+            "Tab"
+          ],
+          "note": "按一次补全，按两次列出候选；补不出来说明路径打错了，别硬回车"
+        },
+        {
+          "action": "调出上一条命令",
+          "mac": [
+            "↑"
+          ],
+          "win": [
+            "↑"
+          ],
+          "note": "连按往上翻；先敲几个字母再按 ↑，只会翻出以它开头的命令"
+        },
+        {
+          "action": "中断当前程序",
+          "mac": [
+            "⌃",
+            "C"
+          ],
+          "win": [
+            "Ctrl",
+            "C"
+          ],
+          "note": "程序卡住、刷屏、等待输入时都按它，提示符会立刻回来"
+        },
+        {
+          "action": "清屏",
+          "mac": [
+            "⌃",
+            "L"
+          ],
+          "win": [
+            "Ctrl",
+            "L"
+          ],
+          "note": "只清视觉，历史还在，按 ↑ 都能翻回来"
+        },
+        {
+          "action": "反向搜索历史",
+          "mac": [
+            "⌃",
+            "R"
+          ],
+          "win": [
+            "Ctrl",
+            "R"
+          ],
+          "note": "输关键词即时匹配，再按一次继续往前找，回车即执行"
+        },
+        {
+          "action": "退出当前 Shell",
+          "mac": [
+            "⌃",
+            "D"
+          ],
+          "win": [
+            "Ctrl",
+            "D"
+          ],
+          "note": "空提示符下按它等于敲 exit；在程序里按它是发送输入结束符"
+        }
+      ]
+    },
+    {
+      "type": "warn",
+      "title": "command not found 不是命令写错，是找不到",
+      "html": "<p>报错原文：<code>zsh: command not found: node</code>，bash 下是 <code>bash: node: command not found</code>。含义是 Shell 沿着 <code>PATH</code> 里列的每个目录找了一遍，没有找到叫 <code>node</code> 的可执行文件。</p><p>三种常见原因：真没装；装了但目录不在 PATH 里（nvm、Homebrew 最常踩）；装的是另一个名字（<code>python3</code> 而不是 <code>python</code>）。</p><p>排查顺序：<code>command -v node</code> 看能不能找到，<code>echo $PATH</code> 看找过哪些目录。第五课会拆开讲 PATH。</p>"
+    },
+    {
+      "type": "steps",
+      "title": "五分钟自己走一遍",
+      "items": [
+        {
+          "title": "看清单前状态",
+          "html": "敲 <code>pwd</code> 和 <code>echo $SHELL</code>，把路径和 Shell 名字记下来，后面出错时有用。"
+        },
+        {
+          "title": "用 Tab 代替手打",
+          "html": "敲 <code>cd ~/Des</code> 然后按 Tab，路径会自动补全成 <code>~/Desktop</code>。补不上就停手看拼写，不要直接回车。"
+        },
+        {
+          "title": "故意触发一次报错",
+          "html": "敲 <code>nodee --version</code>，看 command not found 的原文；再敲 <code>node --version</code> 对比成功的输出。"
+        },
+        {
+          "title": "用 Ctrl+C 逃生",
+          "html": "敲 <code>ping 127.0.0.1</code>，它每秒刷一行；按 ⌃C（Windows 为 Ctrl+C）停下，看提示符回来。"
+        }
+      ]
+    },
+    {
+      "type": "tip",
+      "title": "man 和 --help 怎么选",
+      "html": "<p><code>man ls</code> 打开完整手册：<code>/</code> 搜索、<code>n</code> 下一个匹配、<code>q</code> 退出。输出太长想慢慢翻，<code>man ls | less</code> 效果一样。</p><p>不想离开当前屏幕就用 <code>ls --help</code> 打一份简表。注意 macOS 自带的部分命令（比如 <code>ls</code>）没有 <code>--help</code>，会回你 <code>ls: illegal option -- -</code>，这时只能 man。记不住选项先 <code>man 命令名</code>，比搜索快得多。</p>"
+    },
+    {
+      "type": "compare",
+      "title": "三个新手误会",
+      "left": {
+        "label": "以为是这样",
+        "items": [
+          "终端就是命令行",
+          "关掉窗口只是关掉显示",
+          "按 Ctrl+C 会把电脑弄坏"
+        ]
+      },
+      "right": {
+        "label": "实际是这样",
+        "items": [
+          "终端是窗口，命令行是交互方式，Shell 才是执行者",
+          "窗口关掉，前台进程收到挂断信号一起结束",
+          "Ctrl+C 只是给前台进程发中断信号，系统毫发无损"
+        ]
+      },
+      "note": "这三个误会搞清楚了，你才敢在终端里随便试。"
+    }
+  ],
+  "exercise": {
+    "title": "动手练一练",
+    "brief": "打开终端，按顺序做完下面四步。每步都先看清输出再往下走，卡住了就按 ⌃C 重来一次。",
+    "items": [
       {
-        q: '提示符结尾是 # 而不是 $，说明什么？',
-        options: ['Shell 换成了 bash', '当前是 root 用户，命令会直接生效', '终端进入了只读模式', '上一条命令还没结束'],
-        answer: 1,
-        explain: '井号是 root 的提示符标记。此时每条命令都以超级用户身份执行，删文件、改系统配置都不再问密码，所以回车前务必先看清路径。'
+        "text": "确认当前目录与默认 Shell",
+        "cmd": "pwd; echo $SHELL"
       },
       {
-        q: '敲 ls -la /tmp 时，哪一部分是参数？',
-        options: ['ls', '-la', '/tmp', '整条命令都是参数'],
-        answer: 2,
-        explain: 'ls 是程序名，-la 是合并写的两个短选项（-l 长格式、-a 含隐藏文件），/tmp 才是这条命令作用的对象。选项可以合并，参数不能当选项用。'
+        "text": "用 Tab 补全进入你的项目目录",
+        "cmd": "cd ~/Projects"
       },
       {
-        q: '命令卡在不停刷屏的状态，最干净的停止方式？',
-        options: ['关掉终端窗口', '按 ⌃C（Windows 为 Ctrl+C）', '按 ⌃L 清屏', '再开一个新终端窗口'],
-        answer: 1,
-        explain: '⌃L 只清屏，进程还在后台刷。关窗口会连带杀掉正在跑的任务。⌃C 给前台进程发中断信号，提示符马上回来，副作用最小。'
+        "text": "翻一遍 ls 的手册，用 q 退出",
+        "cmd": "man ls"
+      },
+      {
+        "text": "故意触发一次 command not found 并解释原因",
+        "cmd": "nodee --version"
       }
-    ]
+    ],
+    "done": "你能说出 $ 与 # 的区别，也知道报错时该先查 command -v 还是先看 PATH。"
   },
-  {
-    id: 'files-and-dirs',
-    order: 2,
-    track: 'terminal',
-    title: '文件与目录的十个命令',
-    subtitle: 'pwd 到 rm 走一遍，顺手记住哪一条会吃掉你的数据。',
-    minutes: 12,
-    level: '入门',
-    goal: [
-      '分清绝对路径与相对路径',
-      '用 pwd、ls、cd 安全地在目录间移动',
-      '知道 cp、mv、rm 各自的副作用',
-      '删除任何东西之前先确认路径'
-    ],
-    sections: [
-      {
-        type: 'text',
-        title: '路径是一棵树',
-        html: '<p>文件系统是一棵倒着的树，最上面是根目录 <code>/</code>。<strong>绝对路径</strong>从 <code>/</code> 写起，在任何目录敲都指向同一处；<strong>相对路径</strong>从你当前所在目录算起，换个位置含义就变了。</p><p>三个记号天天用：<code>~</code> 是家目录（<code>/Users/你的名字</code> 或 <code>/home/你的名字</code>），<code>.</code> 是当前目录，<code>..</code> 是上一级。写脚本用绝对路径，手敲用相对路径省事。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '看清单前状态',
-        command: 'pwd; ls -la ~/Projects',
-        output: '/Users/xiaopi/Projects\ntotal 16\ndrwxr-xr-x   4 xiaopi  staff   128  3 14 09:30 .\ndrwxr-xr-x+ 38 xiaopi  staff  1216  3 14 09:30 ..\ndrwxr-xr-x   9 xiaopi  staff   288  3 14 09:18 prompt学校\n-rw-r--r--   1 xiaopi  staff    42  3 14 09:29 notes.md',
-        note: '第一列首字母 d 是目录，横线是普通文件；后面九位是权限，第五课细讲。最后两列是修改时间和名字。'
-      },
-      {
-        type: 'table',
-        title: '十个命令，够用一整年',
-        head: ['命令', '作用', '例子'],
-        rows: [
-          ['pwd', '打印当前目录的绝对路径', 'pwd'],
-          ['ls', '列出目录内容', 'ls -la ~/Projects'],
-          ['cd', '切换目录', 'cd ../assets'],
-          ['mkdir', '新建目录，-p 可以一次建多层', 'mkdir -p src/components'],
-          ['cp', '复制文件，目录要加 -r', 'cp -r src src.bak'],
-          ['mv', '移动，或者改名，同一个命令', 'mv notes.md notes-2024.md'],
-          ['rm', '删除，-i 每删一次都问', 'rm -i draft.md'],
-          ['touch', '建空文件，或更新修改时间', 'touch .env'],
-          ['cat', '整份打印小文件', 'cat .gitignore'],
-          ['open', '用默认程序打开（仅 macOS）', 'open .']
-        ]
-      },
-      {
-        type: 'text',
-        title: 'cd 的四种走法',
-        html: '<p><code>cd /tmp</code> 走绝对路径；<code>cd assets/js</code> 走相对路径；<code>cd ..</code> 回上一级；<code>cd ~</code> 或光敲一个 <code>cd</code> 回家目录；<code>cd -</code> 回到上一个待过的目录，两个目录来回切时最省事。</p><p>目录名带空格必须处理：<code>cd "My Documents"</code> 或 <code>cd My\\ Documents</code>。直接敲 <code>cd My Documents</code> 会被切成两个参数，报 <code>cd: too many arguments</code>。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '建目录、复制、改名，一步不漏',
-        command: 'mkdir -p ~/tmp-demo/src/utils && cd ~/tmp-demo && touch src/utils/log.js && cp -r src src.bak && mv src.bak src-old && ls',
-        output: 'src\nsrc-old',
-        note: '&& 表示前一条成功才执行后一条。mv 在这里只是改名，src.bak 这个目录名从此不存在。'
-      },
-      {
-        type: 'steps',
-        title: '在临时目录里做完这套动作',
-        items: [
-          { title: '一次建出三层目录', html: '在 <code>~</code> 下执行 <code>mkdir -p ~/tmp-demo/a/b/c</code>，-p 会顺手把缺的父目录补上。' },
-          { title: '复制整个目录', html: '<code>cp -r ~/tmp-demo/a ~/tmp-demo/a-copy</code>，然后 <code>ls ~/tmp-demo</code> 确认两份都在。' },
-          { title: '改名，明白 mv 不留原件', html: '<code>mv ~/tmp-demo/a-copy ~/tmp-demo/a-renamed</code>，a-copy 这个名字随即消失。' },
-          { title: '删整个实验目录前先看清楚', html: '先 <code>ls -la ~/tmp-demo</code> 核对，再 <code>rm -rf ~/tmp-demo</code>，最后 <code>ls ~</code> 确认它没了。' }
-        ]
-      },
-      {
-        type: 'warn',
-        title: 'rm -rf 没有回收站',
-        html: '<p><code>rm</code> 删掉的文件不进废纸篓，终端也没有撤销键。一旦回车，只能靠备份或恢复工具去捞。</p><p><code>rm -rf ~/Projects</code> 会递归删掉整个目录，不确认、不提示、不报错。真正致命的是变量拼错：<code>rm -rf $DIR/</code> 在 DIR 为空时展开成 <code>rm -rf /</code>，系统当场报废。</p><p>两条硬规矩：删之前对同一个路径敲一次 <code>ls</code>；写脚本时在开头加 <code>set -u</code>，让未定义变量直接报错，而不是悄悄变成空字符串。</p>'
-      },
-      {
-        type: 'text',
-        title: '空格与特殊字符怎么处理',
-        html: '<p>Shell 用空格切分参数，路径里带空格就会被当成两个参数。三种写法都行：<code>cp "my file.txt" /tmp</code>、<code>cp my\\ file.txt /tmp</code>，以及用 Tab 让 Shell 自己帮你转义。</p><p>文件名里出现 <code>$</code>、<code>&amp;</code>、<code>(</code> 这类字符时，用单引号包住最稳，单引号里一个字符都不解释。养成习惯：路径一律先 Tab 补全，补不出来就是打错了。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '引号保住了空格',
-        command: 'cd "/Users/xiaopi/My Documents" && pwd',
-        output: '/Users/xiaopi/My Documents',
-        note: '引号保住空格。换成 cd /Users/xiaopi/My\\ Documents 效果相同；不加引号会报 cd: too many arguments。'
-      },
-      {
-        type: 'text',
-        title: '三个你一定会撞上的报错',
-        html: '<p><code>mkdir: a: File exists</code>：目录已存在，mkdir 不会覆盖，加 <code>-p</code> 就静默跳过。</p><p><code>cp: src is a directory (not copied)</code>：复制目录忘了 <code>-r</code>。</p><p><code>rm: draft.md: No such file or directory</code>：名字或路径不对，先用 <code>ls</code> 核对。还有一种情况是文件名里带了不可见字符，用 Tab 补全就能避开。</p>'
-      },
-      {
-        type: 'tip',
-        title: '把 rm -i 设成默认值',
-        html: '<p>在 <code>~/.zshrc</code> 里加一行 <code>alias rm="rm -i"</code>，再执行 <code>source ~/.zshrc</code>，以后每次删除都会先问你一句。</p><p>代价是批量删除会被问很多次；而带 <code>-f</code> 的 <code>rm -rf</code> 会把 <code>-i</code> 顶掉，照样一句不问就删，这也是它危险的原因之一。真正可靠的保护是把重要目录交给 Git。</p>'
-      }
-    ],
-    exercise: {
-      title: '动手练一练',
-      brief: '在 ~/tmp-demo 里把建、复制、改名、删除各走一遍，最后亲手把这个目录删掉，再回 ~ 确认它真的没了。',
-      items: [
-        { text: '一次建出三层目录', cmd: 'mkdir -p ~/tmp-demo/a/b/c' },
-        { text: '复制整个目录，再改名', cmd: 'cp -r ~/tmp-demo/a ~/tmp-demo/a-copy && mv ~/tmp-demo/a-copy ~/tmp-demo/a-ok' },
-        { text: '用 ls 确认路径后整体删除', cmd: 'ls -la ~/tmp-demo && rm -rf ~/tmp-demo' }
+  "quiz": [
+    {
+      "q": "提示符结尾是 # 而不是 $，说明什么？",
+      "options": [
+        "Shell 换成了 bash",
+        "当前是 root 用户，命令会直接生效",
+        "终端进入了只读模式",
+        "上一条命令还没结束"
       ],
-      done: 'ls ~ 里已经看不到 tmp-demo 这个目录，而且你能说清 rm -rf 为什么不能随手敲。'
+      "answer": 1,
+      "explain": "井号是 root 的提示符标记。此时每条命令都以超级用户身份执行，删文件、改系统配置都不再问密码，所以回车前务必先看清路径。"
     },
-    quiz: [
+    {
+      "q": "敲 ls -la /tmp 时，哪一部分是参数？",
+      "options": [
+        "ls",
+        "-la",
+        "/tmp",
+        "整条命令都是参数"
+      ],
+      "answer": 2,
+      "explain": "ls 是程序名，-la 是合并写的两个短选项（-l 长格式、-a 含隐藏文件），/tmp 才是这条命令作用的对象。选项可以合并，参数不能当选项用。"
+    },
+    {
+      "q": "命令卡在不停刷屏的状态，最干净的停止方式？",
+      "options": [
+        "关掉终端窗口",
+        "按 ⌃C（Windows 为 Ctrl+C）",
+        "按 ⌃L 清屏",
+        "再开一个新终端窗口"
+      ],
+      "answer": 1,
+      "explain": "⌃L 只清屏，进程还在后台刷。关窗口会连带杀掉正在跑的任务。⌃C 给前台进程发中断信号，提示符马上回来，副作用最小。"
+    }
+  ]
+},
+{
+  "id": "files-and-dirs",
+  "order": 2,
+  "track": "terminal",
+  "title": "文件与目录的十个命令",
+  "subtitle": "pwd 到 rm 走一遍，顺手记住哪一条会吃掉你的数据。",
+  "minutes": 12,
+  "level": "入门",
+  "goal": [
+    "分清绝对路径与相对路径",
+    "用 pwd、ls、cd 安全地在目录间移动",
+    "知道 cp、mv、rm 各自的副作用",
+    "删除任何东西之前先确认路径"
+  ],
+  "sections": [
+    {
+      "type": "text",
+      "title": "路径是一棵树",
+      "html": "<p>文件系统是一棵倒着的树，最上面是根目录 <code>/</code>。<strong>绝对路径</strong>从 <code>/</code> 写起，在任何目录敲都指向同一处；<strong>相对路径</strong>从你当前所在目录算起，换个位置含义就变了。</p><p>三个记号天天用：<code>~</code> 是家目录（<code>/Users/你的名字</code> 或 <code>/home/你的名字</code>），<code>.</code> 是当前目录，<code>..</code> 是上一级。写脚本用绝对路径，手敲用相对路径省事。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "看清单前状态",
+      "command": "pwd; ls -la ~/Projects",
+      "output": "/Users/xiaopi/Projects\ntotal 16\ndrwxr-xr-x   4 xiaopi  staff   128  3 14 09:30 .\ndrwxr-xr-x+ 38 xiaopi  staff  1216  3 14 09:30 ..\ndrwxr-xr-x   9 xiaopi  staff   288  3 14 09:18 prompt学校\n-rw-r--r--   1 xiaopi  staff    42  3 14 09:29 notes.md",
+      "note": "第一列首字母 d 是目录，横线是普通文件；后面九位是权限，第五课细讲。最后两列是修改时间和名字。"
+    },
+    {
+      "type": "table",
+      "title": "十个命令，够用一整年",
+      "head": [
+        "命令",
+        "作用",
+        "例子"
+      ],
+      "rows": [
+        [
+          "pwd",
+          "打印当前目录的绝对路径",
+          "pwd"
+        ],
+        [
+          "ls",
+          "列出目录内容",
+          "ls -la ~/Projects"
+        ],
+        [
+          "cd",
+          "切换目录",
+          "cd ../assets"
+        ],
+        [
+          "mkdir",
+          "新建目录，-p 可以一次建多层",
+          "mkdir -p src/components"
+        ],
+        [
+          "cp",
+          "复制文件，目录要加 -r",
+          "cp -r src src.bak"
+        ],
+        [
+          "mv",
+          "移动，或者改名，同一个命令",
+          "mv notes.md notes-2024.md"
+        ],
+        [
+          "rm",
+          "删除，-i 每删一次都问",
+          "rm -i draft.md"
+        ],
+        [
+          "touch",
+          "建空文件，或更新修改时间",
+          "touch .env"
+        ],
+        [
+          "cat",
+          "整份打印小文件",
+          "cat .gitignore"
+        ],
+        [
+          "open",
+          "用默认程序打开（仅 macOS）",
+          "open ."
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "title": "cd 的四种走法",
+      "html": "<p><code>cd /tmp</code> 走绝对路径；<code>cd assets/js</code> 走相对路径；<code>cd ..</code> 回上一级；<code>cd ~</code> 或光敲一个 <code>cd</code> 回家目录；<code>cd -</code> 回到上一个待过的目录，两个目录来回切时最省事。</p><p>目录名带空格必须处理：<code>cd \"My Documents\"</code> 或 <code>cd My\\ Documents</code>。直接敲 <code>cd My Documents</code> 会被切成两个参数，报 <code>cd: too many arguments</code>。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "建目录、复制、改名，一步不漏",
+      "command": "mkdir -p ~/tmp-demo/src/utils && cd ~/tmp-demo && touch src/utils/log.js && cp -r src src.bak && mv src.bak src-old && ls",
+      "output": "src\nsrc-old",
+      "note": "&& 表示前一条成功才执行后一条。mv 在这里只是改名，src.bak 这个目录名从此不存在。"
+    },
+    {
+      "type": "steps",
+      "title": "在临时目录里做完这套动作",
+      "items": [
+        {
+          "title": "一次建出三层目录",
+          "html": "在 <code>~</code> 下执行 <code>mkdir -p ~/tmp-demo/a/b/c</code>，-p 会顺手把缺的父目录补上。"
+        },
+        {
+          "title": "复制整个目录",
+          "html": "<code>cp -r ~/tmp-demo/a ~/tmp-demo/a-copy</code>，然后 <code>ls ~/tmp-demo</code> 确认两份都在。"
+        },
+        {
+          "title": "改名，明白 mv 不留原件",
+          "html": "<code>mv ~/tmp-demo/a-copy ~/tmp-demo/a-renamed</code>，a-copy 这个名字随即消失。"
+        },
+        {
+          "title": "删整个实验目录前先看清楚",
+          "html": "先 <code>ls -la ~/tmp-demo</code> 核对，再 <code>rm -rf ~/tmp-demo</code>，最后 <code>ls ~</code> 确认它没了。"
+        }
+      ]
+    },
+    {
+      "type": "warn",
+      "title": "rm -rf 没有回收站",
+      "html": "<p><code>rm</code> 删掉的文件不进废纸篓，终端也没有撤销键。一旦回车，只能靠备份或恢复工具去捞。</p><p><code>rm -rf ~/Projects</code> 会递归删掉整个目录，不确认、不提示、不报错。真正致命的是变量拼错：<code>rm -rf $DIR/</code> 在 DIR 为空时展开成 <code>rm -rf /</code>，系统当场报废。</p><p>两条硬规矩：删之前对同一个路径敲一次 <code>ls</code>；写脚本时在开头加 <code>set -u</code>，让未定义变量直接报错，而不是悄悄变成空字符串。</p>"
+    },
+    {
+      "type": "text",
+      "title": "空格与特殊字符怎么处理",
+      "html": "<p>Shell 用空格切分参数，路径里带空格就会被当成两个参数。三种写法都行：<code>cp \"my file.txt\" /tmp</code>、<code>cp my\\ file.txt /tmp</code>，以及用 Tab 让 Shell 自己帮你转义。</p><p>文件名里出现 <code>$</code>、<code>&amp;</code>、<code>(</code> 这类字符时，用单引号包住最稳，单引号里一个字符都不解释。养成习惯：路径一律先 Tab 补全，补不出来就是打错了。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "引号保住了空格",
+      "command": "cd \"/Users/xiaopi/My Documents\" && pwd",
+      "output": "/Users/xiaopi/My Documents",
+      "note": "引号保住空格。换成 cd /Users/xiaopi/My\\ Documents 效果相同；不加引号会报 cd: too many arguments。"
+    },
+    {
+      "type": "text",
+      "title": "三个你一定会撞上的报错",
+      "html": "<p><code>mkdir: a: File exists</code>：目录已存在，mkdir 不会覆盖，加 <code>-p</code> 就静默跳过。</p><p><code>cp: src is a directory (not copied)</code>：复制目录忘了 <code>-r</code>。</p><p><code>rm: draft.md: No such file or directory</code>：名字或路径不对，先用 <code>ls</code> 核对。还有一种情况是文件名里带了不可见字符，用 Tab 补全就能避开。</p>"
+    },
+    {
+      "type": "tip",
+      "title": "把 rm -i 设成默认值",
+      "html": "<p>在 <code>~/.zshrc</code> 里加一行 <code>alias rm=\"rm -i\"</code>，再执行 <code>source ~/.zshrc</code>，以后每次删除都会先问你一句。</p><p>代价是批量删除会被问很多次；而带 <code>-f</code> 的 <code>rm -rf</code> 会把 <code>-i</code> 顶掉，照样一句不问就删，这也是它危险的原因之一。真正可靠的保护是把重要目录交给 Git。</p>"
+    }
+  ],
+  "exercise": {
+    "title": "动手练一练",
+    "brief": "在 ~/tmp-demo 里把建、复制、改名、删除各走一遍，最后亲手把这个目录删掉，再回 ~ 确认它真的没了。",
+    "items": [
       {
-        q: '哪条命令会把 src 目录连同里面的文件一起复制成 src.bak？',
-        options: ['cp src src.bak', 'cp -r src src.bak', 'mv src src.bak', 'mkdir src.bak'],
-        answer: 1,
-        explain: '目录复制必须加 r 参数递归处理，否则系统会直接报错说 src 是个目录。mv 是移动或者改名，原目录不会留下副本，想留原件只能用 cp。'
+        "text": "一次建出三层目录",
+        "cmd": "mkdir -p ~/tmp-demo/a/b/c"
       },
       {
-        q: '路径里有空格，哪条一定能正确执行？',
-        options: ['cd My Documents', 'cd "My Documents"', 'cd My Documents/', 'cd Documents'],
-        answer: 1,
-        explain: '引号把整串当成一个参数交给 cd。不加引号时，Shell 会先按空格把它切成两个参数，cd 收到两个路径就报参数太多，所以路径带空格一律加引号。'
+        "text": "复制整个目录，再改名",
+        "cmd": "cp -r ~/tmp-demo/a ~/tmp-demo/a-copy && mv ~/tmp-demo/a-copy ~/tmp-demo/a-ok"
       },
       {
-        q: '在空目录里执行 rm -rf $DIR/ 而 DIR 未定义，会发生什么？',
-        options: ['什么都不删', '只删当前目录', '展开成 rm -rf /，从根目录开始递归删除', '会要求你确认'],
-        answer: 2,
-        explain: '未定义变量展开成空字符串，命令实际就是 rm -rf /，从根目录递归删除。脚本开头加 set -u，可以让这类未定义变量当场报错。'
+        "text": "用 ls 确认路径后整体删除",
+        "cmd": "ls -la ~/tmp-demo && rm -rf ~/tmp-demo"
       }
-    ]
+    ],
+    "done": "ls ~ 里已经看不到 tmp-demo 这个目录，而且你能说清 rm -rf 为什么不能随手敲。"
   },
-  {
-    id: 'read-and-search',
-    order: 3,
-    track: 'terminal',
-    title: '看文件与在文件里找东西',
-    subtitle: 'cat 看小文件、less 翻大文件、grep 进内容、find 找路径。',
-    minutes: 14,
-    level: '基础',
-    goal: [
-      '按文件大小选对查看命令',
-      '用 less 翻页、搜索、退出',
-      'grep 在内容里定位，find 在路径里定位',
-      '分清通配符与正则的差别'
-    ],
-    sections: [
-      {
-        type: 'text',
-        title: '先分清两个问题',
-        html: '<p>「这个文件里写了什么」和「这个文件在哪」是两件事，用两套命令。看内容用 <code>cat</code>、<code>less</code>、<code>head</code>、<code>tail</code>、<code>grep</code>；找路径用 <code>find</code>，或者 <code>ls</code> 加通配符。</p><p>新手最常浪费的一步，是拿 <code>cat</code> 打印一个几百兆的日志，屏幕滚几分钟，还把终端缓冲区塞满。大文件一律用 <code>less</code>，它按需读取，开多大文件都只占一屏内存。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '小文件、头尾与行数',
-        command: 'wc -l access.log; head -n 2 access.log; tail -n 2 access.log',
-        output: '8421 access.log\n127.0.0.1 - - [14/Mar/2024 09:01:02] "GET / HTTP/1.1" 200 1024\n127.0.0.1 - - [14/Mar/2024 09:01:05] "GET /app.js HTTP/1.1" 200 2321\n10.0.0.7 - - [14/Mar/2024 10:22:41] "POST /api/login HTTP/1.1" 401 87\n10.0.0.7 - - [14/Mar/2024 10:22:44] "POST /api/login HTTP/1.1" 500 61',
-        note: 'wc -l 数行数，head 看开头确认格式，tail 看结尾。日志的最新一条永远在最下面。'
-      },
-      {
-        type: 'table',
-        title: '五个看内容的命令',
-        head: ['命令', '用在哪', '注意'],
-        rows: [
-          ['cat', '几百行以内的小文件、拼接配置', '大文件会刷屏，只能 ⌃C 才停'],
-          ['less', '几十万行的日志、源码', '按 q 退出，按键见下一节'],
-          ['head -n 20', '只看开头，确认格式对不对', '-n 后面跟行数，省略默认 10'],
-          ['tail -n 50', '看最新的日志', '加 -f 会一直跟着文件增长'],
-          ['wc -l', '数行数，判断文件规模', '统计的是换行符个数，不是字符数']
-        ]
-      },
-      {
-        type: 'shortcuts',
-        title: '在 less 里怎么走（两端按键相同）',
-        items: [
-          { action: '向下翻一页、一行', mac: ['Space'], win: ['Space'], note: '空格翻一页，↓ 走一行，b 往回翻一页' },
-          { action: '向下搜索关键词', mac: ['/'], win: ['/'], note: '输入后回车；n 跳到下一个匹配，N 跳到上一个' },
-          { action: '向上搜索', mac: ['?'], win: ['?'], note: '从当前位置往前找，同样用 n 继续' },
-          { action: '跳到开头、结尾', mac: ['g'], win: ['g'], note: 'g 到文件头，G 到文件尾' },
-          { action: '退出阅读', mac: ['q'], win: ['q'], note: '只退出 less，不会关掉终端' },
-          { action: '不退出就执行命令', mac: ['!'], win: ['!'], note: '敲 !ls 回车，可以顺手看一眼当前文件所在的目录' }
-        ]
-      },
-      {
-        type: 'terminal',
-        title: '跟着日志跑',
-        command: 'tail -f logs/app.log',
-        output: '[09:31:02] INFO  server listening on 3000\n[09:31:44] WARN  slow query 812ms path=/api/orders\n[09:32:01] ERROR connect ECONNREFUSED 127.0.0.1:5432',
-        note: '它不会自己退出，按 ⌃C（Windows 为 Ctrl+C）停。加 -n 200 可以先垫出最后两百行再开始跟。'
-      },
-      {
-        type: 'text',
-        title: 'grep：进文件里找一行',
-        html: '<p><code>grep</code> 按行匹配，默认输出命中的整行。<code>-n</code> 带行号，<code>-i</code> 忽略大小写，<code>-r</code> 递归进子目录，<code>-l</code> 只列文件名，<code>-c</code> 只给条数。</p><p><code>-r</code> 会一路扫进 <code>node_modules</code> 和 <code>.git</code>，几十万文件扫几分钟没结果。用 <code>--exclude-dir</code> 排除：<code>grep -rn "TODO" . --exclude-dir=node_modules --exclude-dir=.git</code>。macOS 自带的是 BSD grep，不一定认这个参数，需要时 <code>brew install grep</code>，然后改用 <code>ggrep</code>。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '在项目里找一行代码',
-        command: 'grep -rn "EADDRINUSE" src/ | head -n 3',
-        output: 'src/server.js:14:  // 端口被占用时 Node 抛出 EADDRINUSE\nsrc/server.js:88:  if (err.code === "EADDRINUSE") {\nsrc/net/check.js:31:  throw new Error("EADDRINUSE: port busy");',
-        note: '文件名和行号在冒号前面，可以直接拿去编辑器跳转。结果常常很多，接 head 截断。'
-      },
-      {
-        type: 'compare',
-        title: 'grep 还是 find',
-        left: {
-          label: '用错的写法',
-          items: ['find . -name "EADDRINUSE" 想搜代码里的字符串，永远搜不到', 'grep -r 遍历整个磁盘，只为找一个文件叫什么名字', '用 grep 找 .log 文件的位置，再挨个 cat']
-        },
-        right: {
-          label: '正确的分工',
-          items: ['find . -name "*.log" -type f 找文件名和类型', 'grep -rn "EADDRINUSE" src/ 找文件里的内容', 'grep -r 时限定目录，并排除 node_modules 与 .git']
-        },
-        note: '一句话记法：find 只看名字和属性，grep 只看内容。'
-      },
-      {
-        type: 'text',
-        title: 'find：按名字和类型找文件',
-        html: '<p><code>find</code> 第一个参数是起点目录，后面跟条件。三个最常用：<code>-name "*.log"</code> 按文件名（引号必须有，否则 Shell 会提前展开）、<code>-type f</code> 只要文件、<code>-type d</code> 只要目录。</p><p>两个能省时间的参数：<code>-maxdepth 2</code> 限制深度，避免扫穿整个家目录；<code>-mtime -1</code> 找一天内改过的文件。要对结果逐个执行命令，用 <code>-exec 命令 {} \\;</code>，花括号是占位符。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '找文件，并且只要文件',
-        command: 'find . -maxdepth 3 -name "*.log" -type f',
-        output: './logs/app.log\n./logs/access.log\n./tmp/test.log',
-        note: '不加 -type f，名字叫 .log 的目录也会被列出来；加 -maxdepth 能明显加快。'
-      },
-      {
-        type: 'warn',
-        title: '通配符和正则不是一回事',
-        html: '<p><code>*</code> 和 <code>?</code> 是 Shell 的<strong>通配符</strong>（glob）：<code>*</code> 任意多个字符，<code>?</code> 恰好一个字符，只用于匹配文件名，而且由 Shell 先展开。</p><p><code>grep</code> 用的是<strong>正则</strong>（regular expression），<code>*</code> 表示前一个字符重复任意次，所以 <code>grep "*.log"</code> 找不到 .log 结尾的行。更麻烦的是：当前目录里真有 .log 文件时，Shell 先把 <code>*.log</code> 展开成一串文件名，grep 拿不到文件名参数，就地等标准输入，看起来像卡住。</p><p>正确写法是 <code>grep "\\.log$"</code> 或 <code>grep -F ".log"</code>；通配符留给 <code>find -name</code>。</p>'
-      },
-      {
-        type: 'tip',
-        title: '找大文件与找最近改动',
-        html: '<p>磁盘满了先找大文件：<code>du -sh * | sort -h | tail -n 10</code>，从大到小看最后十行。<code>sort -h</code> 认得 K、M、G 单位，不加它排序会出错。</p><p>找今天改过的文件：<code>find . -type f -mtime -1</code>。排查「谁动了我的配置」时，这条比翻 Git 历史更快。</p>'
-      }
-    ],
-    exercise: {
-      title: '动手练一练',
-      brief: '找一份真实日志（没有就自己造几行），做完四件事：数行、看尾部、搜报错、定位文件。',
-      items: [
-        { text: '数一下日志一共多少行', cmd: 'wc -l logs/access.log' },
-        { text: '看最后 20 行，确认最新一条请求', cmd: 'tail -n 20 logs/access.log' },
-        { text: '统计 500 错误出现几次', cmd: 'grep -c " 500 " logs/access.log' },
-        { text: '列出目录下所有 .log 文件的路径', cmd: 'find . -maxdepth 3 -name "*.log" -type f' }
+  "quiz": [
+    {
+      "q": "哪条命令会把 src 目录连同里面的文件一起复制成 src.bak？",
+      "options": [
+        "cp src src.bak",
+        "cp -r src src.bak",
+        "mv src src.bak",
+        "mkdir src.bak"
       ],
-      done: '四条命令都有输出，并且你能指出哪条用了通配符、哪条用了正则。'
+      "answer": 1,
+      "explain": "目录复制必须加 r 参数递归处理，否则系统会直接报错说 src 是个目录。mv 是移动或者改名，原目录不会留下副本，想留原件只能用 cp。"
     },
-    quiz: [
+    {
+      "q": "路径里有空格，哪条一定能正确执行？",
+      "options": [
+        "cd My Documents",
+        "cd \"My Documents\"",
+        "cd My Documents/",
+        "cd Documents"
+      ],
+      "answer": 1,
+      "explain": "引号把整串当成一个参数交给 cd。不加引号时，Shell 会先按空格把它切成两个参数，cd 收到两个路径就报参数太多，所以路径带空格一律加引号。"
+    },
+    {
+      "q": "在空目录里执行 rm -rf $DIR/ 而 DIR 未定义，会发生什么？",
+      "options": [
+        "什么都不删",
+        "只删当前目录",
+        "展开成 rm -rf /，从根目录开始递归删除",
+        "会要求你确认"
+      ],
+      "answer": 2,
+      "explain": "未定义变量展开成空字符串，命令实际就是 rm -rf /，从根目录递归删除。脚本开头加 set -u，可以让这类未定义变量当场报错。"
+    }
+  ]
+},
+{
+  "id": "read-and-search",
+  "order": 3,
+  "track": "terminal",
+  "title": "看文件与在文件里找东西",
+  "subtitle": "cat 看小文件、less 翻大文件、grep 进内容、find 找路径。",
+  "minutes": 14,
+  "level": "基础",
+  "goal": [
+    "按文件大小选对查看命令",
+    "用 less 翻页、搜索、退出",
+    "grep 在内容里定位，find 在路径里定位",
+    "分清通配符与正则的差别"
+  ],
+  "sections": [
+    {
+      "type": "text",
+      "title": "先分清两个问题",
+      "html": "<p>「这个文件里写了什么」和「这个文件在哪」是两件事，用两套命令。看内容用 <code>cat</code>、<code>less</code>、<code>head</code>、<code>tail</code>、<code>grep</code>；找路径用 <code>find</code>，或者 <code>ls</code> 加通配符。</p><p>新手最常浪费的一步，是拿 <code>cat</code> 打印一个几百兆的日志，屏幕滚几分钟，还把终端缓冲区塞满。大文件一律用 <code>less</code>，它按需读取，开多大文件都只占一屏内存。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "小文件、头尾与行数",
+      "command": "wc -l access.log; head -n 2 access.log; tail -n 2 access.log",
+      "output": "8421 access.log\n127.0.0.1 - - [14/Mar/2024 09:01:02] \"GET / HTTP/1.1\" 200 1024\n127.0.0.1 - - [14/Mar/2024 09:01:05] \"GET /app.js HTTP/1.1\" 200 2321\n10.0.0.7 - - [14/Mar/2024 10:22:41] \"POST /api/login HTTP/1.1\" 401 87\n10.0.0.7 - - [14/Mar/2024 10:22:44] \"POST /api/login HTTP/1.1\" 500 61",
+      "note": "wc -l 数行数，head 看开头确认格式，tail 看结尾。日志的最新一条永远在最下面。"
+    },
+    {
+      "type": "table",
+      "title": "五个看内容的命令",
+      "head": [
+        "命令",
+        "用在哪",
+        "注意"
+      ],
+      "rows": [
+        [
+          "cat",
+          "几百行以内的小文件、拼接配置",
+          "大文件会刷屏，只能 ⌃C 才停"
+        ],
+        [
+          "less",
+          "几十万行的日志、源码",
+          "按 q 退出，按键见下一节"
+        ],
+        [
+          "head -n 20",
+          "只看开头，确认格式对不对",
+          "-n 后面跟行数，省略默认 10"
+        ],
+        [
+          "tail -n 50",
+          "看最新的日志",
+          "加 -f 会一直跟着文件增长"
+        ],
+        [
+          "wc -l",
+          "数行数，判断文件规模",
+          "统计的是换行符个数，不是字符数"
+        ]
+      ]
+    },
+    {
+      "type": "shortcuts",
+      "title": "在 less 里怎么走（两端按键相同）",
+      "items": [
+        {
+          "action": "向下翻一页、一行",
+          "mac": [
+            "Space"
+          ],
+          "win": [
+            "Space"
+          ],
+          "note": "空格翻一页，↓ 走一行，b 往回翻一页"
+        },
+        {
+          "action": "向下搜索关键词",
+          "mac": [
+            "/"
+          ],
+          "win": [
+            "/"
+          ],
+          "note": "输入后回车；n 跳到下一个匹配，N 跳到上一个"
+        },
+        {
+          "action": "向上搜索",
+          "mac": [
+            "?"
+          ],
+          "win": [
+            "?"
+          ],
+          "note": "从当前位置往前找，同样用 n 继续"
+        },
+        {
+          "action": "跳到开头、结尾",
+          "mac": [
+            "g"
+          ],
+          "win": [
+            "g"
+          ],
+          "note": "g 到文件头，G 到文件尾"
+        },
+        {
+          "action": "退出阅读",
+          "mac": [
+            "q"
+          ],
+          "win": [
+            "q"
+          ],
+          "note": "只退出 less，不会关掉终端"
+        },
+        {
+          "action": "不退出就执行命令",
+          "mac": [
+            "!"
+          ],
+          "win": [
+            "!"
+          ],
+          "note": "敲 !ls 回车，可以顺手看一眼当前文件所在的目录"
+        }
+      ]
+    },
+    {
+      "type": "terminal",
+      "title": "跟着日志跑",
+      "command": "tail -f logs/app.log",
+      "output": "[09:31:02] INFO  server listening on 3000\n[09:31:44] WARN  slow query 812ms path=/api/orders\n[09:32:01] ERROR connect ECONNREFUSED 127.0.0.1:5432",
+      "note": "它不会自己退出，按 ⌃C（Windows 为 Ctrl+C）停。加 -n 200 可以先垫出最后两百行再开始跟。"
+    },
+    {
+      "type": "text",
+      "title": "grep：进文件里找一行",
+      "html": "<p><code>grep</code> 按行匹配，默认输出命中的整行。<code>-n</code> 带行号，<code>-i</code> 忽略大小写，<code>-r</code> 递归进子目录，<code>-l</code> 只列文件名，<code>-c</code> 只给条数。</p><p><code>-r</code> 会一路扫进 <code>node_modules</code> 和 <code>.git</code>，几十万文件扫几分钟没结果。用 <code>--exclude-dir</code> 排除：<code>grep -rn \"TODO\" . --exclude-dir=node_modules --exclude-dir=.git</code>。macOS 自带的是 BSD grep，不一定认这个参数，需要时 <code>brew install grep</code>，然后改用 <code>ggrep</code>。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "在项目里找一行代码",
+      "command": "grep -rn \"EADDRINUSE\" src/ | head -n 3",
+      "output": "src/server.js:14:  // 端口被占用时 Node 抛出 EADDRINUSE\nsrc/server.js:88:  if (err.code === \"EADDRINUSE\") {\nsrc/net/check.js:31:  throw new Error(\"EADDRINUSE: port busy\");",
+      "note": "文件名和行号在冒号前面，可以直接拿去编辑器跳转。结果常常很多，接 head 截断。"
+    },
+    {
+      "type": "compare",
+      "title": "grep 还是 find",
+      "left": {
+        "label": "用错的写法",
+        "items": [
+          "find . -name \"EADDRINUSE\" 想搜代码里的字符串，永远搜不到",
+          "grep -r 遍历整个磁盘，只为找一个文件叫什么名字",
+          "用 grep 找 .log 文件的位置，再挨个 cat"
+        ]
+      },
+      "right": {
+        "label": "正确的分工",
+        "items": [
+          "find . -name \"*.log\" -type f 找文件名和类型",
+          "grep -rn \"EADDRINUSE\" src/ 找文件里的内容",
+          "grep -r 时限定目录，并排除 node_modules 与 .git"
+        ]
+      },
+      "note": "一句话记法：find 只看名字和属性，grep 只看内容。"
+    },
+    {
+      "type": "text",
+      "title": "find：按名字和类型找文件",
+      "html": "<p><code>find</code> 第一个参数是起点目录，后面跟条件。三个最常用：<code>-name \"*.log\"</code> 按文件名（引号必须有，否则 Shell 会提前展开）、<code>-type f</code> 只要文件、<code>-type d</code> 只要目录。</p><p>两个能省时间的参数：<code>-maxdepth 2</code> 限制深度，避免扫穿整个家目录；<code>-mtime -1</code> 找一天内改过的文件。要对结果逐个执行命令，用 <code>-exec 命令 {} \\;</code>，花括号是占位符。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "找文件，并且只要文件",
+      "command": "find . -maxdepth 3 -name \"*.log\" -type f",
+      "output": "./logs/app.log\n./logs/access.log\n./tmp/test.log",
+      "note": "不加 -type f，名字叫 .log 的目录也会被列出来；加 -maxdepth 能明显加快。"
+    },
+    {
+      "type": "warn",
+      "title": "通配符和正则不是一回事",
+      "html": "<p><code>*</code> 和 <code>?</code> 是 Shell 的<strong>通配符</strong>（glob）：<code>*</code> 任意多个字符，<code>?</code> 恰好一个字符，只用于匹配文件名，而且由 Shell 先展开。</p><p><code>grep</code> 用的是<strong>正则</strong>（regular expression），<code>*</code> 表示前一个字符重复任意次，所以 <code>grep \"*.log\"</code> 找不到 .log 结尾的行。更麻烦的是：当前目录里真有 .log 文件时，Shell 先把 <code>*.log</code> 展开成一串文件名，grep 拿不到文件名参数，就地等标准输入，看起来像卡住。</p><p>正确写法是 <code>grep \"\\.log$\"</code> 或 <code>grep -F \".log\"</code>；通配符留给 <code>find -name</code>。</p>"
+    },
+    {
+      "type": "tip",
+      "title": "找大文件与找最近改动",
+      "html": "<p>磁盘满了先找大文件：<code>du -sh * | sort -h | tail -n 10</code>，从大到小看最后十行。<code>sort -h</code> 认得 K、M、G 单位，不加它排序会出错。</p><p>找今天改过的文件：<code>find . -type f -mtime -1</code>。排查「谁动了我的配置」时，这条比翻 Git 历史更快。</p>"
+    }
+  ],
+  "exercise": {
+    "title": "动手练一练",
+    "brief": "找一份真实日志（没有就自己造几行），做完四件事：数行、看尾部、搜报错、定位文件。",
+    "items": [
       {
-        q: '要打开一个 2GB 的日志文件，最合适的命令是？',
-        options: ['cat app.log', 'less app.log', 'head -n 200000 app.log', 'vim app.log'],
-        answer: 1,
-        explain: 'less 按需读取，只占一屏内存，还支持搜索和翻页，按 q 退出。cat 会把整份内容刷进终端，几秒钟就能把缓冲区打满。'
+        "text": "数一下日志一共多少行",
+        "cmd": "wc -l logs/access.log"
       },
       {
-        q: '要在 src 下所有文件里找字符串 EADDRINUSE 并显示行号，正确的是？',
-        options: ['find src -name "EADDRINUSE"', 'grep -rn "EADDRINUSE" src', 'grep "EADDRINUSE" src', 'grep -l "EADDRINUSE" src'],
-        answer: 1,
-        explain: 'find 只按文件名和属性匹配，不读文件内容。grep 加 r 参数才递归进目录，加 n 才带行号；直接给它一个目录却不加 r，它会报错说这是个目录而不是文件。'
+        "text": "看最后 20 行，确认最新一条请求",
+        "cmd": "tail -n 20 logs/access.log"
       },
       {
-        q: 'grep "*.log" 为什么找不到以 .log 结尾的行？',
-        options: ['缺少 -i 参数', 'grep 用正则，星号表示前一字符重复，不是通配符', '必须先 cd 到文件所在目录', '只有 sudo 才有权限匹配'],
-        answer: 1,
-        explain: 'Shell 的通配符和正则语法完全不同：在 grep 里，星号只修饰它前面那一个字符。要匹配扩展名，写 "\\.log$"，或者用 grep -F 当纯字符串匹配。'
+        "text": "统计 500 错误出现几次",
+        "cmd": "grep -c \" 500 \" logs/access.log"
+      },
+      {
+        "text": "列出目录下所有 .log 文件的路径",
+        "cmd": "find . -maxdepth 3 -name \"*.log\" -type f"
       }
-    ]
+    ],
+    "done": "四条命令都有输出，并且你能指出哪条用了通配符、哪条用了正则。"
   },
-  {
-    id: 'pipes-redirect',
-    order: 4,
-    track: 'terminal',
-    title: '管道与重定向：把命令拼成流水线',
-    subtitle: '三条命令接成一条，并且不再被 > 覆盖文件坑一次。',
-    minutes: 14,
-    level: '基础',
-    goal: [
-      '说清 stdin、stdout、stderr 三条流',
-      '用管道把两三条命令接起来',
-      '把 > 与 2>&1 的顺序写对',
-      '知道 > 会在写入前清空文件'
-    ],
-    sections: [
-      {
-        type: 'text',
-        title: '三条看不见的通道',
-        html: '<p>每个进程一启动就有三条流：<strong>标准输入</strong>（stdin，文件描述符 0）、<strong>标准输出</strong>（stdout，1）、<strong>标准错误</strong>（stderr，2）。正常结果走 stdout，报错走 stderr，键盘输入走 stdin。</p><p>关键在于 stdout 和 stderr 是两条独立通道，默认都连到屏幕，所以看着分不清。重定向只搬走其中一条——这就是「命令明明报错了，日志文件里却什么都没有」的唯一原因。</p>'
-      },
-      {
-        type: 'table',
-        title: '六个符号',
-        head: ['符号', '作用', '例子'],
-        rows: [
-          ['|', '把左边 stdout 交给右边当 stdin', 'ls -la | grep .js'],
-          ['>', '把 stdout 写进文件，先清空', 'echo hi > a.txt'],
-          ['>>', '把 stdout 追加到文件末尾', 'echo hi >> a.txt'],
-          ['2>', '把 stderr 写进文件', 'node app.js 2> err.log'],
-          ['2>&1', '把 stderr 并到 stdout 一起走', 'node app.js > all.log 2>&1'],
-          ['小于号', '把文件内容喂给 stdin', 'sort names.txt']
-        ]
-      },
-      {
-        type: 'terminal',
-        title: '接一条最简单的管道',
-        command: 'ls -la | grep "\\.js$"',
-        output: '-rw-r--r--  1 xiaopi  staff  1832  3 14 09:40 app.js\n-rw-r--r--  1 xiaopi  staff   412  3 14 09:41 config.js',
-        note: 'ls 的输出没有画到屏幕上，而是直接喂给了 grep；屏幕上只剩匹配的那两行。'
-      },
-      {
-        type: 'text',
-        title: '重定向：把输出搬到别处',
-        html: '<p><code>></code> 把 stdout 写进文件，文件不存在就新建；<code>>></code> 追加到末尾。反方向的 <code>&lt;</code> 把文件内容喂给命令的 stdin：<code>sort &lt; names.txt</code> 等于让 sort 直接读这个名单，不用你亲手打开。</p><p>顺序很重要。<code>2>&1</code> 必须写在 <code>></code> 之后。写成 <code>命令 2>&1 > out.log</code> 时，stderr 仍留在屏幕上：Shell 从左往右处理，先把 2 指向当前 stdout（也就是屏幕），再把 stdout 改成文件。顺序换了，结果就完全不同。</p>'
-      },
-      {
-        type: 'warn',
-        title: '大于号会先把文件清空，这是数据丢失第一名',
-        html: '<p>敲下 <code>echo "x" > app.js</code> 回车的那一瞬，<code>app.js</code> 原有内容已经没了，然后才写入这一个字节。它不是「加进去」，是「换掉」。这个文件如果没进 Git，基本就没了。</p><p>要追加用 <code>>></code>。想先看看会写成什么样，用 <code>tee</code>：<code>echo x | tee app.js</code> 至少能看见内容。历史命令里 <code>></code> 和 <code>>></code> 只差一个字符，按 ↑ 调出来复用时最容易出事。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '把报错单独收走',
-        command: 'node app.js > out.log 2> err.log; echo "exit=$?"',
-        output: 'exit=1',
-        note: '正常输出进 out.log，报错进 err.log。echo "exit=$?" 打印上一条命令的退出码：0 是成功，非 0 是失败。'
-      },
-      {
-        type: 'text',
-        title: '/dev/null：黑洞与分流',
-        html: '<p><code>/dev/null</code> 是一个丢掉一切写入的设备文件。命令太吵又不想看，就把输出扔进去：<code>npm install > /dev/null 2>&1</code>，stdout 和 stderr 一起静音。</p><p>只想丢报错、保留正常输出，写 <code>命令 2> /dev/null</code>。反过来只想看报错、不想被进度条刷屏，写 <code>命令 > /dev/null</code>。用哪条，先想清楚你要的是结果还是要错误。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '数一数日志里有多少条 ERROR',
-        command: 'cat logs/app.log | grep ERROR | wc -l',
-        output: '37',
-        note: '三步流水线：cat 读出全文，grep 只留含 ERROR 的行，wc -l 数行数。这条能跑通，说明管道你已经懂了。'
-      },
-      {
-        type: 'table',
-        title: '三个每天都在用的组合',
-        head: ['场景', '命令', '要点'],
-        rows: [
-          ['看谁在跑 node', 'ps aux | grep node', 'grep 自己也会出现在结果里，看 PID 那列'],
-          ['统计错误行数', 'cat app.log | grep ERROR | wc -l', 'grep -c ERROR app.log 一步就够，管道写法更好读'],
-          ['找大文件', 'du -sh * | sort -h | tail -n 10', 'sort -h 认 K、M、G，不加它排序是错的'],
-          ['实时看错误', 'tail -f app.log | grep ERROR', '管道有缓冲，输出可能延迟；需要即时可用 grep --line-buffered']
-        ]
-      },
-      {
-        type: 'tip',
-        title: 'tee：既存文件又看屏幕',
-        html: '<p><code>tee</code> 把 stdin 同时写进文件和屏幕：<code>npm run build 2>&1 | tee build.log</code>。排查构建失败时特别有用，报错还在屏幕上，同时已经落盘。</p><p>加 <code>-a</code> 是追加而不是覆盖。想留下上一次的日志：<code>命令 | tee -a build.log</code>。在 CI 里把整段输出存下来，回头对比两次失败差在哪，靠的就是它。</p>'
-      },
-      {
-        type: 'compare',
-        title: '同一个文件，两种命运',
-        left: {
-          label: '会丢数据的写法',
-          items: ['echo "PORT=3000" > .env 把原有配置整份替换', '路径打错，大于号顺手建了个空文件', '用 > 追日志，每次只剩最后一段']
-        },
-        right: {
-          label: '更稳的写法',
-          items: ['追加配置用 >>，或者先 cp .env .env.bak', '先写到临时文件，确认内容后再 mv 过去', '日志用 >> 或 tee -a，永远不覆盖']
-        },
-        note: '记住「> 只管 stdout」，就不会在 2>&1 上犯迷糊。'
-      },
-      {
-        type: 'text',
-        title: '管道只搬 stdout，退出码只认最后一条',
-        html: '<p>管道里前一个命令失败，后面的照样执行。<code>curl -s 坏地址 | grep ok</code> 的退出码是 0，因为 grep 成功了，脚本会把一切当成正常。</p><p>要判断整条流水线，bash 里看 <code>PIPESTATUS</code> 数组，zsh 里看 <code>pipestatus</code>；更省事的办法是在脚本开头写 <code>set -euo pipefail</code>：出错即停、未定义变量报错、管道中任一环失败就算失败。</p>'
-      }
-    ],
-    exercise: {
-      title: '动手练一练',
-      brief: '自己造一份小日志，用管道和重定向把它拆成「统计结果」和「错误清单」两个文件。',
-      items: [
-        { text: '造一份带两行 ERROR 的测试日志', cmd: 'printf "INFO ok\\nERROR db\\nINFO ok\\nERROR timeout\\n" > demo.log' },
-        { text: '数出 ERROR 的条数', cmd: 'cat demo.log | grep ERROR | wc -l' },
-        { text: '只把匹配行写进文件，stderr 直接丢掉', cmd: 'grep ERROR demo.log > err.txt 2> /dev/null' },
-        { text: '追加一行，再确认旧内容没被清掉', cmd: 'echo "ERROR last" >> err.txt && cat err.txt' }
+  "quiz": [
+    {
+      "q": "要打开一个 2GB 的日志文件，最合适的命令是？",
+      "options": [
+        "cat app.log",
+        "less app.log",
+        "head -n 200000 app.log",
+        "vim app.log"
       ],
-      done: 'err.txt 里一共有三行内容，说明追加成功，原来的两行没有被清空。'
+      "answer": 1,
+      "explain": "less 按需读取，只占一屏内存，还支持搜索和翻页，按 q 退出。cat 会把整份内容刷进终端，几秒钟就能把缓冲区打满。"
     },
-    quiz: [
+    {
+      "q": "要在 src 下所有文件里找字符串 EADDRINUSE 并显示行号，正确的是？",
+      "options": [
+        "find src -name \"EADDRINUSE\"",
+        "grep -rn \"EADDRINUSE\" src",
+        "grep \"EADDRINUSE\" src",
+        "grep -l \"EADDRINUSE\" src"
+      ],
+      "answer": 1,
+      "explain": "find 只按文件名和属性匹配，不读文件内容。grep 加 r 参数才递归进目录，加 n 才带行号；直接给它一个目录却不加 r，它会报错说这是个目录而不是文件。"
+    },
+    {
+      "q": "grep \"*.log\" 为什么找不到以 .log 结尾的行？",
+      "options": [
+        "缺少 -i 参数",
+        "grep 用正则，星号表示前一字符重复，不是通配符",
+        "必须先 cd 到文件所在目录",
+        "只有 sudo 才有权限匹配"
+      ],
+      "answer": 1,
+      "explain": "Shell 的通配符和正则语法完全不同：在 grep 里，星号只修饰它前面那一个字符。要匹配扩展名，写 \"\\.log$\"，或者用 grep -F 当纯字符串匹配。"
+    }
+  ]
+},
+{
+  "id": "pipes-redirect",
+  "order": 4,
+  "track": "terminal",
+  "title": "管道与重定向：把命令拼成流水线",
+  "subtitle": "三条命令接成一条，并且不再被 > 覆盖文件坑一次。",
+  "minutes": 14,
+  "level": "基础",
+  "goal": [
+    "说清 stdin、stdout、stderr 三条流",
+    "用管道把两三条命令接起来",
+    "把 > 与 2>&1 的顺序写对",
+    "知道 > 会在写入前清空文件"
+  ],
+  "sections": [
+    {
+      "type": "text",
+      "title": "三条看不见的通道",
+      "html": "<p>每个进程一启动就有三条流：<strong>标准输入</strong>（stdin，文件描述符 0）、<strong>标准输出</strong>（stdout，1）、<strong>标准错误</strong>（stderr，2）。正常结果走 stdout，报错走 stderr，键盘输入走 stdin。</p><p>关键在于 stdout 和 stderr 是两条独立通道，默认都连到屏幕，所以看着分不清。重定向只搬走其中一条——这就是「命令明明报错了，日志文件里却什么都没有」的唯一原因。</p>"
+    },
+    {
+      "type": "table",
+      "title": "六个符号",
+      "head": [
+        "符号",
+        "作用",
+        "例子"
+      ],
+      "rows": [
+        [
+          "|",
+          "把左边 stdout 交给右边当 stdin",
+          "ls -la | grep .js"
+        ],
+        [
+          ">",
+          "把 stdout 写进文件，先清空",
+          "echo hi > a.txt"
+        ],
+        [
+          ">>",
+          "把 stdout 追加到文件末尾",
+          "echo hi >> a.txt"
+        ],
+        [
+          "2>",
+          "把 stderr 写进文件",
+          "node app.js 2> err.log"
+        ],
+        [
+          "2>&1",
+          "把 stderr 并到 stdout 一起走",
+          "node app.js > all.log 2>&1"
+        ],
+        [
+          "小于号",
+          "把文件内容喂给 stdin",
+          "sort names.txt"
+        ]
+      ]
+    },
+    {
+      "type": "terminal",
+      "title": "接一条最简单的管道",
+      "command": "ls -la | grep \"\\.js$\"",
+      "output": "-rw-r--r--  1 xiaopi  staff  1832  3 14 09:40 app.js\n-rw-r--r--  1 xiaopi  staff   412  3 14 09:41 config.js",
+      "note": "ls 的输出没有画到屏幕上，而是直接喂给了 grep；屏幕上只剩匹配的那两行。"
+    },
+    {
+      "type": "text",
+      "title": "重定向：把输出搬到别处",
+      "html": "<p><code>></code> 把 stdout 写进文件，文件不存在就新建；<code>>></code> 追加到末尾。反方向的 <code>&lt;</code> 把文件内容喂给命令的 stdin：<code>sort &lt; names.txt</code> 等于让 sort 直接读这个名单，不用你亲手打开。</p><p>顺序很重要。<code>2>&1</code> 必须写在 <code>></code> 之后。写成 <code>命令 2>&1 > out.log</code> 时，stderr 仍留在屏幕上：Shell 从左往右处理，先把 2 指向当前 stdout（也就是屏幕），再把 stdout 改成文件。顺序换了，结果就完全不同。</p>"
+    },
+    {
+      "type": "warn",
+      "title": "大于号会先把文件清空，这是数据丢失第一名",
+      "html": "<p>敲下 <code>echo \"x\" > app.js</code> 回车的那一瞬，<code>app.js</code> 原有内容已经没了，然后才写入这一个字节。它不是「加进去」，是「换掉」。这个文件如果没进 Git，基本就没了。</p><p>要追加用 <code>>></code>。想先看看会写成什么样，用 <code>tee</code>：<code>echo x | tee app.js</code> 至少能看见内容。历史命令里 <code>></code> 和 <code>>></code> 只差一个字符，按 ↑ 调出来复用时最容易出事。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "把报错单独收走",
+      "command": "node app.js > out.log 2> err.log; echo \"exit=$?\"",
+      "output": "exit=1",
+      "note": "正常输出进 out.log，报错进 err.log。echo \"exit=$?\" 打印上一条命令的退出码：0 是成功，非 0 是失败。"
+    },
+    {
+      "type": "text",
+      "title": "/dev/null：黑洞与分流",
+      "html": "<p><code>/dev/null</code> 是一个丢掉一切写入的设备文件。命令太吵又不想看，就把输出扔进去：<code>npm install > /dev/null 2>&1</code>，stdout 和 stderr 一起静音。</p><p>只想丢报错、保留正常输出，写 <code>命令 2> /dev/null</code>。反过来只想看报错、不想被进度条刷屏，写 <code>命令 > /dev/null</code>。用哪条，先想清楚你要的是结果还是要错误。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "数一数日志里有多少条 ERROR",
+      "command": "cat logs/app.log | grep ERROR | wc -l",
+      "output": "37",
+      "note": "三步流水线：cat 读出全文，grep 只留含 ERROR 的行，wc -l 数行数。这条能跑通，说明管道你已经懂了。"
+    },
+    {
+      "type": "table",
+      "title": "三个每天都在用的组合",
+      "head": [
+        "场景",
+        "命令",
+        "要点"
+      ],
+      "rows": [
+        [
+          "看谁在跑 node",
+          "ps aux | grep node",
+          "grep 自己也会出现在结果里，看 PID 那列"
+        ],
+        [
+          "统计错误行数",
+          "cat app.log | grep ERROR | wc -l",
+          "grep -c ERROR app.log 一步就够，管道写法更好读"
+        ],
+        [
+          "找大文件",
+          "du -sh * | sort -h | tail -n 10",
+          "sort -h 认 K、M、G，不加它排序是错的"
+        ],
+        [
+          "实时看错误",
+          "tail -f app.log | grep ERROR",
+          "管道有缓冲，输出可能延迟；需要即时可用 grep --line-buffered"
+        ]
+      ]
+    },
+    {
+      "type": "tip",
+      "title": "tee：既存文件又看屏幕",
+      "html": "<p><code>tee</code> 把 stdin 同时写进文件和屏幕：<code>npm run build 2>&1 | tee build.log</code>。排查构建失败时特别有用，报错还在屏幕上，同时已经落盘。</p><p>加 <code>-a</code> 是追加而不是覆盖。想留下上一次的日志：<code>命令 | tee -a build.log</code>。在 CI 里把整段输出存下来，回头对比两次失败差在哪，靠的就是它。</p>"
+    },
+    {
+      "type": "compare",
+      "title": "同一个文件，两种命运",
+      "left": {
+        "label": "会丢数据的写法",
+        "items": [
+          "echo \"PORT=3000\" > .env 把原有配置整份替换",
+          "路径打错，大于号顺手建了个空文件",
+          "用 > 追日志，每次只剩最后一段"
+        ]
+      },
+      "right": {
+        "label": "更稳的写法",
+        "items": [
+          "追加配置用 >>，或者先 cp .env .env.bak",
+          "先写到临时文件，确认内容后再 mv 过去",
+          "日志用 >> 或 tee -a，永远不覆盖"
+        ]
+      },
+      "note": "记住「> 只管 stdout」，就不会在 2>&1 上犯迷糊。"
+    },
+    {
+      "type": "text",
+      "title": "管道只搬 stdout，退出码只认最后一条",
+      "html": "<p>管道里前一个命令失败，后面的照样执行。<code>curl -s 坏地址 | grep ok</code> 的退出码是 0，因为 grep 成功了，脚本会把一切当成正常。</p><p>要判断整条流水线，bash 里看 <code>PIPESTATUS</code> 数组，zsh 里看 <code>pipestatus</code>；更省事的办法是在脚本开头写 <code>set -euo pipefail</code>：出错即停、未定义变量报错、管道中任一环失败就算失败。</p>"
+    }
+  ],
+  "exercise": {
+    "title": "动手练一练",
+    "brief": "自己造一份小日志，用管道和重定向把它拆成「统计结果」和「错误清单」两个文件。",
+    "items": [
       {
-        q: '命令 a | b 里，a 的报错信息会去哪？',
-        options: ['一起交给 b', '仍然直接打到屏幕上', '被自动丢弃', '写进 b 的标准输入的第二份'],
-        answer: 1,
-        explain: '管道只接管 stdout。stderr 还是连着终端，所以右边收不到错误信息。要把两者一起接过去，必须在管道前先把 2>&1 写好。'
+        "text": "造一份带两行 ERROR 的测试日志",
+        "cmd": "printf \"INFO ok\\nERROR db\\nINFO ok\\nERROR timeout\\n\" > demo.log"
       },
       {
-        q: 'echo "hi" > note.txt 对一个已有内容的文件做了什么？',
-        options: ['在末尾追加一行', '先清空再写入 hi', '询问是否覆盖', '备份原文件后写入'],
-        answer: 1,
-        explain: '大于号在写入前就把文件截断成空，原有的内容一个字都不剩。要追加必须用两个大于号，历史命令里用 ↑ 复用时最容易漏。'
+        "text": "数出 ERROR 的条数",
+        "cmd": "cat demo.log | grep ERROR | wc -l"
       },
       {
-        q: '下面哪种写法能把 stdout 和 stderr 都写进 all.log？',
-        options: ['node app.js 2>&1 > all.log', 'node app.js > all.log 2>&1', 'node app.js > all.log 2> all.log', 'node app.js | all.log'],
-        answer: 1,
-        explain: 'Shell 从左往右处理重定向：先把标准输出指向 all.log，再把标准错误并到标准输出上，两条流才都进文件。顺序写反，报错就仍留在屏幕上。'
+        "text": "只把匹配行写进文件，stderr 直接丢掉",
+        "cmd": "grep ERROR demo.log > err.txt 2> /dev/null"
+      },
+      {
+        "text": "追加一行，再确认旧内容没被清掉",
+        "cmd": "echo \"ERROR last\" >> err.txt && cat err.txt"
       }
-    ]
+    ],
+    "done": "err.txt 里一共有三行内容，说明追加成功，原来的两行没有被清空。"
   },
-  {
-    id: 'permissions-env',
-    order: 5,
-    track: 'terminal',
-    title: '权限与环境变量',
-    subtitle: '读懂 ls -l 的九个位，把 chmod 777 和 sudo 用在正地方。',
-    minutes: 15,
-    level: '基础',
-    goal: [
-      '读懂 ls -l 开头的九个权限位',
-      '用 chmod 和 chown 改对权限',
-      '说清 sudo 能做什么、代价是什么',
-      '让环境变量写在正确的启动文件里'
-    ],
-    sections: [
-      {
-        type: 'text',
-        title: 'ls -l 的第一列怎么读',
-        html: '<p><code>ls -l</code> 每行开头那十个字符是权限，不是乱码。第一个字符是类型：<code>-</code> 普通文件、<code>d</code> 目录、<code>l</code> 符号链接。后面九个三位一组：<strong>属主</strong>（user）、<strong>属组</strong>（group）、<strong>其他人</strong>（other）。</p><p>每组三个字母顺序固定：<code>r</code> 读、<code>w</code> 写、<code>x</code> 执行，没有权限就用 <code>-</code> 占位。目录上的 <code>x</code> 表示「能不能进去」：一个目录只有 r 没有 x，你连 cd 都进不去。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '看一个真实文件',
-        command: 'ls -l ~/Projects/prompt学校/assets/js/data-terminal.js',
-        output: '-rw-r--r--  1 xiaopi  staff  18452  3 14 10:02 data-terminal.js',
-        note: 'rw- 属主可读写，r-- 属组只读，r-- 其他人只读。第三列的 1 是硬链接数，18452 是字节数。'
-      },
-      {
-        type: 'table',
-        title: '九个位与它们的数字',
-        head: ['符号', '含义', '数字'],
-        rows: [
-          ['rwx', '读、写、执行全有', '7'],
-          ['rw-', '读和写，不能执行', '6'],
-          ['r-x', '读和执行，不能改', '5'],
-          ['r--', '只读', '4'],
-          ['---', '什么都不能做', '0'],
-          ['r-xr-xr-x', '755，脚本和目录最常见', '755'],
-          ['rw-r--r--', '644，普通文件的默认值', '644']
-        ]
-      },
-      {
-        type: 'text',
-        title: 'chmod：加号写法与数字写法',
-        html: '<p>两种都常用。<strong>符号写法</strong>：<code>chmod +x deploy.sh</code> 给所有人加执行位；<code>chmod u+w notes.md</code> 只给属主加写；<code>chmod go-w config</code> 去掉属组和其他人的写权限。</p><p><strong>数字写法</strong>：三位八进制，分别对应属主、属组、其他人。<code>chmod 755 deploy.sh</code> 等于 rwxr-xr-x，<code>chmod 644 notes.md</code> 等于 rw-r--r--。加 <code>-R</code> 递归处理整个目录，别对家目录随手用。</p><p>改归属用 <code>chown</code>，格式是 用户:组：<code>sudo chown -R $USER 目录</code>，能把用 sudo 建出来的目录从 root 手里拿回来。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '给脚本加执行位',
-        command: 'touch hello.sh && chmod 755 hello.sh && ls -l hello.sh',
-        output: '-rwxr-xr-x  1 xiaopi  staff  0  3 14 10:05 hello.sh',
-        note: '权限 644 的脚本直接执行会报 Permission denied，加上执行位才跑得起来。'
-      },
-      {
-        type: 'warn',
-        title: 'chmod 777 和 sudo 都不是万能药',
-        html: '<p><code>chmod 777</code> 让任何用户都能改、能执行这个文件。放在网站目录里，等于把上传目录变成别人放后门的入口；放在配置文件上，等于谁改完你都要重启一次。它只压住了「权限报错」，没解决任何真正的问题。</p><p><code>sudo</code> 是以 root 身份执行一条命令，短时间内的后续命令不一定再问密码。危险在于 <code>sudo rm -rf</code> 能删系统文件，<code>sudo npm install -g</code> 会把包装成 root 所有，之后普通用户改不动，只能用 sudo 修，越修越乱。</p><p>先读报错：<code>Permission denied</code> 多数是路径写错或属主不对，<code>ls -l</code> 看一眼比直接 sudo 快。</p>'
-      },
-      {
-        type: 'text',
-        title: '环境变量是随进程走的一张表',
-        html: '<p>环境变量（environment variable）是一组键值对，由父进程传给子进程。你在终端里 <code>export</code> 一个变量，之后从这个终端启动的所有程序都能读到它。</p><p>三个动作：<code>printenv</code> 列出全部，<code>echo $PATH</code> 看单个，<code>export API_KEY=abc</code> 临时设一个（关掉终端就没了）。要长期生效，写进 Shell 的启动文件。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '看一眼 PATH 长什么样',
-        command: 'echo $PATH | tr ":" "\\n"',
-        output: '/usr/local/bin\n/usr/bin\n/bin\n/usr/sbin\n/usr/local/go/bin',
-        note: 'tr 把冒号换成换行，一行一个目录。Shell 找命令时从上往下找，第一个命中的胜出。'
-      },
-      {
-        type: 'table',
-        title: 'PATH 里谁先谁后',
-        head: ['位置', '放的都是什么', '注意'],
-        rows: [
-          ['/usr/local/bin', 'Homebrew 和手动安装的工具', '通常排在系统目录前面'],
-          ['/usr/bin', '系统自带命令', 'ls、grep、python3 都在这里'],
-          ['/bin', '最基础的命令', '多数是 /usr/bin 的软链接'],
-          ['~/.nvm/versions/node/v20/bin', 'nvm 当前选中的 Node', 'nvm use 会改这一段'],
-          ['当前目录 .', '默认不包含', '把 . 加进 PATH 等于允许运行任何同名文件']
-        ]
-      },
-      {
-        type: 'text',
-        title: '为什么改了启动文件却没生效',
-        html: '<p>启动文件只在<strong>新开</strong>一个 Shell 时读取。改完没反应，是因为当前这个 Shell 早就读过了。两个办法：<code>source ~/.zshrc</code> 让当前窗口重读，或者关掉窗口重开。</p><p>zsh 读 <code>~/.zshrc</code>，登录 Shell 还会读 <code>~/.zprofile</code>；bash 读 <code>~/.bashrc</code>，macOS 上的登录 bash 读 <code>~/.bash_profile</code>。写错文件是最常见的「明明配了却不生效」，先 <code>echo $SHELL</code> 确认自己是哪个 Shell，再决定写哪个文件。</p>'
-      },
-      {
-        type: 'tip',
-        title: 'which、command -v 和 type 的分工',
-        html: '<p><code>which node</code> 告诉你实际执行的是哪个文件，但它本身是外部命令，遇到别名会看走眼。<code>command -v node</code> 更可靠，别名、函数、内置命令都能查到。</p><p><code>type -a node</code> 列出所有同名来源，按查找顺序排列。装了两个版本的全局包时，用它一眼看出谁在前面。</p>'
-      },
-      {
-        type: 'compare',
-        title: 'sudo 之前先想三秒',
-        left: {
-          label: '习惯性做法',
-          items: ['一报错就 chmod 777', '全局包装不上就整条 sudo npm install', '改完变量忘了 source，以为没生效', '把项目放 /usr/local 下再用 sudo 编辑']
-        },
-        right: {
-          label: '更稳的做法',
-          items: ['先 ls -l 看属主和权限，判断该改哪一位', '用 nvm 装 Node，全局包不碰系统目录', '改完 source 一次，或者重开窗口', '项目放家目录，谁建的谁改，不需要 sudo']
-        },
-        note: 'sudo 只是临时借用 root，不会改变文件归属；用它创建的文件，之后你会一直需要它。'
-      }
-    ],
-    exercise: {
-      title: '动手练一练',
-      brief: '造一个脚本、给它加上执行位、设一个环境变量，最后把实验文件删掉，别在家目录里留垃圾。',
-      items: [
-        { text: '建脚本并确认当前权限', cmd: 'touch ~/perm-demo.sh && ls -l ~/perm-demo.sh' },
-        { text: '改成 755，再对比一次', cmd: 'chmod 755 ~/perm-demo.sh && ls -l ~/perm-demo.sh' },
-        { text: '设一个临时变量，用子进程读它', cmd: 'export DEMO_KEY=abc && printenv DEMO_KEY' },
-        { text: '看清 PATH 的查找顺序', cmd: 'echo $PATH | tr ":" "\\n"' }
+  "quiz": [
+    {
+      "q": "命令 a | b 里，a 的报错信息会去哪？",
+      "options": [
+        "一起交给 b",
+        "仍然直接打到屏幕上",
+        "被自动丢弃",
+        "写进 b 的标准输入的第二份"
       ],
-      done: '两次 ls -l 结果不同，printenv 打印出了 abc，说明你掌握了权限和变量。'
+      "answer": 1,
+      "explain": "管道只接管 stdout。stderr 还是连着终端，所以右边收不到错误信息。要把两者一起接过去，必须在管道前先把 2>&1 写好。"
     },
-    quiz: [
+    {
+      "q": "echo \"hi\" > note.txt 对一个已有内容的文件做了什么？",
+      "options": [
+        "在末尾追加一行",
+        "先清空再写入 hi",
+        "询问是否覆盖",
+        "备份原文件后写入"
+      ],
+      "answer": 1,
+      "explain": "大于号在写入前就把文件截断成空，原有的内容一个字都不剩。要追加必须用两个大于号，历史命令里用 ↑ 复用时最容易漏。"
+    },
+    {
+      "q": "下面哪种写法能把 stdout 和 stderr 都写进 all.log？",
+      "options": [
+        "node app.js 2>&1 > all.log",
+        "node app.js > all.log 2>&1",
+        "node app.js > all.log 2> all.log",
+        "node app.js | all.log"
+      ],
+      "answer": 1,
+      "explain": "Shell 从左往右处理重定向：先把标准输出指向 all.log，再把标准错误并到标准输出上，两条流才都进文件。顺序写反，报错就仍留在屏幕上。"
+    }
+  ]
+},
+{
+  "id": "permissions-env",
+  "order": 5,
+  "track": "terminal",
+  "title": "权限与环境变量",
+  "subtitle": "读懂 ls -l 的九个位，把 chmod 777 和 sudo 用在正地方。",
+  "minutes": 15,
+  "level": "基础",
+  "goal": [
+    "读懂 ls -l 开头的九个权限位",
+    "用 chmod 和 chown 改对权限",
+    "说清 sudo 能做什么、代价是什么",
+    "让环境变量写在正确的启动文件里"
+  ],
+  "sections": [
+    {
+      "type": "text",
+      "title": "ls -l 的第一列怎么读",
+      "html": "<p><code>ls -l</code> 每行开头那十个字符是权限，不是乱码。第一个字符是类型：<code>-</code> 普通文件、<code>d</code> 目录、<code>l</code> 符号链接。后面九个三位一组：<strong>属主</strong>（user）、<strong>属组</strong>（group）、<strong>其他人</strong>（other）。</p><p>每组三个字母顺序固定：<code>r</code> 读、<code>w</code> 写、<code>x</code> 执行，没有权限就用 <code>-</code> 占位。目录上的 <code>x</code> 表示「能不能进去」：一个目录只有 r 没有 x，你连 cd 都进不去。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "看一个真实文件",
+      "command": "ls -l ~/Projects/prompt学校/assets/js/data-terminal.js",
+      "output": "-rw-r--r--  1 xiaopi  staff  18452  3 14 10:02 data-terminal.js",
+      "note": "rw- 属主可读写，r-- 属组只读，r-- 其他人只读。第三列的 1 是硬链接数，18452 是字节数。"
+    },
+    {
+      "type": "table",
+      "title": "九个位与它们的数字",
+      "head": [
+        "符号",
+        "含义",
+        "数字"
+      ],
+      "rows": [
+        [
+          "rwx",
+          "读、写、执行全有",
+          "7"
+        ],
+        [
+          "rw-",
+          "读和写，不能执行",
+          "6"
+        ],
+        [
+          "r-x",
+          "读和执行，不能改",
+          "5"
+        ],
+        [
+          "r--",
+          "只读",
+          "4"
+        ],
+        [
+          "---",
+          "什么都不能做",
+          "0"
+        ],
+        [
+          "r-xr-xr-x",
+          "755，脚本和目录最常见",
+          "755"
+        ],
+        [
+          "rw-r--r--",
+          "644，普通文件的默认值",
+          "644"
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "title": "chmod：加号写法与数字写法",
+      "html": "<p>两种都常用。<strong>符号写法</strong>：<code>chmod +x deploy.sh</code> 给所有人加执行位；<code>chmod u+w notes.md</code> 只给属主加写；<code>chmod go-w config</code> 去掉属组和其他人的写权限。</p><p><strong>数字写法</strong>：三位八进制，分别对应属主、属组、其他人。<code>chmod 755 deploy.sh</code> 等于 rwxr-xr-x，<code>chmod 644 notes.md</code> 等于 rw-r--r--。加 <code>-R</code> 递归处理整个目录，别对家目录随手用。</p><p>改归属用 <code>chown</code>，格式是 用户:组：<code>sudo chown -R $USER 目录</code>，能把用 sudo 建出来的目录从 root 手里拿回来。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "给脚本加执行位",
+      "command": "touch hello.sh && chmod 755 hello.sh && ls -l hello.sh",
+      "output": "-rwxr-xr-x  1 xiaopi  staff  0  3 14 10:05 hello.sh",
+      "note": "权限 644 的脚本直接执行会报 Permission denied，加上执行位才跑得起来。"
+    },
+    {
+      "type": "warn",
+      "title": "chmod 777 和 sudo 都不是万能药",
+      "html": "<p><code>chmod 777</code> 让任何用户都能改、能执行这个文件。放在网站目录里，等于把上传目录变成别人放后门的入口；放在配置文件上，等于谁改完你都要重启一次。它只压住了「权限报错」，没解决任何真正的问题。</p><p><code>sudo</code> 是以 root 身份执行一条命令，短时间内的后续命令不一定再问密码。危险在于 <code>sudo rm -rf</code> 能删系统文件，<code>sudo npm install -g</code> 会把包装成 root 所有，之后普通用户改不动，只能用 sudo 修，越修越乱。</p><p>先读报错：<code>Permission denied</code> 多数是路径写错或属主不对，<code>ls -l</code> 看一眼比直接 sudo 快。</p>"
+    },
+    {
+      "type": "text",
+      "title": "环境变量是随进程走的一张表",
+      "html": "<p>环境变量（environment variable）是一组键值对，由父进程传给子进程。你在终端里 <code>export</code> 一个变量，之后从这个终端启动的所有程序都能读到它。</p><p>三个动作：<code>printenv</code> 列出全部，<code>echo $PATH</code> 看单个，<code>export API_KEY=abc</code> 临时设一个（关掉终端就没了）。要长期生效，写进 Shell 的启动文件。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "看一眼 PATH 长什么样",
+      "command": "echo $PATH | tr \":\" \"\\n\"",
+      "output": "/usr/local/bin\n/usr/bin\n/bin\n/usr/sbin\n/usr/local/go/bin",
+      "note": "tr 把冒号换成换行，一行一个目录。Shell 找命令时从上往下找，第一个命中的胜出。"
+    },
+    {
+      "type": "table",
+      "title": "PATH 里谁先谁后",
+      "head": [
+        "位置",
+        "放的都是什么",
+        "注意"
+      ],
+      "rows": [
+        [
+          "/usr/local/bin",
+          "Homebrew 和手动安装的工具",
+          "通常排在系统目录前面"
+        ],
+        [
+          "/usr/bin",
+          "系统自带命令",
+          "ls、grep、python3 都在这里"
+        ],
+        [
+          "/bin",
+          "最基础的命令",
+          "多数是 /usr/bin 的软链接"
+        ],
+        [
+          "~/.nvm/versions/node/v20/bin",
+          "nvm 当前选中的 Node",
+          "nvm use 会改这一段"
+        ],
+        [
+          "当前目录 .",
+          "默认不包含",
+          "把 . 加进 PATH 等于允许运行任何同名文件"
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "title": "为什么改了启动文件却没生效",
+      "html": "<p>启动文件只在<strong>新开</strong>一个 Shell 时读取。改完没反应，是因为当前这个 Shell 早就读过了。两个办法：<code>source ~/.zshrc</code> 让当前窗口重读，或者关掉窗口重开。</p><p>zsh 读 <code>~/.zshrc</code>，登录 Shell 还会读 <code>~/.zprofile</code>；bash 读 <code>~/.bashrc</code>，macOS 上的登录 bash 读 <code>~/.bash_profile</code>。写错文件是最常见的「明明配了却不生效」，先 <code>echo $SHELL</code> 确认自己是哪个 Shell，再决定写哪个文件。</p>"
+    },
+    {
+      "type": "tip",
+      "title": "which、command -v 和 type 的分工",
+      "html": "<p><code>which node</code> 告诉你实际执行的是哪个文件，但它本身是外部命令，遇到别名会看走眼。<code>command -v node</code> 更可靠，别名、函数、内置命令都能查到。</p><p><code>type -a node</code> 列出所有同名来源，按查找顺序排列。装了两个版本的全局包时，用它一眼看出谁在前面。</p>"
+    },
+    {
+      "type": "compare",
+      "title": "sudo 之前先想三秒",
+      "left": {
+        "label": "习惯性做法",
+        "items": [
+          "一报错就 chmod 777",
+          "全局包装不上就整条 sudo npm install",
+          "改完变量忘了 source，以为没生效",
+          "把项目放 /usr/local 下再用 sudo 编辑"
+        ]
+      },
+      "right": {
+        "label": "更稳的做法",
+        "items": [
+          "先 ls -l 看属主和权限，判断该改哪一位",
+          "用 nvm 装 Node，全局包不碰系统目录",
+          "改完 source 一次，或者重开窗口",
+          "项目放家目录，谁建的谁改，不需要 sudo"
+        ]
+      },
+      "note": "sudo 只是临时借用 root，不会改变文件归属；用它创建的文件，之后你会一直需要它。"
+    }
+  ],
+  "exercise": {
+    "title": "动手练一练",
+    "brief": "造一个脚本、给它加上执行位、设一个环境变量，最后把实验文件删掉，别在家目录里留垃圾。",
+    "items": [
       {
-        q: 'ls -l 显示 -rw-r--r--，这个文件的权限数字是？',
-        options: ['755', '644', '600', '777'],
-        answer: 1,
-        explain: '三位权限分别换成数字：rw- 是 6，r-- 是 4，再一个 r-- 还是 4，合起来就是 644。意思只有属主能写，属组和其他人只能读，谁都不能执行。'
+        "text": "建脚本并确认当前权限",
+        "cmd": "touch ~/perm-demo.sh && ls -l ~/perm-demo.sh"
       },
       {
-        q: '一个目录的权限是 r--，你能 cd 进去吗？',
-        options: ['能，有读权限就够', '不能，进目录需要 x 位', '能进去，但看不到文件名', '取决于文件的属主是谁'],
-        answer: 1,
-        explain: '目录上的 r 只允许列出里面的名字，x 才是进入和访问路径的权限。缺 x 时 cd 会直接报 Permission denied，看起来像「明明有读权限」。'
+        "text": "改成 755，再对比一次",
+        "cmd": "chmod 755 ~/perm-demo.sh && ls -l ~/perm-demo.sh"
       },
       {
-        q: '在 ~/.zshrc 里加了 export，当前终端却没反应，原因是？',
-        options: ['变量名写错了', '启动文件只在启动 Shell 时读取，需要 source 或重开窗口', 'zsh 根本不读 .zshrc', '必须用 sudo 才会生效'],
-        answer: 1,
-        explain: '当前 Shell 早就读完配置文件并进入运行状态。source ~/.zshrc 让它当场重读，或者关掉窗口重开一个，新 Shell 才会执行这一行。'
+        "text": "设一个临时变量，用子进程读它",
+        "cmd": "export DEMO_KEY=abc && printenv DEMO_KEY"
+      },
+      {
+        "text": "看清 PATH 的查找顺序",
+        "cmd": "echo $PATH | tr \":\" \"\\n\""
       }
-    ]
+    ],
+    "done": "两次 ls -l 结果不同，printenv 打印出了 abc，说明你掌握了权限和变量。"
   },
-  {
-    id: 'processes-network',
-    order: 6,
-    track: 'terminal',
-    title: '进程、端口与网络',
-    subtitle: '从 ps 到 curl，定位占着端口的进程并把它干净地送走。',
-    minutes: 15,
-    level: '进阶',
-    goal: [
-      '用 ps 和 top 找到目标进程',
-      '分清 kill 与 kill -9 的后果',
-      '查出某个端口被哪个进程占用',
-      '用 curl 判断服务到底活没活'
-    ],
-    sections: [
-      {
-        type: 'text',
-        title: '进程就是正在跑的程序',
-        html: '<p>你敲一次命令，系统就创建一个<strong>进程</strong>（process），分配一个 <strong>PID</strong>（进程号）。进程有父子关系：终端启动 Shell，Shell 启动你敲的命令；关掉 Shell 时，它的子进程会收到挂断信号。</p><p>排查「端口被占用」「CPU 跑满」永远是同一条路：先找到 PID，再确认它是什么，最后才决定要不要杀。跳过第一步直接重启机器，问题会原样回来。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '先看有哪些进程',
-        command: 'ps aux | head -n 5',
-        output: 'USER    PID  %CPU %MEM      VSZ    RSS   TT  STAT STARTED      TIME COMMAND\nroot      1   0.1  0.1  4312832   9216   ??  Ss    3 14 08:00   0:12.31 /sbin/launchd\nxiaopi  812   4.2  1.8  8271521 152384 s001  S     3 14 09:12   1:04.22 node server.js\nxiaopi  903   0.0  0.0  4268001   2048 s001  R+    3 14 10:01   0:00.01 ps aux',
-        note: 'STAT 列：S 睡眠、R 运行中、R+ 表示在前台。COMMAND 列能看到启动时带了什么参数，这一步常被忽略。'
-      },
-      {
-        type: 'table',
-        title: '六个命令各管一段',
-        head: ['命令', '回答什么问题', '例子'],
-        rows: [
-          ['ps aux', '有哪些进程，PID 是多少', 'ps aux | grep node'],
-          ['top / htop', '谁在吃 CPU 和内存', 'top -o cpu'],
-          ['kill', '给指定 PID 发一个信号', 'kill 812'],
-          ['kill -9', '强制干掉，不给清理机会', 'kill -9 812'],
-          ['lsof -i :3000', '谁占着这个端口', 'lsof -i :3000'],
-          ['ss -ltnp', '系统里哪些端口在监听', 'ss -ltnp | grep 3000']
-        ]
-      },
-      {
-        type: 'text',
-        title: 'kill 与 kill -9 的差别',
-        html: '<p><code>kill</code> 不带参数发的是 <code>TERM</code>（信号 15），意思是「请结束」。进程可以捕获它，先把缓存写盘、关掉连接、删掉临时文件，再安静退出。</p><p><code>kill -9</code> 发的是 <code>KILL</code>（信号 9），进程无法捕获、无法忽略，内核直接回收。所以顺序是：先 <code>kill PID</code>，等两三秒；还在再 <code>kill -9 PID</code>。数据库、构建工具这类有状态的进程被 -9 杀掉，可能出现锁文件残留、迁移只做了一半。</p>'
-      },
-      {
-        type: 'terminal',
-        title: '端口被占用时怎么定位',
-        command: 'lsof -i :3000; kill 812',
-        output: 'COMMAND  PID    USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME\nnode    812  xiaopi   18u  IPv6 0x9a1c      0t0  TCP *:3000 (LISTEN)',
-        note: 'lsof 输出里就有 PID 812。确认这是你自己的 node、不是别的项目之后，再 kill。杀不掉才用 kill -9 812。'
-      },
-      {
-        type: 'text',
-        title: 'ss -ltnp：不用猜端口',
-        html: '<p><code>ss -ltnp</code> 列出所有监听中的 TCP 端口：<code>-l</code> 只看 listen，<code>-t</code> 只看 TCP，<code>-n</code> 显示数字端口不做域名解析，<code>-p</code> 带进程名和 PID（需要权限）。</p><p>这是 Linux 的命令。macOS 上没有 <code>ss</code>，用 <code>lsof -nP -iTCP -sTCP:LISTEN</code> 代替。查具体端口：<code>ss -ltnp | grep 3000</code>，有输出说明被占了，没输出说明服务根本没起来。</p>'
-      },
-      {
-        type: 'terminal',
-        title: 'curl：看响应头，以及发一个 POST',
-        command: 'curl -I http://127.0.0.1:3000/health\necho "--- POST ---"\ncurl -X POST -H "Content-Type: application/json" -d @body.json http://127.0.0.1:3000/api/login',
-        output: 'HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\nDate: Thu, 14 Mar 2024 02:22:31 GMT\n\n--- POST ---\n{"ok":true,"token":"demo-token"}',
-        note: '-I 只发 HEAD，只看响应头，判断服务活没活最快。第二条是 POST，-d @body.json 表示从文件读请求体；加 -v 能看到完整请求头与握手过程。'
-      },
-      {
-        type: 'table',
-        title: 'EADDRINUSE 排错表',
-        head: ['现象', '先查什么', '常见原因'],
-        rows: [
-          ['Error: listen EADDRINUSE :::3000', 'lsof -i :3000 找 PID', '上次的 node 没退干净，或另一个项目占了同一个端口'],
-          ['curl 报 Could not connect', 'ss -ltnp 看端口在不在监听', '服务没启动，或只监听 127.0.0.1 而你用局域网 IP 访问'],
-          ['浏览器能开，curl 127.0.0.1 不行', '核对端口和协议', '端口写错；服务只监听 IPv6；或者你该用 https'],
-          ['kill 之后端口还占着', 'lsof 再查一次', '有父进程自动重启，或端口还在 TIME_WAIT']
-        ]
-      },
-      {
-        type: 'text',
-        title: '127.0.0.1、localhost 与 0.0.0.0',
-        html: '<p><code>127.0.0.1</code> 是本机回环地址（loopback），只有这台机器能访问。<code>localhost</code> 一般解析到它，但解析顺序可能先给 IPv6 的 <code>::1</code>，于是出现「服务只监听 IPv4，curl localhost 却连不上」的怪事。用 <code>127.0.0.1</code> 最确定。</p><p>服务里写 <code>0.0.0.0</code> 表示所有网卡都监听，别的机器才连得进来；写 <code>127.0.0.1</code> 就只有本机能连。手机调试连不上电脑，八成是这里写错了。</p>'
-      },
-      {
-        type: 'terminal',
-        title: 'ping 只能说明网络通不通',
-        command: 'ping -c 4 127.0.0.1',
-        output: 'PING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.042 ms\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.041 ms\n--- 127.0.0.1 ping statistics ---\n4 packets transmitted, 4 packets received, 0.0% packet loss',
-        note: 'macOS 用 -c 4 限定次数，Windows 用 ping -n 4。ping 通不代表端口通，ICMP 和 TCP 是两回事。'
-      },
-      {
-        type: 'warn',
-        title: 'kill -9 和随手改 hosts 的代价',
-        html: '<p><code>kill -9</code> 跳过所有清理逻辑。开发服务器被 -9 掉，端口可能停在 <code>TIME_WAIT</code> 几十秒，重启照样 EADDRINUSE；数据库被 -9 掉，可能留下锁文件，下次启动直接拒绝服务。</p><p>另一种常见破坏是往 <code>/etc/hosts</code> 里加一行 <code>127.0.0.1 api.example.com</code>，忘了删，几天后排查「线上接口怎么返回本地数据」才发现。改之前先 <code>cp /etc/hosts /etc/hosts.bak</code>。</p>'
-      },
-      {
-        type: 'steps',
-        title: '端口被占用，按这个顺序查',
-        items: [
-          { title: '确认端口真的被占', html: '<code>lsof -i :3000</code> 或 <code>ss -ltnp | grep 3000</code>，有输出就记下 PID。' },
-          { title: '确认这个 PID 是什么', html: '<code>ps -p 812 -o pid,command</code>，看清是不是你自己的进程、属于哪个项目。' },
-          { title: '先正常结束它', html: '<code>kill 812</code>，等两三秒，再查一次端口是否空出来。' },
-          { title: '杀不掉再强制', html: '<code>kill -9 812</code>，随后立刻重启服务，观察有没有数据损坏。' }
-        ]
-      }
-    ],
-    exercise: {
-      title: '动手练一练',
-      brief: '起一个本地服务、查出它占的端口、正常结束它，全程不重启机器，也不重启终端。',
-      items: [
-        { text: '启动一个临时静态服务器', cmd: 'python3 -m http.server 8000' },
-        { text: '另开一个窗口，查出占用 8000 的 PID', cmd: 'lsof -i :8000' },
-        { text: '先确认服务活着', cmd: 'curl -I http://127.0.0.1:8000/' },
-        { text: '把 lsof 拿到的 PID 填进 kill，正常结束它', cmd: 'kill 12345' }
+  "quiz": [
+    {
+      "q": "ls -l 显示 -rw-r--r--，这个文件的权限数字是？",
+      "options": [
+        "755",
+        "644",
+        "600",
+        "777"
       ],
-      done: 'lsof 已经查不到 8000 端口，再用 curl 访问会报连不上，说明进程真的退出了。'
+      "answer": 1,
+      "explain": "三位权限分别换成数字：rw- 是 6，r-- 是 4，再一个 r-- 还是 4，合起来就是 644。意思只有属主能写，属组和其他人只能读，谁都不能执行。"
     },
-    quiz: [
+    {
+      "q": "一个目录的权限是 r--，你能 cd 进去吗？",
+      "options": [
+        "能，有读权限就够",
+        "不能，进目录需要 x 位",
+        "能进去，但看不到文件名",
+        "取决于文件的属主是谁"
+      ],
+      "answer": 1,
+      "explain": "目录上的 r 只允许列出里面的名字，x 才是进入和访问路径的权限。缺 x 时 cd 会直接报 Permission denied，看起来像「明明有读权限」。"
+    },
+    {
+      "q": "在 ~/.zshrc 里加了 export，当前终端却没反应，原因是？",
+      "options": [
+        "变量名写错了",
+        "启动文件只在启动 Shell 时读取，需要 source 或重开窗口",
+        "zsh 根本不读 .zshrc",
+        "必须用 sudo 才会生效"
+      ],
+      "answer": 1,
+      "explain": "当前 Shell 早就读完配置文件并进入运行状态。source ~/.zshrc 让它当场重读，或者关掉窗口重开一个，新 Shell 才会执行这一行。"
+    }
+  ]
+},
+{
+  "id": "processes-network",
+  "order": 6,
+  "track": "terminal",
+  "title": "进程、端口与网络",
+  "subtitle": "从 ps 到 curl，定位占着端口的进程并把它干净地送走。",
+  "minutes": 15,
+  "level": "进阶",
+  "goal": [
+    "用 ps 和 top 找到目标进程",
+    "分清 kill 与 kill -9 的后果",
+    "查出某个端口被哪个进程占用",
+    "用 curl 判断服务到底活没活"
+  ],
+  "sections": [
+    {
+      "type": "text",
+      "title": "进程就是正在跑的程序",
+      "html": "<p>你敲一次命令，系统就创建一个<strong>进程</strong>（process），分配一个 <strong>PID</strong>（进程号）。进程有父子关系：终端启动 Shell，Shell 启动你敲的命令；关掉 Shell 时，它的子进程会收到挂断信号。</p><p>排查「端口被占用」「CPU 跑满」永远是同一条路：先找到 PID，再确认它是什么，最后才决定要不要杀。跳过第一步直接重启机器，问题会原样回来。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "先看有哪些进程",
+      "command": "ps aux | head -n 5",
+      "output": "USER    PID  %CPU %MEM      VSZ    RSS   TT  STAT STARTED      TIME COMMAND\nroot      1   0.1  0.1  4312832   9216   ??  Ss    3 14 08:00   0:12.31 /sbin/launchd\nxiaopi  812   4.2  1.8  8271521 152384 s001  S     3 14 09:12   1:04.22 node server.js\nxiaopi  903   0.0  0.0  4268001   2048 s001  R+    3 14 10:01   0:00.01 ps aux",
+      "note": "STAT 列：S 睡眠、R 运行中、R+ 表示在前台。COMMAND 列能看到启动时带了什么参数，这一步常被忽略。"
+    },
+    {
+      "type": "table",
+      "title": "六个命令各管一段",
+      "head": [
+        "命令",
+        "回答什么问题",
+        "例子"
+      ],
+      "rows": [
+        [
+          "ps aux",
+          "有哪些进程，PID 是多少",
+          "ps aux | grep node"
+        ],
+        [
+          "top / htop",
+          "谁在吃 CPU 和内存",
+          "top -o cpu"
+        ],
+        [
+          "kill",
+          "给指定 PID 发一个信号",
+          "kill 812"
+        ],
+        [
+          "kill -9",
+          "强制干掉，不给清理机会",
+          "kill -9 812"
+        ],
+        [
+          "lsof -i :3000",
+          "谁占着这个端口",
+          "lsof -i :3000"
+        ],
+        [
+          "ss -ltnp",
+          "系统里哪些端口在监听",
+          "ss -ltnp | grep 3000"
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "title": "kill 与 kill -9 的差别",
+      "html": "<p><code>kill</code> 不带参数发的是 <code>TERM</code>（信号 15），意思是「请结束」。进程可以捕获它，先把缓存写盘、关掉连接、删掉临时文件，再安静退出。</p><p><code>kill -9</code> 发的是 <code>KILL</code>（信号 9），进程无法捕获、无法忽略，内核直接回收。所以顺序是：先 <code>kill PID</code>，等两三秒；还在再 <code>kill -9 PID</code>。数据库、构建工具这类有状态的进程被 -9 杀掉，可能出现锁文件残留、迁移只做了一半。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "端口被占用时怎么定位",
+      "command": "lsof -i :3000; kill 812",
+      "output": "COMMAND  PID    USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME\nnode    812  xiaopi   18u  IPv6 0x9a1c      0t0  TCP *:3000 (LISTEN)",
+      "note": "lsof 输出里就有 PID 812。确认这是你自己的 node、不是别的项目之后，再 kill。杀不掉才用 kill -9 812。"
+    },
+    {
+      "type": "text",
+      "title": "ss -ltnp：不用猜端口",
+      "html": "<p><code>ss -ltnp</code> 列出所有监听中的 TCP 端口：<code>-l</code> 只看 listen，<code>-t</code> 只看 TCP，<code>-n</code> 显示数字端口不做域名解析，<code>-p</code> 带进程名和 PID（需要权限）。</p><p>这是 Linux 的命令。macOS 上没有 <code>ss</code>，用 <code>lsof -nP -iTCP -sTCP:LISTEN</code> 代替。查具体端口：<code>ss -ltnp | grep 3000</code>，有输出说明被占了，没输出说明服务根本没起来。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "curl：看响应头，以及发一个 POST",
+      "command": "curl -I http://127.0.0.1:3000/health\necho \"--- POST ---\"\ncurl -X POST -H \"Content-Type: application/json\" -d @body.json http://127.0.0.1:3000/api/login",
+      "output": "HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\nDate: Thu, 14 Mar 2024 02:22:31 GMT\n\n--- POST ---\n{\"ok\":true,\"token\":\"demo-token\"}",
+      "note": "-I 只发 HEAD，只看响应头，判断服务活没活最快。第二条是 POST，-d @body.json 表示从文件读请求体；加 -v 能看到完整请求头与握手过程。"
+    },
+    {
+      "type": "table",
+      "title": "EADDRINUSE 排错表",
+      "head": [
+        "现象",
+        "先查什么",
+        "常见原因"
+      ],
+      "rows": [
+        [
+          "Error: listen EADDRINUSE :::3000",
+          "lsof -i :3000 找 PID",
+          "上次的 node 没退干净，或另一个项目占了同一个端口"
+        ],
+        [
+          "curl 报 Could not connect",
+          "ss -ltnp 看端口在不在监听",
+          "服务没启动，或只监听 127.0.0.1 而你用局域网 IP 访问"
+        ],
+        [
+          "浏览器能开，curl 127.0.0.1 不行",
+          "核对端口和协议",
+          "端口写错；服务只监听 IPv6；或者你该用 https"
+        ],
+        [
+          "kill 之后端口还占着",
+          "lsof 再查一次",
+          "有父进程自动重启，或端口还在 TIME_WAIT"
+        ]
+      ]
+    },
+    {
+      "type": "text",
+      "title": "127.0.0.1、localhost 与 0.0.0.0",
+      "html": "<p><code>127.0.0.1</code> 是本机回环地址（loopback），只有这台机器能访问。<code>localhost</code> 一般解析到它，但解析顺序可能先给 IPv6 的 <code>::1</code>，于是出现「服务只监听 IPv4，curl localhost 却连不上」的怪事。用 <code>127.0.0.1</code> 最确定。</p><p>服务里写 <code>0.0.0.0</code> 表示所有网卡都监听，别的机器才连得进来；写 <code>127.0.0.1</code> 就只有本机能连。手机调试连不上电脑，八成是这里写错了。</p>"
+    },
+    {
+      "type": "terminal",
+      "title": "ping 只能说明网络通不通",
+      "command": "ping -c 4 127.0.0.1",
+      "output": "PING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.042 ms\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.041 ms\n--- 127.0.0.1 ping statistics ---\n4 packets transmitted, 4 packets received, 0.0% packet loss",
+      "note": "macOS 用 -c 4 限定次数，Windows 用 ping -n 4。ping 通不代表端口通，ICMP 和 TCP 是两回事。"
+    },
+    {
+      "type": "warn",
+      "title": "kill -9 和随手改 hosts 的代价",
+      "html": "<p><code>kill -9</code> 跳过所有清理逻辑。开发服务器被 -9 掉，端口可能停在 <code>TIME_WAIT</code> 几十秒，重启照样 EADDRINUSE；数据库被 -9 掉，可能留下锁文件，下次启动直接拒绝服务。</p><p>另一种常见破坏是往 <code>/etc/hosts</code> 里加一行 <code>127.0.0.1 api.example.com</code>，忘了删，几天后排查「线上接口怎么返回本地数据」才发现。改之前先 <code>cp /etc/hosts /etc/hosts.bak</code>。</p>"
+    },
+    {
+      "type": "steps",
+      "title": "端口被占用，按这个顺序查",
+      "items": [
+        {
+          "title": "确认端口真的被占",
+          "html": "<code>lsof -i :3000</code> 或 <code>ss -ltnp | grep 3000</code>，有输出就记下 PID。"
+        },
+        {
+          "title": "确认这个 PID 是什么",
+          "html": "<code>ps -p 812 -o pid,command</code>，看清是不是你自己的进程、属于哪个项目。"
+        },
+        {
+          "title": "先正常结束它",
+          "html": "<code>kill 812</code>，等两三秒，再查一次端口是否空出来。"
+        },
+        {
+          "title": "杀不掉再强制",
+          "html": "<code>kill -9 812</code>，随后立刻重启服务，观察有没有数据损坏。"
+        }
+      ]
+    }
+  ],
+  "exercise": {
+    "title": "动手练一练",
+    "brief": "起一个本地服务、查出它占的端口、正常结束它，全程不重启机器，也不重启终端。",
+    "items": [
       {
-        q: 'ps aux 里有个 node 进程占满 CPU，想让它先保存数据再退出，应该？',
-        options: ['kill -9 PID', 'kill PID', 'kill -1 PID', '直接重启机器'],
-        answer: 1,
-        explain: 'kill 默认发 TERM 信号，进程能捕获它，先把缓存写盘、关掉连接再退出。kill -9 是内核直接回收，进程没有机会做任何清理。'
+        "text": "启动一个临时静态服务器",
+        "cmd": "python3 -m http.server 8000"
       },
       {
-        q: '启动服务时报 Error: listen EADDRINUSE :::3000，第一步做什么？',
-        options: ['换个端口重新启动', '用 lsof -i :3000 找出占用的 PID', '重装 Node', '执行 kill -9 1'],
-        answer: 1,
-        explain: 'EADDRINUSE 表示端口已被监听。先查清是哪个进程占着、是不是自己上次没退干净，再决定结束它还是换端口，不要盲目重启。'
+        "text": "另开一个窗口，查出占用 8000 的 PID",
+        "cmd": "lsof -i :8000"
       },
       {
-        q: '服务监听 127.0.0.1:3000，同事用你的局域网 IP 访问会怎样？',
-        options: ['正常访问', '连不上，因为只监听了回环地址', '能连上但很慢', '只能 ping 通，打不开页面'],
-        answer: 1,
-        explain: '127.0.0.1 只在回环网卡上监听，外部流量根本进不来。要让同事访问，服务必须监听 0.0.0.0，并用局域网 IP 而不是 localhost 去连。'
+        "text": "先确认服务活着",
+        "cmd": "curl -I http://127.0.0.1:8000/"
+      },
+      {
+        "text": "把 lsof 拿到的 PID 填进 kill，正常结束它",
+        "cmd": "kill 12345"
       }
-    ]
-  }
+    ],
+    "done": "lsof 已经查不到 8000 端口，再用 curl 访问会报连不上，说明进程真的退出了。"
+  },
+  "quiz": [
+    {
+      "q": "ps aux 里有个 node 进程占满 CPU，想让它先保存数据再退出，应该？",
+      "options": [
+        "kill -9 PID",
+        "kill PID",
+        "kill -1 PID",
+        "直接重启机器"
+      ],
+      "answer": 1,
+      "explain": "kill 默认发 TERM 信号，进程能捕获它，先把缓存写盘、关掉连接再退出。kill -9 是内核直接回收，进程没有机会做任何清理。"
+    },
+    {
+      "q": "启动服务时报 Error: listen EADDRINUSE :::3000，第一步做什么？",
+      "options": [
+        "换个端口重新启动",
+        "用 lsof -i :3000 找出占用的 PID",
+        "重装 Node",
+        "执行 kill -9 1"
+      ],
+      "answer": 1,
+      "explain": "EADDRINUSE 表示端口已被监听。先查清是哪个进程占着、是不是自己上次没退干净，再决定结束它还是换端口，不要盲目重启。"
+    },
+    {
+      "q": "服务监听 127.0.0.1:3000，同事用你的局域网 IP 访问会怎样？",
+      "options": [
+        "正常访问",
+        "连不上，因为只监听了回环地址",
+        "能连上但很慢",
+        "只能 ping 通，打不开页面"
+      ],
+      "answer": 1,
+      "explain": "127.0.0.1 只在回环网卡上监听，外部流量根本进不来。要让同事访问，服务必须监听 0.0.0.0，并用局域网 IP 而不是 localhost 去连。"
+    }
+  ]
+}
 );

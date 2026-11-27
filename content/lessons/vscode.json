@@ -1,0 +1,1806 @@
+[
+  {
+    "id": "vscode-tour",
+    "order": 15,
+    "track": "vscode",
+    "title": "先认识这个编辑器",
+    "subtitle": "五个区域、一个命令面板，先学会用键盘找到一切",
+    "minutes": 10,
+    "level": "入门",
+    "goal": [
+      "叫得出界面五个区域的名字",
+      "用命令面板完成一次菜单里没有的操作",
+      "用 ⌘P 在三秒内打开任意文件",
+      "在项目目录里打开集成终端并执行命令"
+    ],
+    "sections": [
+      {
+        "type": "text",
+        "title": "打开之后，屏幕被分成五块",
+        "html": "<p>第一次打开 VS Code，界面看着干净，其实被切成五块。以后你所有的「找不到东西」，都能归到其中一块。</p><ul><li><strong>活动栏（Activity Bar）</strong>：最左边一竖排图标，管资源管理器、搜索、源代码管理、运行和调试、扩展。</li><li><strong>侧边栏（Side Bar）</strong>：活动栏右边那一栏，内容随你点的图标变化。</li><li><strong>编辑器区（Editor Group）</strong>：中间写代码的地方，可以左右分栏、上下分栏。</li><li><strong>面板（Panel）</strong>：编辑器下方，装终端、问题、输出、调试控制台。</li><li><strong>状态栏（Status Bar）</strong>：最下面一行细条，显示光标行列、缩进、编码、语言模式和 Git 分支。</li></ul>"
+      },
+      {
+        "type": "table",
+        "title": "五个区域各管什么",
+        "head": [
+          "区域",
+          "装什么",
+          "怎么开关"
+        ],
+        "rows": [
+          [
+            "活动栏",
+            "资源管理器、搜索、源代码管理、运行、扩展",
+            "命令面板里搜 Toggle Activity Bar Visibility"
+          ],
+          [
+            "侧边栏",
+            "当前入口的详细列表，比如文件树",
+            "⌘B（Ctrl+B）"
+          ],
+          [
+            "编辑器区",
+            "打开的文件标签页，可以拆成多栏",
+            "拖动标签页到边缘，或右键 Split Right"
+          ],
+          [
+            "面板",
+            "终端、问题、输出、调试控制台",
+            "⌘J（Ctrl+J）整体开关"
+          ],
+          [
+            "状态栏",
+            "行列、缩进、行尾、编码、语言、分支",
+            "右键状态栏可以只留你关心的那几项"
+          ]
+        ]
+      },
+      {
+        "type": "shortcuts",
+        "title": "先记住这七个",
+        "items": [
+          {
+            "action": "打开命令面板",
+            "mac": [
+              "⌘",
+              "⇧",
+              "P"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "P"
+            ],
+            "note": "F1 也可以。忘了功能在哪，先来这里搜名字。"
+          },
+          {
+            "action": "快速打开文件",
+            "mac": [
+              "⌘",
+              "P"
+            ],
+            "win": [
+              "Ctrl",
+              "P"
+            ],
+            "note": "输入文件名的一部分就够了，不用输全路径。"
+          },
+          {
+            "action": "开关集成终端",
+            "mac": [
+              "⌃",
+              "`"
+            ],
+            "win": [
+              "Ctrl",
+              "`"
+            ],
+            "note": "终端打开时所在的目录，就是你当前打开的文件夹。"
+          },
+          {
+            "action": "打开设置界面",
+            "mac": [
+              "⌘",
+              ","
+            ],
+            "win": [
+              "Ctrl",
+              ","
+            ]
+          },
+          {
+            "action": "打开键盘快捷方式",
+            "mac": [
+              "⌘",
+              "K",
+              "⌘",
+              "S"
+            ],
+            "win": [
+              "Ctrl",
+              "K",
+              "Ctrl",
+              "S"
+            ],
+            "note": "在里面按一次组合键，就能看到它被哪个命令占了。"
+          },
+          {
+            "action": "开关侧边栏",
+            "mac": [
+              "⌘",
+              "B"
+            ],
+            "win": [
+              "Ctrl",
+              "B"
+            ]
+          },
+          {
+            "action": "开关面板",
+            "mac": [
+              "⌘",
+              "J"
+            ],
+            "win": [
+              "Ctrl",
+              "J"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "title": "命令面板才是真正的入口",
+        "html": "<p>菜单栏里能点的，命令面板里都有；菜单栏里没有的，命令面板里更多。它做的事很简单：把编辑器全部命令按名字列出来，你只要记住名字里的几个字就能调到。</p><p>输入框最左边有一个大于号时，搜的是<strong>命令</strong>；把大于号删掉，同一个输入框就变成按文件名搜索。这是新手最容易卡住的地方：明明想找文件，却一直停在命令模式里，输入什么都没结果。</p><p>在快速打开（Quick Open）里还能用几个前缀：<code>@</code> 搜当前文件的符号，<code>:</code> 跳行号，<code>#</code> 搜整个工作区的符号，输入 <code>?</code> 会列出全部前缀。</p>"
+      },
+      {
+        "type": "code",
+        "title": "快速打开里的四种写法",
+        "lang": "text",
+        "text": "app.js:42        跳到 app.js 第 42 行\n@save            当前文件里找名字含 save 的符号\n@:120            跳到当前文件第 120 行\n#fetchUser       在整个工作区里搜这个符号",
+        "note": "先按 ⌘P（Windows 是 Ctrl+P）打开输入框，再输入冒号或井号。输入错了按 Esc 关掉，不会改动任何文件。"
+      },
+      {
+        "type": "steps",
+        "title": "第一次打开，按顺序做四件事",
+        "items": [
+          {
+            "title": "打开文件夹，而不是打开文件",
+            "html": "<p>File → Open Folder 选项目根目录。VS Code 的能力几乎都以文件夹为单位：搜索范围、终端工作目录、Git 面板、插件配置。</p>"
+          },
+          {
+            "title": "打开集成终端，确认它在项目里",
+            "html": "<p>按 ⌃ 加反引号键（Windows 是 Ctrl 加反引号）。终端里的当前目录就是刚打开的文件夹，不用再 cd 过去。</p>"
+          },
+          {
+            "title": "分清两种放大",
+            "html": "<p>⌘ 加号放大的是整个窗口（Zoom），侧边栏和菜单一起变大；只想让代码字变大，要改设置里的 <code>editor.fontSize</code>。</p>"
+          },
+          {
+            "title": "在命令面板里搜一次 Toggle",
+            "html": "<p>输入 Toggle 看结果有多少条。这一步是建立「每个功能都有命令名」的直觉，以后遇到找不到的开关，第一个动作就是来这里搜。</p>"
+          }
+        ]
+      },
+      {
+        "type": "warn",
+        "title": "没打开文件夹时，一半功能是哑的",
+        "html": "<p>用 File → Open File 双击打开单个文件时，资源管理器会显示 <code>You have not yet opened a folder.</code>。此时搜索只在这一个文件里生效，集成终端的当前目录不是你的项目目录，源代码管理面板也看不到仓库。</p><p>这不是装坏了。回到 File → Open Folder 重新打开目录，所有面板立刻恢复。养成习惯：先开文件夹，再改代码。</p>"
+      },
+      {
+        "type": "tip",
+        "title": "状态栏那一条细线，全是可点的",
+        "html": "<p>右下角 <code>Spaces: 2</code> 点开可以改缩进宽度和是否用空格；<code>LF</code> 和 <code>CRLF</code> 是行尾序列（line ending），从 Windows 同事那里拿来的文件常带 CRLF，直接提交会让整个文件在 diff 里变成红色；<code>UTF-8</code> 是文件编码；再往左的语言模式（Plain Text、JavaScript）决定语法高亮，后缀名不常见的文件高亮不对时，点它手动指定即可。</p>"
+      },
+      {
+        "type": "terminal",
+        "title": "在终端里打开一个项目",
+        "command": "code .",
+        "note": "在项目根目录执行，会用新窗口打开当前目录；如果已经开着同一个目录，会直接激活那个窗口。macOS 第一次用可能报 code: command not found，先在命令面板执行 Shell Command: Install code command in PATH。别在 / 或整个用户主目录下执行，那会把几十万个文件塞进搜索索引，内存和启动速度都会变差。"
+      },
+      {
+        "type": "text",
+        "title": "布局拖乱了怎么回来",
+        "html": "<p>面板标题栏可以拖到编辑器右侧，变成竖排；活动栏也能拖到右边。拖乱之后不用手动摆，命令面板里执行 <code>View: Reset View Locations</code> 一次性恢复默认布局。分栏开太多时，<code>View: Close All Editor Groups</code> 会关掉除当前之外的所有分栏，没保存的文件它会先问你。</p>"
+      }
+    ],
+    "exercise": {
+      "title": "动手练一练",
+      "brief": "找一个你电脑里的真实项目目录打开，下面几件事全部用键盘完成，不要点菜单栏。",
+      "items": [
+        {
+          "text": "用 ⌘P（Ctrl+P）打开目录里任意一个文件"
+        },
+        {
+          "text": "打开集成终端，确认当前目录就是项目根目录",
+          "cmd": "pwd"
+        },
+        {
+          "text": "在命令面板里执行一次 View: Toggle Panel Position"
+        },
+        {
+          "text": "点状态栏把缩进从 Spaces: 2 改成 Spaces: 4"
+        }
+      ],
+      "done": "不看菜单就能打开文件、开终端、改缩进，说明五个区域你都摸到了。"
+    },
+    "quiz": [
+      {
+        "q": "命令面板打开时，输入框最左边的符号代表什么？",
+        "options": [
+          "大于号表示当前在搜命令",
+          "大于号表示当前在搜文件",
+          "大于号表示开启了多光标",
+          "大于号没有含义，只是装饰"
+        ],
+        "answer": 0,
+        "explain": "带大于号时搜的是命令名；把大于号删掉，输入框就变成按文件名搜索的快速打开，两种模式共用一个入口，别混着找。"
+      },
+      {
+        "q": "只打开了单个文件、没有打开文件夹时，哪一项会不正常？",
+        "options": [
+          "语法高亮",
+          "集成终端的当前目录",
+          "光标的移动",
+          "字体大小"
+        ],
+        "answer": 1,
+        "explain": "没有工作目录，终端会落在用户主目录下，搜索范围也只剩这一个文件，Git 面板同样看不到仓库，大部分功能都开始打折。"
+      },
+      {
+        "q": "想让代码字号变大、侧边栏保持不变，应该怎么做？",
+        "options": [
+          "按 ⌘ 加号放大窗口",
+          "改设置里的 editor.fontSize",
+          "把窗口拖大一点",
+          "改设置里的 window.zoomLevel"
+        ],
+        "answer": 1,
+        "explain": "⌘ 加号改的是整个窗口的缩放，侧边栏和菜单会一起变大；editor.fontSize 只影响编辑器里的代码文字，两者互不干扰。"
+      }
+    ]
+  },
+  {
+    "id": "vscode-editing",
+    "order": 16,
+    "track": "vscode",
+    "title": "编辑快捷键：多光标、行操作、快速跳转",
+    "subtitle": "同一处改动要在四十行里重复，就别再复制粘贴了",
+    "minutes": 14,
+    "level": "基础",
+    "goal": [
+      "用 ⌘D 一次改掉同一个词的十几处",
+      "在任意位置点一下就能加光标",
+      "不碰鼠标完成整行的移动、复制、删除",
+      "用 F12 和返回键在代码里来回跳"
+    ],
+    "sections": [
+      {
+        "type": "text",
+        "title": "浪费时间的不是打字，是重复",
+        "html": "<p>写代码时最常见的浪费不是打字慢，是<strong>同一件小事重复几十遍</strong>：给十行对象加同一个字段、把四处的颜色值从 #111 换成 #000、给三十行末尾补逗号。手改一遍两分钟，改漏一处要在浏览器里排查十分钟。</p><p>多光标（multi-cursor）解决的就是这件事：同时开出多个光标，一次输入，多处生效。</p>"
+      },
+      {
+        "type": "shortcuts",
+        "title": "多光标",
+        "items": [
+          {
+            "action": "选中下一个相同的词",
+            "mac": [
+              "⌘",
+              "D"
+            ],
+            "win": [
+              "Ctrl",
+              "D"
+            ],
+            "note": "连续按会逐个加光标；选多了用 ⌘U（Ctrl+U）撤掉一个。"
+          },
+          {
+            "action": "跳过当前匹配，选下一个",
+            "mac": [
+              "⌘",
+              "K",
+              "⌘",
+              "D"
+            ],
+            "win": [
+              "Ctrl",
+              "K",
+              "Ctrl",
+              "D"
+            ],
+            "note": "遇到不该改的那一处（比如字符串里的同名文字）用它跳过。"
+          },
+          {
+            "action": "选中全文所有相同词",
+            "mac": [
+              "⌘",
+              "⇧",
+              "L"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "L"
+            ],
+            "note": "范围是整个文件，改名前先确认这个词足够独特。"
+          },
+          {
+            "action": "鼠标加光标",
+            "mac": [
+              "⌥",
+              "点击"
+            ],
+            "win": [
+              "Alt",
+              "点击"
+            ]
+          },
+          {
+            "action": "向上加一个光标",
+            "mac": [
+              "⌘",
+              "⌥",
+              "↑"
+            ],
+            "win": [
+              "Ctrl",
+              "Alt",
+              "↑"
+            ]
+          },
+          {
+            "action": "向下加一个光标",
+            "mac": [
+              "⌘",
+              "⌥",
+              "↓"
+            ],
+            "win": [
+              "Ctrl",
+              "Alt",
+              "↓"
+            ]
+          },
+          {
+            "action": "撤掉最后加的那个光标",
+            "mac": [
+              "⌘",
+              "U"
+            ],
+            "win": [
+              "Ctrl",
+              "U"
+            ]
+          },
+          {
+            "action": "列选择（块选择）",
+            "mac": [
+              "⇧",
+              "⌥",
+              "拖拽"
+            ],
+            "win": [
+              "Shift",
+              "Alt",
+              "拖拽"
+            ],
+            "note": "改对齐的空格、批量删行尾注释时最好用。"
+          },
+          {
+            "action": "退出多光标",
+            "mac": [
+              "Esc"
+            ],
+            "win": [
+              "Esc"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "title": "⌘D 和查找替换的区别",
+        "html": "<p>「全部替换」按文本动手，改的是整个文件，包括注释、字符串和你根本没看过的角落；<strong>多光标是可见的</strong>，每个光标停在哪你都看得见，改完扫一眼就知道对不对。</p><p>但两者都有边界：改<strong>变量名</strong>时正确工具是重命名符号（Rename Symbol，F2），它会理解作用域，不会动到同名的字符串。⌘D 只适合改颜色值、字段名、成段重复的文本这类「本来就是一回事」的内容。</p>"
+      },
+      {
+        "type": "shortcuts",
+        "title": "行操作：整行不用先选中",
+        "items": [
+          {
+            "action": "把当前行上移",
+            "mac": [
+              "⌥",
+              "↑"
+            ],
+            "win": [
+              "Alt",
+              "↑"
+            ],
+            "note": "光标在哪一行就动哪一行，不需要选中整行。"
+          },
+          {
+            "action": "把当前行下移",
+            "mac": [
+              "⌥",
+              "↓"
+            ],
+            "win": [
+              "Alt",
+              "↓"
+            ]
+          },
+          {
+            "action": "复制当前行到上方",
+            "mac": [
+              "⇧",
+              "⌥",
+              "↑"
+            ],
+            "win": [
+              "Shift",
+              "Alt",
+              "↑"
+            ]
+          },
+          {
+            "action": "复制当前行到下方",
+            "mac": [
+              "⇧",
+              "⌥",
+              "↓"
+            ],
+            "win": [
+              "Shift",
+              "Alt",
+              "↓"
+            ]
+          },
+          {
+            "action": "删除当前行",
+            "mac": [
+              "⌘",
+              "⇧",
+              "K"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "K"
+            ],
+            "note": "整行删掉，剪贴板里不会留下半行残渣。"
+          },
+          {
+            "action": "在下方插入空行并跳过去",
+            "mac": [
+              "⌘",
+              "Enter"
+            ],
+            "win": [
+              "Ctrl",
+              "Enter"
+            ],
+            "note": "不用先按 End 再按回车。"
+          },
+          {
+            "action": "在上方插入空行",
+            "mac": [
+              "⌘",
+              "⇧",
+              "Enter"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "Enter"
+            ]
+          },
+          {
+            "action": "注释 / 取消注释",
+            "mac": [
+              "⌘",
+              "/"
+            ],
+            "win": [
+              "Ctrl",
+              "/"
+            ],
+            "note": "块注释是 ⇧⌥A（Shift+Alt+A）。"
+          }
+        ]
+      },
+      {
+        "type": "shortcuts",
+        "title": "折叠、格式化、保存",
+        "items": [
+          {
+            "action": "格式化整个文件",
+            "mac": [
+              "⇧",
+              "⌥",
+              "F"
+            ],
+            "win": [
+              "Shift",
+              "Alt",
+              "F"
+            ],
+            "note": "没装格式化插件时会提示找不到格式化程序。"
+          },
+          {
+            "action": "折叠光标所在的块",
+            "mac": [
+              "⌥",
+              "⌘",
+              "["
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "["
+            ]
+          },
+          {
+            "action": "展开光标所在的块",
+            "mac": [
+              "⌥",
+              "⌘",
+              "]"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "]"
+            ]
+          },
+          {
+            "action": "折叠全部",
+            "mac": [
+              "⌘",
+              "K",
+              "⌘",
+              "0"
+            ],
+            "win": [
+              "Ctrl",
+              "K",
+              "Ctrl",
+              "0"
+            ]
+          },
+          {
+            "action": "展开全部",
+            "mac": [
+              "⌘",
+              "K",
+              "⌘",
+              "J"
+            ],
+            "win": [
+              "Ctrl",
+              "K",
+              "Ctrl",
+              "J"
+            ]
+          },
+          {
+            "action": "保存",
+            "mac": [
+              "⌘",
+              "S"
+            ],
+            "win": [
+              "Ctrl",
+              "S"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "title": "跳转：别再用眼睛找",
+        "html": "<p>光标停在函数名上按 F12，跳到它的定义；按 ⌃ 减号（Windows 是 Ctrl+Alt+减号）回到刚才的位置，可以连着按，一路往回退。⌥F12（Alt+F12）是预览定义（Peek Definition），不跳走，就在当前文件上方弹一个小窗，看两眼按 Esc 关掉。</p><p>函数名是灰色、F12 按下去没反应，通常是这个符号没被导进当前文件，或者语言服务没启动：右下角语言模式不对、项目没装依赖、tsconfig 的路径写错，都会这样。</p>"
+      },
+      {
+        "type": "shortcuts",
+        "title": "跳转与符号",
+        "items": [
+          {
+            "action": "跳到定义",
+            "mac": [
+              "F12"
+            ],
+            "win": [
+              "F12"
+            ]
+          },
+          {
+            "action": "预览定义，不跳走",
+            "mac": [
+              "⌥",
+              "F12"
+            ],
+            "win": [
+              "Alt",
+              "F12"
+            ]
+          },
+          {
+            "action": "列出所有引用",
+            "mac": [
+              "⇧",
+              "F12"
+            ],
+            "win": [
+              "Shift",
+              "F12"
+            ]
+          },
+          {
+            "action": "返回上一个位置",
+            "mac": [
+              "⌃",
+              "-"
+            ],
+            "win": [
+              "Ctrl",
+              "Alt",
+              "-"
+            ],
+            "note": "Windows 的减号是主键盘上那个，不是小键盘。"
+          },
+          {
+            "action": "前进到下一个位置",
+            "mac": [
+              "⌃",
+              "⇧",
+              "-"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "Alt",
+              "-"
+            ]
+          },
+          {
+            "action": "跳到第 N 行",
+            "mac": [
+              "⌃",
+              "G"
+            ],
+            "win": [
+              "Ctrl",
+              "G"
+            ]
+          },
+          {
+            "action": "当前文件的符号列表",
+            "mac": [
+              "⌘",
+              "⇧",
+              "O"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "O"
+            ]
+          },
+          {
+            "action": "整个工作区的符号",
+            "mac": [
+              "⌘",
+              "T"
+            ],
+            "win": [
+              "Ctrl",
+              "T"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "warn",
+        "title": "三个真会咬人的坑",
+        "html": "<p><strong>忘了按 Esc。</strong>多光标状态下继续往下写，之后每次输入都会同时作用在每一个光标上，一次删除能删掉一大片。发现不对立刻按 Esc 回到单光标，再连按几次 ⌘Z（Ctrl+Z）撤回。</p><p><strong>⌘⇧L 选太宽。</strong>在整个文件里选中所有同名文字再改名，字符串和注释里的会一起变。改名用 F2。</p><p><strong>⌥ 点错位置。</strong>多点出来的光标会让你下一次输入出现在不相干的行上；⌘U（Ctrl+U）可以只撤掉最后加的那一个。</p>"
+      },
+      {
+        "type": "code",
+        "title": "一段可以拿来练手的代码",
+        "lang": "text",
+        "text": ".card { color: #111; padding: 24px; }\n.note { color: #111; padding: 12px; }\n.tag  { color: #111; padding: 4px; }\n.btn  { color: #111; padding: 8px; }",
+        "note": "把光标放进第一个 #111，连按四次 ⌘D（Ctrl+D），输入 #000，四处颜色一次改完。然后按 Esc，连按几次 ⌘Z 撤回，再用 ⌥ 点击逐行加光标改 padding，练一遍。"
+      },
+      {
+        "type": "compare",
+        "title": "同一件小事，两种做法",
+        "left": {
+          "label": "手改",
+          "items": [
+            "用鼠标拖选第一个 #111",
+            "复制，滚到下一行粘贴",
+            "重复四遍，中间切一次窗口",
+            "漏掉第四处，页面上有一块颜色不对"
+          ]
+        },
+        "right": {
+          "label": "多光标",
+          "items": [
+            "光标放进 #111，连按 ⌘D 四次",
+            "直接输入 #000，四处同时变",
+            "按 Esc 退出，扫一眼确认没有多余光标",
+            "改错了就连按 ⌘Z 撤回重来"
+          ]
+        },
+        "note": "<p>多光标不是更快地重复，而是把重复这个动作整个删掉。判断标准很简单：同一个改动要出现三次以上，就该换工具，而不是拼手速。</p>"
+      },
+      {
+        "type": "tip",
+        "title": "折叠不是藏 bug 的地方",
+        "html": "<p>折叠（fold）用来把已经写好、暂时不看的函数收起来，让一个屏幕装下更多结构。它不减少文件的复杂度，也不影响编译结果。真要理解一个文件，用 ⌘⇧O（Ctrl+Shift+O）打开符号列表，比一层层展开快得多。另外先格式化（⇧⌥F）再折叠，缩进才对得齐。</p>"
+      }
+    ],
+    "exercise": {
+      "title": "动手练一练",
+      "brief": "新建一个 .css 或 .js 文件，把下面的动作各做一遍，重点是让手指记住位置。",
+      "items": [
+        {
+          "text": "写四行内容相同的 color 声明，用 ⌘D 一次改完"
+        },
+        {
+          "text": "用 ⌥ 点击在四行末尾各加一个光标，同时补上分号"
+        },
+        {
+          "text": "用 ⌥↑ 把最后一行一路移到最前面"
+        },
+        {
+          "text": "按 F12 跳进一个函数的定义，再用 ⌃ 减号退回来"
+        }
+      ],
+      "done": "四行一次改完、整行不用选就能移动，这两件事不看笔记也能做出来。"
+    },
+    "quiz": [
+      {
+        "q": "想改一个变量名，哪种做法最安全？",
+        "options": [
+          "用 ⌘D 逐个选中同名文字",
+          "用 F2 重命名符号",
+          "用查找替换全部替换",
+          "手动一行一行改"
+        ],
+        "answer": 1,
+        "explain": "F2 会按作用域改，字符串和注释里的同名文字不会被碰到；⌘D 和全部替换只认文本，改坏的地方要你自己找回来。"
+      },
+      {
+        "q": "多光标状态下发现选多了，想只撤掉最后一个光标按什么？",
+        "options": [
+          "Esc",
+          "⌘U（Ctrl+U）",
+          "⌘Z（Ctrl+Z）",
+          "⌘⇧L（Ctrl+Shift+L）"
+        ],
+        "answer": 1,
+        "explain": "⌘U 只撤掉最后加的那个光标，已经输入的内容都还在；Esc 是全部退出，⌘Z 撤回的是文本改动。"
+      },
+      {
+        "q": "F12 按下去没有任何反应，最可能的原因是什么？",
+        "options": [
+          "键盘按键坏了",
+          "符号没被导入当前文件，或语言服务没启动",
+          "必须先用鼠标点一下函数名",
+          "要先打开断点面板"
+        ],
+        "answer": 1,
+        "explain": "跳转靠语言服务解析，依赖没装、语言模式不对、tsconfig 路径写错都会让它失效；先看右下角的语言模式对不对。"
+      }
+    ]
+  },
+  {
+    "id": "vscode-settings",
+    "order": 17,
+    "track": "vscode",
+    "title": "settings.json：把编辑器调成你的",
+    "subtitle": "先把默认值改对一次，以后每天少点十次鼠标",
+    "minutes": 12,
+    "level": "基础",
+    "goal": [
+      "分清用户设置和工作区设置",
+      "能打开并手写 settings.json",
+      "抄一份适合自己的配置文件",
+      "知道写错时去哪看报错"
+    ],
+    "sections": [
+      {
+        "type": "text",
+        "title": "两层设置，别混着改",
+        "html": "<p>VS Code 的设置分两层。用户设置（User Settings）存在你自己机器上，对你打开的所有项目生效，放个人偏好；工作区设置（Workspace Settings）存在项目里的 <code>.vscode/settings.json</code>，只对这个项目生效，跟着仓库走。</p><p>优先级很直接：同一个键，工作区设置赢用户设置。所以团队约定写进工作区，个人偏好留在用户设置里，两边都不要越界。</p>"
+      },
+      {
+        "type": "table",
+        "title": "两个文件分别在哪",
+        "head": [
+          "层级",
+          "文件位置",
+          "影响谁",
+          "要不要进 Git"
+        ],
+        "rows": [
+          [
+            "用户设置",
+            "macOS 在 ~/Library/Application Support/Code/User/settings.json；Windows 在 %APPDATA%\\Code\\User\\settings.json",
+            "你打开的所有项目",
+            "不要，跟机器绑在一起"
+          ],
+          [
+            "工作区设置",
+            "项目根目录下的 .vscode/settings.json",
+            "打开这个项目的所有人",
+            "要，前提是写的是团队约定"
+          ]
+        ]
+      },
+      {
+        "type": "steps",
+        "title": "打开 JSON 的三种办法",
+        "items": [
+          {
+            "title": "走命令面板",
+            "html": "<p>⌘⇧P（Ctrl+Shift+P）打开命令面板，输入 <code>Preferences: Open User Settings (JSON)</code> 或 <code>Preferences: Open Workspace Settings (JSON)</code>，回车。这条路径最不容易点错。</p>"
+          },
+          {
+            "title": "走设置界面右上角",
+            "html": "<p>⌘,（Ctrl+,）打开设置界面，标题栏右上角有一个像翻开的文件的图标，点它就是整份 JSON。旁边的图标打开的是当前页面的片段，点错会以为设置丢了。</p>"
+          },
+          {
+            "title": "直接当普通文件打开",
+            "html": "<p>工作区设置就是一个普通文件。在资源管理器里点 <code>.vscode/settings.json</code> 就能编辑；文件不存在时，新建并保存到这个路径即可。</p>"
+          }
+        ]
+      },
+      {
+        "type": "code",
+        "title": "一份可以直接用的 settings.json",
+        "lang": "json",
+        "text": "{\n  // 编辑体验\n  \"editor.fontSize\": 14,                // 只影响编辑器里的代码字号，不动侧边栏\n  \"editor.tabSize\": 2,                  // 一个缩进显示成 2 个空格（Go、Java 常用 4）\n  \"editor.insertSpaces\": true,          // 按 Tab 键插入空格而不是制表符\n  \"editor.rulers\": [80, 120],           // 在第 80、120 列画竖线，提醒一行别太长\n  \"editor.wordWrap\": \"on\",              // 长行自动折行，写 Markdown 时很需要\n  \"editor.minimap.enabled\": false,      // 关掉右侧缩略图，小屏幕能多出两行\n\n  // 保存与格式\n  \"editor.formatOnSave\": true,          // 保存时自动格式化，需要先装格式化插件\n  \"editor.formatOnPaste\": false,        // 粘贴时不自动格式化，很容易打乱原有缩进\n  \"editor.defaultFormatter\": \"esbenp.prettier-vscode\",\n  \"files.eol\": \"\\n\",                    // 行尾统一成 LF，避免 CRLF 混进仓库\n\n  // 文件\n  \"files.autoSave\": \"onFocusChange\",    // 切走窗口时保存；也有 off、afterDelay、onWindowChange\n  \"files.autoSaveDelay\": 1000,          // autoSave 选 afterDelay 时的延迟毫秒数\n\n  // 文件树里藏掉噪音，文件本身不会删\n  \"files.exclude\": {\n    \"**/.git\": true,\n    \"**/node_modules\": true,\n    \"**/.DS_Store\": true\n  }\n}",
+        "note": "settings.json 是 JSON with Comments（JSONC），可以写 // 注释，编辑器自己认。但把这份文件喂给标准 JSON 解析器（比如某些构建脚本）会报错，所以它只适合放 VS Code 的配置目录。"
+      },
+      {
+        "type": "table",
+        "title": "最常用的七项",
+        "head": [
+          "设置键",
+          "作用",
+          "建议值"
+        ],
+        "rows": [
+          [
+            "editor.fontSize",
+            "编辑器字号，不影响侧边栏",
+            "13 到 15，看你的屏幕"
+          ],
+          [
+            "editor.tabSize",
+            "一个缩进显示成几个空格",
+            "前端 2，Go 和 Java 4"
+          ],
+          [
+            "editor.formatOnSave",
+            "保存时自动格式化",
+            "打开，但要先装格式化插件"
+          ],
+          [
+            "files.exclude",
+            "在文件树里藏掉匹配的路径",
+            "node_modules、.git、dist"
+          ],
+          [
+            "editor.rulers",
+            "在第 N 列画一条竖线",
+            "[80, 120] 两档"
+          ],
+          [
+            "files.autoSave",
+            "自动保存的时机",
+            "onFocusChange，切走窗口时存"
+          ],
+          [
+            "editor.defaultFormatter",
+            "默认用哪个格式化器",
+            "团队统一的那一个"
+          ]
+        ]
+      },
+      {
+        "type": "warn",
+        "title": "写错一个逗号，整份设置不生效",
+        "html": "<p>少一个逗号、多一个括号，保存时会弹出 <code>Unable to write into user settings. Please open the user settings to correct errors/warnings in it and try again.</code>。这时界面上的设置会退回默认值，看起来像「改了没用」。</p><p>按提示打开文件，⌘⇧M（Ctrl+Shift+M）打开问题面板，能直接看到第几行第几列。另一种错更安静：键名拼错不会报红，设置界面里显示 <code>Unknown Configuration Setting</code>，或者干脆被忽略，你只会觉得这个设置项不存在。</p>"
+      },
+      {
+        "type": "tip",
+        "title": "设置同步：换机器不用重配",
+        "html": "<p>左下角齿轮 → Turn on Settings Sync，或者命令面板搜 <code>Settings Sync: Turn On</code>，用 GitHub 或 Microsoft 账号登录。同步项包括设置、键盘快捷方式、用户代码片段、扩展、UI 状态和配置档案（Profiles），在 <code>Settings Sync: Configure</code> 里逐项勾选。</p><p>注意扩展也在同步范围里：公司机器和个人机器共用一个账号时，你个人的插件会被带过去，启动变慢。这一点在别人的机器上尤其明显。</p>"
+      },
+      {
+        "type": "compare",
+        "title": "哪些设置该进仓库",
+        "left": {
+          "label": "塞进工作区的个人偏好",
+          "items": [
+            "editor.fontSize: 18",
+            "workbench.colorTheme: 某个深色主题",
+            "files.autoSave: off",
+            "你自己的字体和缩放比例"
+          ]
+        },
+        "right": {
+          "label": "真正属于团队约定",
+          "items": [
+            "editor.tabSize 与 insertSpaces",
+            "files.eol 统一成 LF",
+            "editor.formatOnSave: true",
+            "files.exclude 藏掉 dist、node_modules"
+          ]
+        },
+        "note": "<p>一条判断标准：这条设置影响<strong>代码长什么样</strong>，进工作区；只影响<strong>你自己看得舒不舒服</strong>，留用户设置。混着写，同事每次拉代码都要改回来。</p>"
+      },
+      {
+        "type": "text",
+        "title": "设置界面里的搜索前缀",
+        "html": "<p>设置界面顶部的搜索框支持前缀：<code>@modified</code> 只看你改过的项，<code>@ext:esbenp.prettier-vscode</code> 只看某个扩展贡献的设置，<code>@lang:javascript</code> 只看这门语言的设置。找一项记不住名字的设置，从这里搜比翻文档快得多。</p><p>搜到之后点齿轮可以直接选「复制设置 ID」，粘到 JSON 里再填值，键名就不用背了。</p>"
+      },
+      {
+        "type": "terminal",
+        "title": "确认用户设置文件真的存在",
+        "command": "ls -l \"$HOME/Library/Application Support/Code/User/settings.json\"",
+        "output": "-rw-r--r--  1 you  staff  812 11月 20 10:02 /Users/you/Library/Application Support/Code/User/settings.json",
+        "note": "macOS 的默认路径。Linux 在 ~/.config/Code/User/settings.json，Windows 在 PowerShell 里看 $env:APPDATA\\Code\\User\\settings.json。文件不存在，说明你还没保存过任何用户设置，在设置界面改一项就会生成。"
+      }
+    ],
+    "exercise": {
+      "title": "动手练一练",
+      "brief": "把上面那份设置抄进你的用户设置里，再为一个真实项目加一份工作区设置。",
+      "items": [
+        {
+          "text": "按 ⌘, 打开设置界面，搜 format on save 并勾上"
+        },
+        {
+          "text": "点标题栏右上角图标切到 JSON，对照抄一遍"
+        },
+        {
+          "text": "在项目根目录建 .vscode/settings.json，只写 tabSize 和 files.exclude"
+        },
+        {
+          "text": "把 .vscode 一起提交，让同事拉到同样的设置"
+        }
+      ],
+      "done": "打开任意文件按 ⌘S，代码自动排好，说明工作区设置已经生效了。"
+    },
+    "quiz": [
+      {
+        "q": "同一个设置在用户设置和工作区设置里取值不同，哪个生效？",
+        "options": [
+          "用户设置",
+          "工作区设置",
+          "随机取一个",
+          "弹窗让你当场选"
+        ],
+        "answer": 1,
+        "explain": "工作区设置优先级更高，它压在你自己的用户设置上面。这也是团队约定放 .vscode/settings.json 的原因，谁拉下来都一致。"
+      },
+      {
+        "q": "工作区设置文件应该放在哪里？",
+        "options": [
+          "项目根目录的 settings.json",
+          "项目根目录的 .vscode/settings.json",
+          "用户目录下的 .vscode/settings.json",
+          "VS Code 安装目录里"
+        ],
+        "answer": 1,
+        "explain": "VS Code 只认项目根下 .vscode 目录里的 settings.json。放错位置不会报错，只是完全不起作用，这是最常见的「设置了没用」原因。"
+      },
+      {
+        "q": "改完 settings.json 保存，设置却没变化，先查什么？",
+        "options": [
+          "重装 VS Code",
+          "文件里有没有语法错误，看问题面板",
+          "换一个主题",
+          "把项目目录删掉重开"
+        ],
+        "answer": 1,
+        "explain": "有语法错误时整份文件会被忽略，编辑器退回默认值。保存弹出提示就按提示打开文件，问题面板会直接指出第几行第几列。"
+      }
+    ]
+  },
+  {
+    "id": "vscode-extensions",
+    "order": 18,
+    "track": "vscode",
+    "title": "插件：少而精",
+    "subtitle": "装之前花两分钟判断，比装完再排查省事",
+    "minutes": 14,
+    "level": "基础",
+    "goal": [
+      "用三个问题筛掉不靠谱的插件",
+      "知道每个常用插件解决什么问题",
+      "会用 command line 装、列、卸插件",
+      "遇到冲突时能定位到具体插件"
+    ],
+    "sections": [
+      {
+        "type": "text",
+        "title": "插件改的是编辑器本身",
+        "html": "<p>插件（Extension）不是皮肤，它能读你打开的所有文件、能执行命令、能联网、能在保存时改写内容。所有插件都跑在同一个扩展宿主（Extension Host）进程里，一个插件卡住，整个窗口的补全、跳转、格式化都会跟着停。</p><p>所以装之前先花两分钟判断三件事：它还在维护吗，值不值得为它付启动时间，它要的能力配得上它干的事吗。</p>"
+      },
+      {
+        "type": "steps",
+        "title": "装之前先问三个问题",
+        "items": [
+          {
+            "title": "还在维护吗",
+            "html": "<p>详情页看 Last updated 和安装量，再去 GitHub 看最近一次提交。一年没更新、issue 区没人回的插件，遇上新版编辑器出问题只能你自己扛。</p>"
+          },
+          {
+            "title": "会不会拖慢启动",
+            "html": "<p>命令面板执行 <code>Developer: Show Running Extensions</code>，能看到每个插件的激活耗时（activation time）。几十毫秒无所谓，超过一秒的通常是启动时要扫全目录的插件。</p>"
+          },
+          {
+            "title": "权限合理吗",
+            "html": "<p>详情页会标它跑在哪一端（UI 还是 Workspace），以及是否要求工作区受信任（Workspace Trust）。配色插件不该读文件，代码片段插件不该联网。</p>"
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "title": "推荐清单：九个常用的",
+        "head": [
+          "插件",
+          "解决什么",
+          "什么时候别装"
+        ],
+        "rows": [
+          [
+            "Chinese (Simplified) Language Pack",
+            "把菜单和设置界面换成中文",
+            "你已经习惯英文，装了反而对不上教程里的命令名"
+          ],
+          [
+            "Error Lens",
+            "把错误信息直接印在行尾",
+            "文件很大、报错很多时，行尾文字会把代码挤到看不见"
+          ],
+          [
+            "Prettier - Code formatter",
+            "统一 JS、TS、CSS、Markdown 的格式",
+            "项目已经用 ESLint 的排版规则，两套规则会互相改回去"
+          ],
+          [
+            "ESLint",
+            "把 ESLint 的问题显示成波浪线",
+            "项目里没有 eslint 依赖和配置文件，它只会报找不到配置"
+          ],
+          [
+            "GitLens",
+            "看每一行的提交人和提交时间",
+            "大仓库里全文件开 blame 标注会明显变慢"
+          ],
+          [
+            "Live Server",
+            "起本地静态服务器，保存后自动刷新",
+            "项目自己有 dev server（Vite、Next）时，两个服务器抢端口"
+          ],
+          [
+            "Path Intellisense",
+            "补全 import 里的文件路径",
+            "TypeScript 项目自带路径补全，装了会有两份候选"
+          ],
+          [
+            "Code Spell Checker",
+            "拼错的英文单词画波浪线",
+            "代码里全是拼音缩写和业务名词时，误报会盖住真正的错"
+          ],
+          [
+            "Material Icon Theme",
+            "给文件树加图标，扫一眼分辨类型",
+            "纯黑极简风格下，彩色图标会显得很花"
+          ]
+        ]
+      },
+      {
+        "type": "terminal",
+        "title": "用命令行装一个、列出已装的",
+        "command": "code --install-extension esbenp.prettier-vscode",
+        "output": "Installing extensions...\nInstalling extension 'esbenp.prettier-vscode'...\nExtension 'esbenp.prettier-vscode' was successfully installed.",
+        "note": "在哪个目录执行都行，装完要重开窗口才生效。卸载是 code --uninstall-extension 加同一个 id；id 不是插件显示名，用 code --list-extensions 能看到真实 id，排查「到底装了什么」时最有用。"
+      },
+      {
+        "type": "code",
+        "title": ".vscode/extensions.json 写推荐清单",
+        "lang": "json",
+        "text": "{\n  \"recommendations\": [\n    \"dbaeumer.vscode-eslint\",\n    \"esbenp.prettier-vscode\",\n    \"usernamehw.errorlens\",\n    \"streetsidesoftware.code-spell-checker\"\n  ],\n  \"unwantedRecommendations\": [\n    \"hookyqr.beautify\"\n  ]\n}",
+        "note": "推荐列表不会自动安装，只会在同事打开项目时弹一个提示。unwantedRecommendations 用来挡掉和团队格式化规则冲突的插件，比如早已停更的 Beautify。"
+      },
+      {
+        "type": "warn",
+        "title": "插件冲突：一次保存被改了两次",
+        "html": "<p>典型症状：按 ⌘S 时缩进先变成一种样子，又跳回另一种；或者右下角出现两个格式化器抢活。常见原因是 Prettier 和 ESLint 都开了保存时格式化。</p><p>排查顺序：在 <code>.vscode/settings.json</code> 里把 <code>editor.defaultFormatter</code> 写死成一个；再看 ESLint 的 <code>eslint.format.enable</code> 是不是也开着；还不行就执行 <code>Extensions: Disable All Installed Extensions</code>，然后一半一半地开回来，两三轮就能定位。</p><p>状态栏出现 <code>Extension host terminated unexpectedly</code> 时，打开命令面板的 <code>Developer: Open Extension Logs Folder</code>，报错在时间最近的那个目录里。</p>"
+      },
+      {
+        "type": "tip",
+        "title": "按工作区禁用，而不是卸载",
+        "html": "<p>插件详情页的齿轮菜单里有 Disable (Workspace)：只在这个项目里关掉，换个项目照常启用。它比卸载安全，也不用担心以后忘了装回来。排查问题时先用它，确认是哪个插件惹的祸，再决定要不要真的卸掉。</p>"
+      },
+      {
+        "type": "compare",
+        "title": "两种装法",
+        "left": {
+          "label": "见一个装一个",
+          "items": [
+            "装了三十多个插件",
+            "打开项目时扩展宿主启动要两三秒",
+            "同事格式化出来的结果和你不一样",
+            "出问题不知道是哪个插件"
+          ]
+        },
+        "right": {
+          "label": "按需装加工作区推荐",
+          "items": [
+            "只留格式化、Lint、Git 三个刚需",
+            "extensions.json 写推荐，同事第一次打开会收到提示",
+            "冲突插件写进 unwantedRecommendations",
+            "出问题用 Disable (Workspace) 二分排查"
+          ]
+        },
+        "note": "<p>插件是长期成本：每次启动都要加载，每次升级编辑器都要重新验证。留十个你天天用的，比装五十个偶尔用的划算得多。</p>"
+      },
+      {
+        "type": "text",
+        "title": "启动慢先看谁在拖",
+        "html": "<p>命令行执行 <code>code --status</code>，会打印当前窗口、进程、以及每个插件的加载耗时和内存占用。启动明显变慢时先跑这个，比一个个禁用插件去猜快得多。</p><p>另外 <code>code --disable-extensions</code> 能开一个完全不加载插件的窗口，用来确认问题到底出在插件还是编辑器本身。</p>"
+      },
+      {
+        "type": "text",
+        "title": "什么时候该禁用，什么时候该卸载",
+        "html": "<p>临时排查、只在某个项目里不需要的，禁用；一年都没启用过、或者已经被官方功能替代的，卸载。卸载前记一下 id（<code>code --list-extensions</code>），以后要装回来直接 <code>code --install-extension</code> 跟上 id，不用再去搜索框里翻。</p>"
+      }
+    ],
+    "exercise": {
+      "title": "动手练一练",
+      "brief": "打开扩展面板，把装过的插件过一遍，再给一个真实项目写推荐清单。",
+      "items": [
+        {
+          "text": "用 code --list-extensions 列出你现在装的所有插件",
+          "cmd": "code --list-extensions"
+        },
+        {
+          "text": "在扩展面板里按 Last Updated 排序，挑出一年没更新的"
+        },
+        {
+          "text": "给一个真实项目写 .vscode/extensions.json 推荐清单"
+        },
+        {
+          "text": "对其中一个插件试一次 Disable (Workspace)，再用 code --status 看启动耗时"
+        }
+      ],
+      "done": "你能说清留下的每个插件解决了什么问题，其余已经禁用或卸载。"
+    },
+    "quiz": [
+      {
+        "q": "判断一个插件还值不值得用，最先看什么？",
+        "options": [
+          "图标好不好看",
+          "最近一次更新时间和 issue 有没有人回",
+          "安装量是不是第一",
+          "是不是官方出的插件"
+        ],
+        "answer": 1,
+        "explain": "更新停了一年、issue 没人处理，遇上新版本编辑器的兼容问题只能自己扛。安装量高不代表现在还在维护，这两个指标要一起看。"
+      },
+      {
+        "q": "同事拉下项目后格式化结果和你不一样，最该做什么？",
+        "options": [
+          "让他自己装一个 Prettier",
+          "把格式化设置和推荐插件写进工作区与 extensions.json",
+          "每次提交前手动整理一遍",
+          "关掉保存时自动格式化"
+        ],
+        "answer": 1,
+        "explain": "把 editor.defaultFormatter 和推荐插件写进仓库，工具链就跟着代码走；只靠口头交代，换个人、换台机器就会漂。"
+      },
+      {
+        "q": "想让某个插件只在这个项目里关闭，用哪个操作？",
+        "options": [
+          "把它卸载掉",
+          "在详情页选 Disable (Workspace)",
+          "删掉 .vscode 目录",
+          "关掉扩展面板"
+        ],
+        "answer": 1,
+        "explain": "Disable (Workspace) 只影响当前工作区，其他项目照旧启用，适合排查冲突；卸载是全局的，下次要用还得重新装回来。"
+      }
+    ]
+  },
+  {
+    "id": "vscode-debug",
+    "order": 19,
+    "track": "vscode",
+    "title": "断点调试：比 console.log 快十倍",
+    "subtitle": "让程序停在你想看的那一行，变量就摆在旁边",
+    "minutes": 16,
+    "level": "进阶",
+    "goal": [
+      "会打行断点和条件断点",
+      "看懂变量、监视、调用栈、断点四个面板",
+      "写出一份能跑的 launch.json",
+      "断点不生效时知道从哪查"
+    ],
+    "sections": [
+      {
+        "type": "text",
+        "title": "console.log 的问题不是丑",
+        "html": "<p>console.log 能回答「这一行执行了吗、变量是多少」，但要问「它在第几次循环里开始变错、谁把参数改成了 undefined」，就得反复加打印、重跑、删打印。异步代码里更糟：刷屏的输出根本分不清哪条属于哪次请求。</p><p>断点（breakpoint）让程序停在你想看的那一行，变量就摆在旁边的面板里，还能一层层往回看调用栈。它不修改代码，也不用重跑。</p>"
+      },
+      {
+        "type": "steps",
+        "title": "第一次打断点，四步",
+        "items": [
+          {
+            "title": "在行号左边点一下",
+            "html": "<p>点行号左侧的空白处，出现红点就是行断点（line breakpoint）。只有可执行语句才能打，空行和纯注释行打不上。</p>"
+          },
+          {
+            "title": "按 F5 启动",
+            "html": "<p>第一次按 F5，编辑器让你选环境（Select environment），选 Node.js。程序跑起来后会停在红点那一行，整行高亮。</p>"
+          },
+          {
+            "title": "看左边的面板",
+            "html": "<p>变量（VARIABLES）里是当前作用域的值，调用栈（CALL STACK）显示谁调用了这里，断点（BREAKPOINTS）列出所有断点。</p>"
+          },
+          {
+            "title": "按 F10 一行一行走",
+            "html": "<p>F10 单步跳过（Step Over），不进函数；F11 单步进入（Step Into）会钻进被调用的函数。走几步就知道从哪一行开始不对。</p>"
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "title": "调试面板四个区块",
+        "head": [
+          "区块",
+          "看什么",
+          "怎么用"
+        ],
+        "rows": [
+          [
+            "变量 VARIABLES",
+            "当前作用域的局部变量、闭包、this",
+            "点三角展开对象；双击值可以临时改，只在这次运行有效"
+          ],
+          [
+            "监视 WATCH",
+            "你手写的表达式",
+            "点加号输入 user.items.length，每走一步都会重新求值"
+          ],
+          [
+            "调用栈 CALL STACK",
+            "谁调用了当前函数",
+            "点上一层栈帧，能看到那一层的局部变量"
+          ],
+          [
+            "断点 BREAKPOINTS",
+            "所有断点的清单",
+            "取消勾选可以临时屏蔽，不用删掉再打一遍"
+          ]
+        ]
+      },
+      {
+        "type": "shortcuts",
+        "title": "调试键",
+        "items": [
+          {
+            "action": "启动 / 继续",
+            "mac": [
+              "F5"
+            ],
+            "win": [
+              "F5"
+            ],
+            "note": "macOS 上 F 键可能被亮度、音量占用，要按住 Fn 一起按。"
+          },
+          {
+            "action": "单步跳过，不进函数",
+            "mac": [
+              "F10"
+            ],
+            "win": [
+              "F10"
+            ]
+          },
+          {
+            "action": "单步进入函数",
+            "mac": [
+              "F11"
+            ],
+            "win": [
+              "F11"
+            ]
+          },
+          {
+            "action": "单步跳出当前函数",
+            "mac": [
+              "⇧",
+              "F11"
+            ],
+            "win": [
+              "Shift",
+              "F11"
+            ]
+          },
+          {
+            "action": "停止调试",
+            "mac": [
+              "⇧",
+              "F5"
+            ],
+            "win": [
+              "Shift",
+              "F5"
+            ]
+          },
+          {
+            "action": "重启调试",
+            "mac": [
+              "⌘",
+              "⇧",
+              "F5"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "F5"
+            ]
+          },
+          {
+            "action": "在当前行切换断点",
+            "mac": [
+              "F9"
+            ],
+            "win": [
+              "F9"
+            ]
+          },
+          {
+            "action": "打开运行和调试面板",
+            "mac": [
+              "⌘",
+              "⇧",
+              "D"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "D"
+            ]
+          },
+          {
+            "action": "打开调试控制台",
+            "mac": [
+              "⌘",
+              "⇧",
+              "Y"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "Y"
+            ],
+            "note": "暂停时可以在里面直接敲表达式求值。"
+          }
+        ]
+      },
+      {
+        "type": "code",
+        "title": "最小的 Node 调试配置 launch.json",
+        "lang": "json",
+        "text": "{\n  \"version\": \"0.2.0\",\n  \"configurations\": [\n    {\n      \"type\": \"node\",\n      \"request\": \"launch\",\n      \"name\": \"启动 src/index.js\",\n      \"program\": \"src/index.js\",\n      \"cwd\": \".\",\n      \"console\": \"integratedTerminal\",\n      \"skipFiles\": [\"<node_internals>/**\"]\n    }\n  ]\n}",
+        "note": "放在项目根目录的 .vscode/launch.json。program 和 cwd 都按相对路径写，换机器也能用；如果团队里每个人的目录结构不同，也可以把入口写成绝对的 workspace 变量，VS Code 支持一组内置变量，在 launch.json 的输入框里按 ⌃ 空格 能看到候选。"
+      },
+      {
+        "type": "table",
+        "title": "launch.json 里每行在说什么",
+        "head": [
+          "字段",
+          "含义"
+        ],
+        "rows": [
+          [
+            "version",
+            "配置文件版本，固定写 0.2.0"
+          ],
+          [
+            "type",
+            "调试器类型。node 是内置的 Node.js 调试器；python、go、pwa-chrome 要装对应插件才有"
+          ],
+          [
+            "request",
+            "launch 表示由 VS Code 启动程序；attach 表示连上一个已经在跑的进程"
+          ],
+          [
+            "name",
+            "下拉框里显示的名字，随便起，有多套配置时靠它区分"
+          ],
+          [
+            "program",
+            "入口文件，相对路径按 cwd 解析。写错会报 Cannot find module"
+          ],
+          [
+            "cwd",
+            "程序运行时的工作目录，填 . 就是当前工作区根目录；读配置文件、找相对路径资源全靠它"
+          ],
+          [
+            "console",
+            "integratedTerminal 让程序输出走集成终端，能接受键盘输入；默认的 internalConsole 是只读的"
+          ],
+          [
+            "skipFiles",
+            "F11 单步时跳过这些文件，避免钻进 Node 内部源码"
+          ]
+        ]
+      },
+      {
+        "type": "text",
+        "title": "条件断点：只在出问题的那一次停下",
+        "html": "<p>右键行号左边的红点，选 Edit Breakpoint，再选 Expression，填一个条件：只有条件为真时才停。循环里排查「第几次开始错」，这一条能省掉几百次按 F5。</p><p>同一个菜单里还有 Hit Count，填 500 表示第 500 次经过这里才停，适合复现「跑一阵子才出问题」的 bug。还有 Log Message 模式，只打印不暂停，等于一个不用删的 console.log。</p>"
+      },
+      {
+        "type": "warn",
+        "title": "断点不生效时先看这四种",
+        "html": "<p><strong>断点是空心灰圈。</strong>悬停显示 <code>Breakpoint set but not yet bound</code>，意思是调试器还没把这段代码加载进来：路径映射不对、跑的是编译后的文件，或者那段代码根本没被执行到。</p><p><strong>报找不到模块。</strong>终端里出现 <code>Error: Cannot find module</code> 和 <code>MODULE_NOT_FOUND</code>，就是 program 写错了，先确认相对路径是相对 cwd 还是相对工作区根目录。</p><p><strong>端口被占。</strong><code>Error: listen EADDRINUSE: address already in use :::3000</code> 说明上一次调试没停干净，或者本地 dev server 还开着。</p><p><strong>TypeScript 断点位置偏移。</strong>要打开 sourceMap 并设置 outFiles，否则断点会落在编译产物上。</p>"
+      },
+      {
+        "type": "tip",
+        "title": "attach：连上已经在跑的进程",
+        "html": "<p>有些进程不归你启动：PM2 托管的服务、容器里的 Node、已经跑了一小时的脚本。这时用 attach：先让进程带 <code>--inspect</code> 启动，再用 request 为 attach 的配置连上去。</p><p>连接配置最少只要三项：type 为 node、request 为 attach、port 为 9229。连上之后断点、变量、调用栈和 launch 模式完全一样。</p>"
+      },
+      {
+        "type": "terminal",
+        "title": "带调试端口启动一个脚本",
+        "command": "node --inspect-brk src/index.js",
+        "output": "Debugger listening on ws://127.0.0.1:9229/3f1c2d9a-6b1e-4f0a-9c2e-7d5b8a1f0c33\nFor help, see: https://nodejs.org/en/docs/inspector",
+        "note": "加 -brk 会在第一行就停下来等你连，不加则直接跑，只在你打断点的地方停。执行后进程会一直等着，按 Ctrl+C 结束。端口 9229 默认只监听本机，别改成 0.0.0.0，那等于把调试口开给整个内网。"
+      },
+      {
+        "type": "compare",
+        "title": "两种查 bug 的方式",
+        "left": {
+          "label": "到处塞 console.log",
+          "items": [
+            "改代码、重跑、再看输出",
+            "循环里刷出几百行，找不到关键那条",
+            "异步请求交错，日志对不上号",
+            "查完忘了删，一起提交进仓库"
+          ]
+        },
+        "right": {
+          "label": "断点加监视",
+          "items": [
+            "不改一行代码，停在你关心的位置",
+            "变量、调用栈、闭包全在面板里",
+            "条件断点直接跳到出错那一次",
+            "关掉调试，代码一行没动"
+          ]
+        },
+        "note": "<p>console.log 不是不能用：跑批处理、看时序、排查只在生产出现的问题时，它仍然最快。区别在于<strong>本地能复现的 bug，先用断点</strong>。</p>"
+      }
+    ],
+    "exercise": {
+      "title": "动手练一练",
+      "brief": "写一个十来行的小脚本，让它在循环里算错一个数，然后用断点把它找出来。",
+      "items": [
+        {
+          "text": "写一个 for 循环累加数组，故意把 += 写成 ="
+        },
+        {
+          "text": "在循环体里打行断点，按 F5 启动"
+        },
+        {
+          "text": "编辑断点加条件 i === 3，只在第四次循环停下"
+        },
+        {
+          "text": "在监视里加 arr.length，走几步看值怎么变"
+        }
+      ],
+      "done": "能在监视面板里指出从第三次循环开始不对，说明你真的抓住它了。"
+    },
+    "quiz": [
+      {
+        "q": "想让程序停在某一行，最直接的做法是什么？",
+        "options": [
+          "在那行写一句 console.log",
+          "在行号左侧点一下打红点，然后按 F5",
+          "把文件保存一次",
+          "在终端里执行 node"
+        ],
+        "answer": 1,
+        "explain": "行断点在编辑器里点出来，F5 启动后程序会在那一行暂停，变量和调用栈都在左边的面板里，完全不用改代码。"
+      },
+      {
+        "q": "启动调试后报 Cannot find module，最可能是什么问题？",
+        "options": [
+          "Node 没有安装",
+          "launch.json 里的 program 或 cwd 写错",
+          "断点打得太多了",
+          "编辑器版本太旧"
+        ],
+        "answer": 1,
+        "explain": "program 是相对 cwd 解析的入口文件路径。cwd 指错目录或文件名拼错，Node 找不到文件就会抛 MODULE_NOT_FOUND。"
+      },
+      {
+        "q": "断点显示成一个空心灰圈，说明什么？",
+        "options": [
+          "断点已经命中过了",
+          "调试器还没把这段代码加载进来",
+          "文件被删掉了",
+          "代码里有语法错误"
+        ],
+        "answer": 1,
+        "explain": "空心圈表示断点已设置但还没绑定（not yet bound）：路径映射不对、代码没被执行，或者跑的是编译产物而源映射没配好。"
+      }
+    ]
+  },
+  {
+    "id": "vscode-remote",
+    "order": 20,
+    "track": "vscode",
+    "title": "远程开发：在本机编辑服务器上的代码",
+    "subtitle": "代码在远端跑，界面在本机，改完不用再 scp",
+    "minutes": 15,
+    "level": "进阶",
+    "goal": [
+      "说清 Remote - SSH 是怎么工作的",
+      "配好 ssh 别名并连上远端",
+      "会用端口转发看远端服务",
+      "连不上时能从日志里找到原因"
+    ],
+    "sections": [
+      {
+        "type": "text",
+        "title": "Remote - SSH 到底在做什么",
+        "html": "<p>装上 Remote - SSH 之后，VS Code 仍然是本机那个窗口，但它会在远端机器上拉起一个 VS Code Server。文件读写、语言服务、终端、调试全部在远端执行，界面通过 SSH 隧道传回本地。</p><p>结果是你用本机的主题、字体、快捷键，编辑的是服务器上的文件，⌘S 即生效，不用再 scp、不用再 rsync、也不用在 vim 里和缩进较劲。</p>"
+      },
+      {
+        "type": "steps",
+        "title": "连上第一台机器",
+        "items": [
+          {
+            "title": "装 Remote - SSH",
+            "html": "<p>扩展面板搜 Remote - SSH（发布者是 Microsoft），装上。它会连带装上编辑 SSH 配置文件的那个小插件。</p>"
+          },
+          {
+            "title": "从命令面板发起连接",
+            "html": "<p>⌘⇧P 输入 <code>Remote-SSH: Connect to Host</code>，选你配好的别名；还没有别名就选 Add New SSH Host，填 user@host。</p>"
+          },
+          {
+            "title": "等远端 server 装好",
+            "html": "<p>第一次连接会在远端下载 VS Code Server，状态栏显示 Setting up SSH Host 加主机名。公司网络访问不了下载地址时，这一步会卡很久，最后报 Downloading VS Code Server failed。</p>"
+          },
+          {
+            "title": "打开远端目录",
+            "html": "<p>连上后左下角显示 SSH: 你的主机名，再用 File → Open Folder 打开远端路径。此时资源管理器里的文件全部在服务器上。</p>"
+          }
+        ]
+      },
+      {
+        "type": "code",
+        "title": "~/.ssh/config 配一个别名",
+        "lang": "text",
+        "text": "Host myserver\n    HostName 203.0.113.10\n    User deploy\n    Port 2222\n    IdentityFile ~/.ssh/id_ed25519\n    ServerAliveInterval 30\n    ServerAliveCountMax 3",
+        "note": "写完记得 chmod 600 ~/.ssh/config，权限太宽 ssh 会直接忽略它并报 Bad owner or permissions。之后 ssh myserver 和 VS Code 里选 myserver 用的是同一份配置。ServerAliveInterval 30 表示每 30 秒发一次心跳，防止 NAT 把空闲连接掐掉。"
+      },
+      {
+        "type": "terminal",
+        "title": "先在终端里确认 ssh 本身能通",
+        "command": "ssh myserver",
+        "output": "Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-105-generic x86_64)\n\n * Documentation:  https://help.ubuntu.com\nLast login: Thu Nov 20 21:03:11 2025 from 198.51.100.7\ndeploy@ubuntu-2gb:~$",
+        "note": "VS Code 用的就是这条命令背后的 ssh。这里能进，Remote-SSH 才能连；这里就卡住，先解决密钥、端口和跳板机，别在编辑器里瞎试。"
+      },
+      {
+        "type": "terminal",
+        "title": "从命令行直接开远端目录",
+        "command": "code --remote ssh-remote+myserver /srv/app",
+        "note": "在你本机的终端执行：用远程模式打开 /srv/app，这个路径是远端路径，不是本机路径。第一次仍然要等远端 server 下载完；路径写错会打开一个空目录，而不是报错。"
+      },
+      {
+        "type": "table",
+        "title": "连接之后，东西在哪一端",
+        "head": [
+          "东西",
+          "在哪",
+          "含义"
+        ],
+        "rows": [
+          [
+            "文件树、搜索、Git",
+            "远端",
+            "打开的是远端路径，本机没有自动副本"
+          ],
+          [
+            "集成终端",
+            "远端",
+            "命令在服务器上执行，改的是服务器上的文件"
+          ],
+          [
+            "语言服务、ESLint、调试器",
+            "远端",
+            "第一次会提示 Install in SSH，要在远端再装一次"
+          ],
+          [
+            "主题、字体、快捷键",
+            "本机",
+            "UI 类插件不需要在远端重装"
+          ],
+          [
+            "端口转发",
+            "两端之间",
+            "远端 3000 映射成本机的 localhost:3000"
+          ]
+        ]
+      },
+      {
+        "type": "text",
+        "title": "端口转发：用本机浏览器看远端服务",
+        "html": "<p>远端跑着 <code>npm run dev</code>，你在本机浏览器打开 localhost:3000 却是空白——那个端口在本机上根本没人监听。解决办法是端口转发（port forwarding）：在面板（Ports）里点 Forward a Port 填 3000，或者从命令面板执行 <code>Ports: Focus on Ports View</code>。</p><p>终端输出里出现 http://localhost:3000 时，VS Code 一般会自动识别并转发，右下角弹一个提示。转发借 SSH 隧道走，默认只有本机能访问，不会把端口暴露到公网。</p>"
+      },
+      {
+        "type": "table",
+        "title": "三种远程方式怎么选",
+        "head": [
+          "方式",
+          "什么时候用",
+          "代价"
+        ],
+        "rows": [
+          [
+            "Remote - SSH",
+            "代码本来就在服务器或云主机上",
+            "要有 SSH 权限，网络差时输入延迟明显"
+          ],
+          [
+            "Dev Containers",
+            "想让每个项目有独立依赖环境，比如不同 Node 版本",
+            "要装 Docker，镜像占磁盘和内存"
+          ],
+          [
+            "WSL",
+            "你在 Windows 上开发，但项目依赖 Linux 工具链",
+            "文件放 /mnt/c 下读写很慢，要放到 WSL 自己的文件系统里"
+          ]
+        ]
+      },
+      {
+        "type": "warn",
+        "title": "连不上的时候先看这几条",
+        "html": "<p><code>Could not establish connection to \"myserver\": Permission denied (publickey).</code> 密钥没被加载。检查 IdentityFile 指向的文件是否存在，或者先 <code>ssh-add ~/.ssh/id_ed25519</code>。</p><p><code>Could not establish connection to \"myserver\": Timed out while waiting for handshake</code> 是网络层就不通，端口、安全组、跳板机逐个排。</p><p>远端磁盘满也会表现为连不上：登录远端执行 <code>df -h</code> 看根分区用了多少。清理时注意 <code>rm -rf ~/.vscode-server</code> 会删掉远端的语言服务和装过的远端插件，下次连接要重新下载，正在用这台机器的人会当场断线。</p>"
+      },
+      {
+        "type": "tip",
+        "title": "断开与重连",
+        "html": "<p>直接关窗口，远端的 server 不会立刻退出，过一段时间才被回收；想马上释放，用命令面板的 <code>Remote-SSH: Kill VS Code Server on Host</code>。重连同一台机器时，未保存的编辑器内容通常还在，因为热退出（hot exit）把状态存在了远端。</p><p>网络断了不用重走整个流程，编辑器会自动重连；实在连不上，执行 <code>Remote: Close Remote Connection</code> 回到本地，再连一次就好。</p>"
+      },
+      {
+        "type": "shortcuts",
+        "title": "远程开发时用得上的键",
+        "items": [
+          {
+            "action": "打开命令面板找 Remote 命令",
+            "mac": [
+              "⌘",
+              "⇧",
+              "P"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "P"
+            ],
+            "note": "输入 Remote 能看到全部远程相关命令。"
+          },
+          {
+            "action": "打开输出面板看连接日志",
+            "mac": [
+              "⌘",
+              "⇧",
+              "U"
+            ],
+            "win": [
+              "Ctrl",
+              "Shift",
+              "U"
+            ],
+            "note": "右上角下拉选 Remote-SSH，报错原文在这里，比弹窗有用。"
+          },
+          {
+            "action": "开关终端",
+            "mac": [
+              "⌃",
+              "`"
+            ],
+            "win": [
+              "Ctrl",
+              "`"
+            ],
+            "note": "连上远端后，这里开的就是远端 shell。"
+          },
+          {
+            "action": "打开设置",
+            "mac": [
+              "⌘",
+              ","
+            ],
+            "win": [
+              "Ctrl",
+              ","
+            ]
+          }
+        ]
+      }
+    ],
+    "exercise": {
+      "title": "动手练一练",
+      "brief": "没有服务器也能练：用 localhost 或一台你能登录的机器，把下面的流程走完。",
+      "items": [
+        {
+          "text": "在 ~/.ssh/config 里给一台机器加别名，用别名登录一次",
+          "cmd": "ssh myserver"
+        },
+        {
+          "text": "在 VS Code 里 Connect to Host，打开远端的一个目录"
+        },
+        {
+          "text": "在远端终端执行 node -v，确认命令跑在服务器上",
+          "cmd": "node -v"
+        },
+        {
+          "text": "把远端的 3000 端口转发到本机，用浏览器打开验证"
+        }
+      ],
+      "done": "左下角显示 SSH: 主机名，终端 pwd 出来是远端路径，就算走通了。"
+    },
+    "quiz": [
+      {
+        "q": "Remote - SSH 连上之后，文件实际存在哪里？",
+        "options": [
+          "本机缓存了一份完整副本",
+          "远端机器上",
+          "VS Code 的安装目录里",
+          "浏览器的存储里"
+        ],
+        "answer": 1,
+        "explain": "编辑器只是界面，读写都通过 SSH 在远端完成，本地没有自动副本。这也是断网之后文件打不开、搜索失效的原因。"
+      },
+      {
+        "q": "远端跑着 dev server，本机浏览器打开 localhost:3000 是空白，怎么办？",
+        "options": [
+          "把服务改成 80 端口",
+          "在 Ports 面板里把 3000 转发出来",
+          "重装 Remote - SSH",
+          "在远端执行 curl 本机地址"
+        ],
+        "answer": 1,
+        "explain": "这个端口在本机上没人监听，需要用端口转发把远端 3000 通过 SSH 隧道映射到本机，然后再访问 localhost:3000。"
+      },
+      {
+        "q": "远端 .vscode-server 占满磁盘，删之前要注意什么？",
+        "options": [
+          "随便删，删了没有影响",
+          "删掉后远端插件和语言服务要重新下载，别人会断线",
+          "必须先重启服务器",
+          "必须改掉 ssh 端口"
+        ],
+        "answer": 1,
+        "explain": "整个目录是远端 server 的家，删掉等于把远端开发环境重置。正在用这台机器的人会立刻断线，下次连接要等重新下载。"
+      }
+    ]
+  }
+]
