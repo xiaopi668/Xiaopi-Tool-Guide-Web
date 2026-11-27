@@ -241,6 +241,7 @@ class LessonEditor(Gtk.Box):
             self.listbox.add(row)
         if self.listbox.get_children():
             idx = min(self.section_index, len(self.listbox.get_children()) - 1)
+            self.listbox.show_all()
             self.listbox.select_row(self.listbox.get_children()[idx])
         else:
             self.clear_section_area()
@@ -528,11 +529,11 @@ REF_FIELDS = {
 
 
 class RefsEditor(Gtk.Box):
-    def __init__(self, store, on_change):
+    def __init__(self, store, on_change, kind="commands"):
         super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         self.store = store
         self.on_change = on_change
-        self.kind = "commands"
+        self.kind = kind
         self.index = 0
 
         side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
@@ -541,7 +542,7 @@ class RefsEditor(Gtk.Box):
         self.kind_combo = Gtk.ComboBoxText()
         for k, name in (("commands", "命令"), ("shortcuts", "快捷键"), ("glossary", "术语")):
             self.kind_combo.append_text(name)
-        self.kind_combo.set_active(0)
+        self.kind_combo.set_active(["commands", "shortcuts", "glossary"].index(kind))
         self.kind_combo.connect("changed", self.on_kind_changed)
         side.pack_start(self.kind_combo, False, False, 0)
 
@@ -606,6 +607,7 @@ class RefsEditor(Gtk.Box):
         rows = self.listbox.get_children()
         if rows:
             idx = min(self.index, len(rows) - 1)
+            self.listbox.show_all()
             self.listbox.select_row(rows[idx])
         else:
             self.build_form(None)
@@ -799,7 +801,8 @@ class App(Gtk.Window):
                 self.show_editor(LessonEditor(self.store, track, lesson, self.on_lesson_change))
         elif key.startswith("refs:"):
             self.current = key
-            self.show_editor(RefsEditor(self.store, None))
+            kind = key.split(":", 1)[1]
+            self.show_editor(RefsEditor(self.store, None, kind))
         elif key.startswith("track:"):
             pass
 
